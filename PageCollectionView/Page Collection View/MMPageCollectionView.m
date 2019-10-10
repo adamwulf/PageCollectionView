@@ -73,52 +73,6 @@
     }
 }
 
-- (NSInteger)sectionForPoint:(CGPoint)point
-{
-    NSIndexPath *path = [self closestIndexPathForPoint:point];
-
-    if (!path) {
-        NSArray<NSIndexPath *> *headers = [self indexPathsForVisibleSupplementaryElementsOfKind:UICollectionElementKindSectionHeader];
-        NSArray<NSIndexPath *> *footers = [self indexPathsForVisibleSupplementaryElementsOfKind:UICollectionElementKindSectionFooter];
-        UICollectionReusableView *closest = nil;
-        NSIndexPath *closestPath = nil;
-
-        for (NSIndexPath *headerPath in headers) {
-            UICollectionReusableView *view = [self supplementaryViewForElementKind:UICollectionElementKindSectionHeader atIndexPath:headerPath];
-            if (!closest) {
-                closest = view;
-            } else {
-                CGFloat dist1 = sqDist([closest center], point);
-                CGFloat dist2 = sqDist([view center], point);
-
-                if (dist2 < dist1) {
-                    closest = view;
-                    closestPath = headerPath;
-                }
-            }
-        }
-
-        for (NSIndexPath *footerPath in footers) {
-            UICollectionReusableView *view = [self supplementaryViewForElementKind:UICollectionElementKindSectionFooter atIndexPath:footerPath];
-            if (!closest) {
-                closest = view;
-            } else {
-                CGFloat dist1 = sqDist([closest center], point);
-                CGFloat dist2 = sqDist([view center], point);
-
-                if (dist2 < dist1) {
-                    closest = view;
-                    closestPath = footerPath;
-                }
-            }
-        }
-
-        path = closestPath;
-    }
-
-    return [path section];
-}
-
 - (NSIndexPath *)closestIndexPathForPoint:(CGPoint)point
 {
     UICollectionViewCell *closest = nil;

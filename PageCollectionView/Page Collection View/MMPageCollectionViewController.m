@@ -20,7 +20,7 @@
 CGFloat const kMaxDim = 140;
 
 
-@interface MMPageCollectionViewController () <MMPageCollectionViewDelegate, UICollectionViewDelegateFlowLayout>
+@interface MMPageCollectionViewController () <MMPageCollectionViewDelegate, MMPageCollectionViewDelegateShelfLayout>
 
 @property(nonatomic, strong) UICollectionViewFlowLayout *pageLayout;
 @property(nonatomic, strong) UICollectionViewTransitionLayout *transitionLayout;
@@ -357,6 +357,28 @@ CGFloat const kMaxDim = 140;
     }
 
     [[self collectionView] setCollectionViewLayout:updatedLayout animated:YES completion:nil];
+}
+
+#pragma mark - Shelf Layout
+
+-(CGSize)collectionView:(UICollectionView *)collectionView layout:(MMShelfLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath{
+    CGSize size = [collectionViewLayout defaultItemSize];
+    
+    // handle different size items similar to flow layout
+    if(indexPath.row % 7 == 0){
+        size.height = 1.2 * size.width;
+    }else if(indexPath.row % 3 == 0){
+        size.height = .8 * size.width;
+    }
+    
+    if([collectionViewLayout isKindOfClass:[MMPageLayout class]]){
+        // it's in page view, so zoom it to full width of the collection view
+        CGFloat ratio = size.height / size.width;
+        size.width = CGRectGetWidth([collectionView bounds]);
+        size.height = size.width * ratio;
+    }
+
+    return size;
 }
 
 #pragma mark - Layout Changes

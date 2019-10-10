@@ -11,15 +11,17 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class MMShelfLayout;
+
 /// Similar  to UICollectionViewDelegateFlowLayout, these delegate method will be used by the layout
 /// for item specific properties. If they are not implemented, then defaultHeaderSize or defaultItemSize
 /// will be used instead.
 @protocol MMPageCollectionViewDelegateShelfLayout <MMPageCollectionViewDelegate>
 @optional
 
-- (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout referenceSizeForHeaderInSection:(NSInteger)section;
+- (CGSize)collectionView:(UICollectionView *)collectionView layout:(MMShelfLayout *)collectionViewLayout referenceSizeForHeaderInSection:(NSInteger)section;
 
-- (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath;
+- (CGSize)collectionView:(UICollectionView *)collectionView layout:(MMShelfLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath;
 
 @end
 

@@ -24,8 +24,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property(nonatomic, weak) id<MMPageCollectionViewDelegate> delegate;
 
-- (NSInteger)sectionForPoint:(CGPoint)point;
-
 - (NSIndexPath *)closestIndexPathForPoint:(CGPoint)point;
 
 @end
