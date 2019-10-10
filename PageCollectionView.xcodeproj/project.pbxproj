@@ -14,6 +14,16 @@
 		C5551919234EEC2800BED51A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C5551918234EEC2800BED51A /* Assets.xcassets */; };
 		C555191C234EEC2800BED51A /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C555191A234EEC2800BED51A /* LaunchScreen.storyboard */; };
 		C555191F234EEC2800BED51A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = C555191E234EEC2800BED51A /* main.m */; };
+		C55519AB234EECDD00BED51A /* MMPinchVelocityGestureRecognizer.m in Sources */ = {isa = PBXBuildFile; fileRef = C55519AA234EECDD00BED51A /* MMPinchVelocityGestureRecognizer.m */; };
+		C55519B1234EECEB00BED51A /* MMPageIconView.m in Sources */ = {isa = PBXBuildFile; fileRef = C55519AD234EECEB00BED51A /* MMPageIconView.m */; };
+		C55519B2234EECEB00BED51A /* MMGridIconView.m in Sources */ = {isa = PBXBuildFile; fileRef = C55519B0234EECEB00BED51A /* MMGridIconView.m */; };
+		C55519BA234EECF700BED51A /* MMPageLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = C55519B6234EECF700BED51A /* MMPageLayout.m */; };
+		C55519BB234EECF700BED51A /* MMShelfLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = C55519B7234EECF700BED51A /* MMShelfLayout.m */; };
+		C55519BC234EECF700BED51A /* MMGridLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = C55519B8234EECF700BED51A /* MMGridLayout.m */; };
+		C55519C6234EED0800BED51A /* MMPageCollectionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C55519BE234EED0700BED51A /* MMPageCollectionViewController.m */; };
+		C55519C7234EED0800BED51A /* MMPageCollectionView.m in Sources */ = {isa = PBXBuildFile; fileRef = C55519BF234EED0700BED51A /* MMPageCollectionView.m */; };
+		C55519C8234EED0800BED51A /* MMPageCollectionCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C55519C3234EED0700BED51A /* MMPageCollectionCell.m */; };
+		C55519C9234EED0800BED51A /* MMPageCollectionHeader.m in Sources */ = {isa = PBXBuildFile; fileRef = C55519C4234EED0700BED51A /* MMPageCollectionHeader.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -29,6 +39,26 @@
 		C555191B234EEC2800BED51A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		C555191D234EEC2800BED51A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C555191E234EEC2800BED51A /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		C55519A9234EECDD00BED51A /* MMPinchVelocityGestureRecognizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MMPinchVelocityGestureRecognizer.h; sourceTree = "<group>"; };
+		C55519AA234EECDD00BED51A /* MMPinchVelocityGestureRecognizer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MMPinchVelocityGestureRecognizer.m; sourceTree = "<group>"; };
+		C55519AD234EECEB00BED51A /* MMPageIconView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MMPageIconView.m; sourceTree = "<group>"; };
+		C55519AE234EECEB00BED51A /* MMGridIconView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MMGridIconView.h; sourceTree = "<group>"; };
+		C55519AF234EECEB00BED51A /* MMPageIconView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MMPageIconView.h; sourceTree = "<group>"; };
+		C55519B0234EECEB00BED51A /* MMGridIconView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MMGridIconView.m; sourceTree = "<group>"; };
+		C55519B4234EECF700BED51A /* MMShelfLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MMShelfLayout.h; sourceTree = "<group>"; };
+		C55519B5234EECF700BED51A /* MMGridLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MMGridLayout.h; sourceTree = "<group>"; };
+		C55519B6234EECF700BED51A /* MMPageLayout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MMPageLayout.m; sourceTree = "<group>"; };
+		C55519B7234EECF700BED51A /* MMShelfLayout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MMShelfLayout.m; sourceTree = "<group>"; };
+		C55519B8234EECF700BED51A /* MMGridLayout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MMGridLayout.m; sourceTree = "<group>"; };
+		C55519B9234EECF700BED51A /* MMPageLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MMPageLayout.h; sourceTree = "<group>"; };
+		C55519BE234EED0700BED51A /* MMPageCollectionViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MMPageCollectionViewController.m; sourceTree = "<group>"; };
+		C55519BF234EED0700BED51A /* MMPageCollectionView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MMPageCollectionView.m; sourceTree = "<group>"; };
+		C55519C0234EED0700BED51A /* MMPageCollectionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MMPageCollectionViewController.h; sourceTree = "<group>"; };
+		C55519C1234EED0700BED51A /* MMPageCollectionCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MMPageCollectionCell.h; sourceTree = "<group>"; };
+		C55519C2234EED0700BED51A /* MMPageCollectionView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MMPageCollectionView.h; sourceTree = "<group>"; };
+		C55519C3234EED0700BED51A /* MMPageCollectionCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MMPageCollectionCell.m; sourceTree = "<group>"; };
+		C55519C4234EED0700BED51A /* MMPageCollectionHeader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MMPageCollectionHeader.m; sourceTree = "<group>"; };
+		C55519C5234EED0800BED51A /* MMPageCollectionHeader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MMPageCollectionHeader.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -61,6 +91,10 @@
 		C555190B234EEC2600BED51A /* PageCollectionView */ = {
 			isa = PBXGroup;
 			children = (
+				C55519BD234EECFC00BED51A /* Page Collection View */,
+				C55519B3234EECF000BED51A /* Layouts */,
+				C55519AC234EECE300BED51A /* Header Icons */,
+				C55519A8234EECD500BED51A /* Gestures */,
 				C555190C234EEC2600BED51A /* AppDelegate.h */,
 				C555190D234EEC2600BED51A /* AppDelegate.m */,
 				C555190F234EEC2600BED51A /* SceneDelegate.h */,
@@ -74,6 +108,54 @@
 				C555191E234EEC2800BED51A /* main.m */,
 			);
 			path = PageCollectionView;
+			sourceTree = "<group>";
+		};
+		C55519A8234EECD500BED51A /* Gestures */ = {
+			isa = PBXGroup;
+			children = (
+				C55519A9234EECDD00BED51A /* MMPinchVelocityGestureRecognizer.h */,
+				C55519AA234EECDD00BED51A /* MMPinchVelocityGestureRecognizer.m */,
+			);
+			path = Gestures;
+			sourceTree = "<group>";
+		};
+		C55519AC234EECE300BED51A /* Header Icons */ = {
+			isa = PBXGroup;
+			children = (
+				C55519AE234EECEB00BED51A /* MMGridIconView.h */,
+				C55519B0234EECEB00BED51A /* MMGridIconView.m */,
+				C55519AF234EECEB00BED51A /* MMPageIconView.h */,
+				C55519AD234EECEB00BED51A /* MMPageIconView.m */,
+			);
+			path = "Header Icons";
+			sourceTree = "<group>";
+		};
+		C55519B3234EECF000BED51A /* Layouts */ = {
+			isa = PBXGroup;
+			children = (
+				C55519B5234EECF700BED51A /* MMGridLayout.h */,
+				C55519B8234EECF700BED51A /* MMGridLayout.m */,
+				C55519B9234EECF700BED51A /* MMPageLayout.h */,
+				C55519B6234EECF700BED51A /* MMPageLayout.m */,
+				C55519B4234EECF700BED51A /* MMShelfLayout.h */,
+				C55519B7234EECF700BED51A /* MMShelfLayout.m */,
+			);
+			path = Layouts;
+			sourceTree = "<group>";
+		};
+		C55519BD234EECFC00BED51A /* Page Collection View */ = {
+			isa = PBXGroup;
+			children = (
+				C55519C0234EED0700BED51A /* MMPageCollectionViewController.h */,
+				C55519BE234EED0700BED51A /* MMPageCollectionViewController.m */,
+				C55519C2234EED0700BED51A /* MMPageCollectionView.h */,
+				C55519BF234EED0700BED51A /* MMPageCollectionView.m */,
+				C55519C1234EED0700BED51A /* MMPageCollectionCell.h */,
+				C55519C3234EED0700BED51A /* MMPageCollectionCell.m */,
+				C55519C5234EED0800BED51A /* MMPageCollectionHeader.h */,
+				C55519C4234EED0700BED51A /* MMPageCollectionHeader.m */,
+			);
+			path = "Page Collection View";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -146,10 +228,20 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C55519B2234EECEB00BED51A /* MMGridIconView.m in Sources */,
+				C55519BC234EECF700BED51A /* MMGridLayout.m in Sources */,
 				C5551914234EEC2600BED51A /* ViewController.m in Sources */,
+				C55519AB234EECDD00BED51A /* MMPinchVelocityGestureRecognizer.m in Sources */,
+				C55519B1234EECEB00BED51A /* MMPageIconView.m in Sources */,
+				C55519C6234EED0800BED51A /* MMPageCollectionViewController.m in Sources */,
 				C555190E234EEC2600BED51A /* AppDelegate.m in Sources */,
 				C555191F234EEC2800BED51A /* main.m in Sources */,
+				C55519C8234EED0800BED51A /* MMPageCollectionCell.m in Sources */,
+				C55519BA234EECF700BED51A /* MMPageLayout.m in Sources */,
 				C5551911234EEC2600BED51A /* SceneDelegate.m in Sources */,
+				C55519BB234EECF700BED51A /* MMShelfLayout.m in Sources */,
+				C55519C7234EED0800BED51A /* MMPageCollectionView.m in Sources */,
+				C55519C9234EED0800BED51A /* MMPageCollectionHeader.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
