@@ -17,8 +17,6 @@
 #import "MMGridLayout.h"
 #import "MMPageLayout.h"
 
-CGFloat const kMaxDim = 140;
-
 
 @interface MMPageCollectionViewController () <MMPageCollectionViewDelegate, MMPageCollectionViewDelegateShelfLayout>
 

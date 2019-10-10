@@ -10,9 +10,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-extern CGFloat const kMaxDim;
-
-
 @interface MMPageCollectionViewController : UICollectionViewController <UICollectionViewDelegateFlowLayout>
 
 @end
