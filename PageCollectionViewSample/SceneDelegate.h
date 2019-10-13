@@ -1,8 +1,8 @@
 //
 //  SceneDelegate.h
-//  PageCollectionView
+//  PageCollectionViewSample
 //
-//  Created by Adam Wulf on 10/9/19.
+//  Created by Adam Wulf on 10/13/19.
 //  Copyright © 2019 Milestone Made. All rights reserved.
 //
 
