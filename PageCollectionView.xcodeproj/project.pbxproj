@@ -27,7 +27,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		C5551909234EEC2600BED51A /* PageCollectionView.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PageCollectionView.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C5551909234EEC2600BED51A /* PageCollectionViewSample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PageCollectionViewSample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C555190C234EEC2600BED51A /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		C555190D234EEC2600BED51A /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		C555190F234EEC2600BED51A /* SceneDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SceneDelegate.h; sourceTree = "<group>"; };
@@ -75,7 +75,7 @@
 		C5551900234EEC2600BED51A = {
 			isa = PBXGroup;
 			children = (
-				C555190B234EEC2600BED51A /* PageCollectionView */,
+				C555190B234EEC2600BED51A /* PageCollectionViewSample */,
 				C555190A234EEC2600BED51A /* Products */,
 			);
 			sourceTree = "<group>";
@@ -83,12 +83,12 @@
 		C555190A234EEC2600BED51A /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				C5551909234EEC2600BED51A /* PageCollectionView.app */,
+				C5551909234EEC2600BED51A /* PageCollectionViewSample.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		C555190B234EEC2600BED51A /* PageCollectionView */ = {
+		C555190B234EEC2600BED51A /* PageCollectionViewSample */ = {
 			isa = PBXGroup;
 			children = (
 				C55519BD234EECFC00BED51A /* Page Collection View */,
@@ -107,7 +107,7 @@
 				C555191D234EEC2800BED51A /* Info.plist */,
 				C555191E234EEC2800BED51A /* main.m */,
 			);
-			path = PageCollectionView;
+			path = PageCollectionViewSample;
 			sourceTree = "<group>";
 		};
 		C55519A8234EECD500BED51A /* Gestures */ = {
@@ -161,9 +161,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		C5551908234EEC2600BED51A /* PageCollectionView */ = {
+		C5551908234EEC2600BED51A /* PageCollectionViewSample */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = C5551922234EEC2800BED51A /* Build configuration list for PBXNativeTarget "PageCollectionView" */;
+			buildConfigurationList = C5551922234EEC2800BED51A /* Build configuration list for PBXNativeTarget "PageCollectionViewSample" */;
 			buildPhases = (
 				C5551905234EEC2600BED51A /* Sources */,
 				C5551906234EEC2600BED51A /* Frameworks */,
@@ -173,9 +173,9 @@
 			);
 			dependencies = (
 			);
-			name = PageCollectionView;
+			name = PageCollectionViewSample;
 			productName = PageCollectionView;
-			productReference = C5551909234EEC2600BED51A /* PageCollectionView.app */;
+			productReference = C5551909234EEC2600BED51A /* PageCollectionViewSample.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -205,7 +205,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				C5551908234EEC2600BED51A /* PageCollectionView */,
+				C5551908234EEC2600BED51A /* PageCollectionViewSample */,
 			);
 		};
 /* End PBXProject section */
@@ -383,12 +383,12 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = MU27A4SCKC;
-				INFOPLIST_FILE = PageCollectionView/Info.plist;
+				INFOPLIST_FILE = PageCollectionViewSample/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.milestonemade.PageCollectionView;
+				PRODUCT_BUNDLE_IDENTIFIER = com.milestonemade.PageCollectionViewSample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -400,12 +400,12 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = MU27A4SCKC;
-				INFOPLIST_FILE = PageCollectionView/Info.plist;
+				INFOPLIST_FILE = PageCollectionViewSample/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.milestonemade.PageCollectionView;
+				PRODUCT_BUNDLE_IDENTIFIER = com.milestonemade.PageCollectionViewSample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -423,7 +423,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		C5551922234EEC2800BED51A /* Build configuration list for PBXNativeTarget "PageCollectionView" */ = {
+		C5551922234EEC2800BED51A /* Build configuration list for PBXNativeTarget "PageCollectionViewSample" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C5551923234EEC2800BED51A /* Debug */,
