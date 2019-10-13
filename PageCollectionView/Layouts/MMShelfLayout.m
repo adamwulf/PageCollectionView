@@ -202,12 +202,13 @@
 
         attrs = attrs ?: [self layoutAttributesForItemAtIndexPath:[self targetIndexPath]];
 
-        CGFloat screenHeight = CGRectGetHeight([[self collectionView] bounds]);
-        CGSize size = [self collectionViewContentSize];
+        CGFloat const inset = -[[self collectionView] safeAreaInsets].top;
+        CGFloat const screenHeight = CGRectGetHeight([[self collectionView] bounds]);
+        CGSize const size = [self collectionViewContentSize];
         CGFloat targetY = attrs.frame.origin.y;
         targetY = targetY < size.height - screenHeight ? targetY : size.height - screenHeight;
-        targetY = targetY < 0 ? 0 : targetY;
-
+        targetY = targetY < inset ? inset : targetY;
+        
         return CGPointMake(0, targetY);
     }
 
