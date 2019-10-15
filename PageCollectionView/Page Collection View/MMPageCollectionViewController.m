@@ -21,7 +21,6 @@
 @interface MMPageCollectionViewController () <MMPageCollectionViewDelegate>
 
 @property(nonatomic, strong) UICollectionViewFlowLayout *pageLayout;
-@property(nonatomic, strong) UICollectionViewTransitionLayout *transitionLayout;
 @property(nonatomic, assign) BOOL transitionComplete;
 
 @end
@@ -86,25 +85,27 @@
 
 #pragma mark - Layout Helpers
 
+-(UICollectionViewTransitionLayout*)activeTransitionLayout{
+    return [[[self collectionView] collectionViewLayout] isKindOfClass:[UICollectionViewTransitionLayout class]] ? (UICollectionViewTransitionLayout*) [[self collectionView] collectionViewLayout] : nil;
+}
+
+- (__kindof MMShelfLayout*)currentLayout{
+    return (MMShelfLayout*)([self activeTransitionLayout] ? [[self activeTransitionLayout] currentLayout] : [[self collectionView] collectionViewLayout]);
+}
+
 - (MMPageLayout *)isPageLayout
 {
-    UICollectionViewLayout *currentLayout = (_transitionLayout == [[self collectionView] collectionViewLayout]) ? [_transitionLayout currentLayout] : [[self collectionView] collectionViewLayout];
-
-    return [currentLayout isMemberOfClass:[MMPageLayout class]] ? (MMPageLayout *)currentLayout : nil;
+    return [[self currentLayout] isMemberOfClass:[MMPageLayout class]] ? [self currentLayout] : nil;
 }
 
 - (MMShelfLayout *)isShelfLayout
 {
-    UICollectionViewLayout *currentLayout = (_transitionLayout == [[self collectionView] collectionViewLayout]) ? [_transitionLayout currentLayout] : [[self collectionView] collectionViewLayout];
-
-    return [currentLayout isMemberOfClass:[MMShelfLayout class]] ? (MMShelfLayout *)currentLayout : nil;
+    return [[self currentLayout] isMemberOfClass:[MMShelfLayout class]] ? [self currentLayout] : nil;
 }
 
 - (MMGridLayout *)isGridLayout
 {
-    UICollectionViewLayout *currentLayout = (_transitionLayout == [[self collectionView] collectionViewLayout]) ? [_transitionLayout currentLayout] : [[self collectionView] collectionViewLayout];
-
-    return [currentLayout isMemberOfClass:[MMGridLayout class]] ? (MMGridLayout *)currentLayout : nil;
+    return [[self currentLayout] isMemberOfClass:[MMGridLayout class]] ? [self currentLayout] : nil;
 }
 
 #pragma mark - Gestures
@@ -122,7 +123,9 @@
 
 - (void)pinchFromShelf:(MMPinchVelocityGestureRecognizer *)pinchGesture
 {
-    if (!_transitionLayout && [pinchGesture state] == UIGestureRecognizerStateBegan) {
+    UICollectionViewTransitionLayout *transitionLayout = [self activeTransitionLayout];
+    
+    if (!transitionLayout && [pinchGesture state] == UIGestureRecognizerStateBegan) {
         NSIndexPath *targetPath = [[self collectionView] indexPathForItemAtPoint:[pinchGesture locationInView:[self collectionView]]];
 
         MMGridLayout *pageGridLayout = [[MMGridLayout alloc] initWithSection:[targetPath section]];
@@ -130,12 +133,11 @@
 
         if (targetPath) {
             _transitionComplete = NO;
-            _transitionLayout = [[self collectionView] startInteractiveTransitionToCollectionViewLayout:pageGridLayout completion:^(BOOL completed, BOOL finished) {
+            [[self collectionView] startInteractiveTransitionToCollectionViewLayout:pageGridLayout completion:^(BOOL completed, BOOL finished) {
                 self->_targetIndexPath = nil;
-                self->_transitionLayout = nil;
             }];
         }
-    } else if (_transitionLayout && [pinchGesture state] == UIGestureRecognizerStateChanged) {
+    } else if (transitionLayout && [pinchGesture state] == UIGestureRecognizerStateChanged) {
         // 1 if we've completed the transition to the new layout, 0 if we are at the existing layout
         CGFloat progress;
 
@@ -146,16 +148,16 @@
             progress = 0;
         }
 
-        _transitionLayout.transitionProgress = progress;
-        [_transitionLayout invalidateLayout];
-    } else if (!_transitionComplete && _transitionLayout && [pinchGesture state] == UIGestureRecognizerStateEnded) {
+        transitionLayout.transitionProgress = progress;
+        [transitionLayout invalidateLayout];
+    } else if (!_transitionComplete && transitionLayout && [pinchGesture state] == UIGestureRecognizerStateEnded) {
         _transitionComplete = YES;
         if ([pinchGesture scaleDirection] > 0) {
             [[self collectionView] finishInteractiveTransition];
         } else {
             [[self collectionView] cancelInteractiveTransition];
         }
-    } else if (!_transitionComplete && _transitionLayout) {
+    } else if (!_transitionComplete && transitionLayout) {
         _transitionComplete = YES;
         [[self collectionView] cancelInteractiveTransition];
     }
@@ -163,11 +165,13 @@
 
 - (void)pinchFromGrid:(MMPinchVelocityGestureRecognizer *)pinchGesture
 {
+    UICollectionViewTransitionLayout *transitionLayout = [self activeTransitionLayout];
+    
     if ([pinchGesture state] == UIGestureRecognizerStateBegan) {
         _targetIndexPath = [[self collectionView] closestIndexPathForPoint:[pinchGesture locationInView:[self collectionView]]];
     } else if (_targetIndexPath && [pinchGesture state] == UIGestureRecognizerStateChanged) {
-        if (_transitionLayout) {
-            BOOL toPage = [[_transitionLayout nextLayout] isKindOfClass:[MMPageLayout class]];
+        if (transitionLayout) {
+            BOOL toPage = [[transitionLayout nextLayout] isKindOfClass:[MMPageLayout class]];
             CGFloat progress;
 
             if (toPage) {
@@ -185,8 +189,8 @@
                 }
             }
 
-            _transitionLayout.transitionProgress = progress;
-            [_transitionLayout invalidateLayout];
+            transitionLayout.transitionProgress = progress;
+            [transitionLayout invalidateLayout];
         } else {
             UICollectionViewLayout *nextLayout;
             if (pinchGesture.scaleDirection > 0) {
@@ -202,13 +206,12 @@
             }
 
             _transitionComplete = NO;
-            _transitionLayout = [[self collectionView] startInteractiveTransitionToCollectionViewLayout:nextLayout completion:^(BOOL completed, BOOL finished) {
+            [[self collectionView] startInteractiveTransitionToCollectionViewLayout:nextLayout completion:^(BOOL completed, BOOL finished) {
                 self->_targetIndexPath = nil;
-                self->_transitionLayout = nil;
             }];
         }
-    } else if (!_transitionComplete && _transitionLayout && [pinchGesture state] == UIGestureRecognizerStateEnded) {
-        BOOL toPage = [[_transitionLayout nextLayout] isKindOfClass:[MMPageLayout class]];
+    } else if (!_transitionComplete && transitionLayout && [pinchGesture state] == UIGestureRecognizerStateEnded) {
+        BOOL toPage = [[transitionLayout nextLayout] isKindOfClass:[MMPageLayout class]];
         _transitionComplete = YES;
 
         if (toPage && pinchGesture.scaleDirection > 0) {
@@ -218,7 +221,7 @@
         } else {
             [[self collectionView] cancelInteractiveTransition];
         }
-    } else if (!_transitionComplete && _transitionLayout) {
+    } else if (!_transitionComplete && transitionLayout) {
         _transitionComplete = YES;
         [[self collectionView] cancelInteractiveTransition];
     }
@@ -226,7 +229,9 @@
 
 - (void)pinchFromPage:(MMPinchVelocityGestureRecognizer *)pinchGesture
 {
-    if (!_transitionLayout && [pinchGesture state] == UIGestureRecognizerStateBegan) {
+    UICollectionViewTransitionLayout *transitionLayout = [self activeTransitionLayout];
+    
+    if (!transitionLayout && [pinchGesture state] == UIGestureRecognizerStateBegan) {
         NSInteger targetSection = [[self isPageLayout] section];
         NSIndexPath *targetPath = [[self collectionView] indexPathForItemAtPoint:[pinchGesture locationInView:[self collectionView]]];
 
@@ -235,12 +240,11 @@
 
         if (targetPath) {
             _transitionComplete = NO;
-            _transitionLayout = [[self collectionView] startInteractiveTransitionToCollectionViewLayout:pageGridLayout completion:^(BOOL completed, BOOL finished) {
+            [[self collectionView] startInteractiveTransitionToCollectionViewLayout:pageGridLayout completion:^(BOOL completed, BOOL finished) {
                 self->_targetIndexPath = nil;
-                self->_transitionLayout = nil;
             }];
         }
-    } else if (_transitionLayout && [pinchGesture state] == UIGestureRecognizerStateChanged) {
+    } else if (transitionLayout && [pinchGesture state] == UIGestureRecognizerStateChanged) {
         // 1 if we've completed the transition to the new layout, 0 if we are at the existing layout
         CGFloat progress;
 
@@ -250,16 +254,16 @@
             progress = 0;
         }
 
-        _transitionLayout.transitionProgress = progress;
-        [_transitionLayout invalidateLayout];
-    } else if (!_transitionComplete && _transitionLayout && [pinchGesture state] == UIGestureRecognizerStateEnded) {
+        transitionLayout.transitionProgress = progress;
+        [transitionLayout invalidateLayout];
+    } else if (!_transitionComplete && transitionLayout && [pinchGesture state] == UIGestureRecognizerStateEnded) {
         _transitionComplete = YES;
         if ([pinchGesture scaleDirection] < 0) {
             [[self collectionView] finishInteractiveTransition];
         } else {
             [[self collectionView] cancelInteractiveTransition];
         }
-    } else if (!_transitionComplete && _transitionLayout) {
+    } else if (!_transitionComplete && transitionLayout) {
         _transitionComplete = YES;
         [[self collectionView] cancelInteractiveTransition];
     }
@@ -349,7 +353,7 @@
     MMGridLayout *updatedLayout;
     if ([self isShelfLayout]) {
         updatedLayout = [[MMGridLayout alloc] initWithSection:[indexPath section]];
-    } else if (!_transitionLayout) {
+    } else if (![self activeTransitionLayout]) {
         updatedLayout = [[MMPageLayout alloc] initWithSection:[indexPath section]];
         [updatedLayout setTargetIndexPath:indexPath];
     }
