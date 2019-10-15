@@ -21,6 +21,18 @@
     CGFloat _sectionHeight;
 }
 
+-(BOOL)isShelfLayout{
+    return NO;
+}
+
+-(BOOL)isGridLayout{
+    return YES;
+}
+
+-(BOOL)isPageLayout{
+    return NO;
+}
+
 - (instancetype)initWithCoder:(NSCoder *)coder
 {
     if (self = [super initWithCoder:coder]) {

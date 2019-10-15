@@ -15,9 +15,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MMPageCollectionViewController : UICollectionViewController <MMPageCollectionViewDelegateShelfLayout>
 
-- (MMPageLayout *)isPageLayout;
-- (MMShelfLayout *)isShelfLayout;
-- (MMGridLayout *)isGridLayout;
+/// Returns the current layout of the collection view. If the collectionview is in the middel of a transition layout,
+/// then the current layout of that transition layout is returned
+- (__kindof MMShelfLayout*)currentLayout;
 
 @end
 

@@ -37,6 +37,18 @@
     return self;
 }
 
+-(BOOL)isShelfLayout{
+    return NO;
+}
+
+-(BOOL)isGridLayout{
+    return NO;
+}
+
+-(BOOL)isPageLayout{
+    return YES;
+}
+
 #pragma mark - UICollectionViewLayout
 
 - (CGSize)collectionViewContentSize

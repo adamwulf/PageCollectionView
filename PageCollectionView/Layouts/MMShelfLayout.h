@@ -37,6 +37,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, strong, nullable) NSIndexPath *targetIndexPath;
 @property(nonatomic, readonly) id<MMPageCollectionViewDelegateShelfLayout> delegate;
 
+@property(nonatomic, readonly) BOOL isShelfLayout;
+@property(nonatomic, readonly) BOOL isGridLayout;
+@property(nonatomic, readonly) BOOL isPageLayout;
+
 @end
 
 NS_ASSUME_NONNULL_END

@@ -47,6 +47,18 @@
     return self;
 }
 
+-(BOOL)isShelfLayout{
+    return YES;
+}
+
+-(BOOL)isGridLayout{
+    return NO;
+}
+
+-(BOOL)isPageLayout{
+    return NO;
+}
+
 - (id<MMPageCollectionViewDelegateShelfLayout>)delegate
 {
     return (id<MMPageCollectionViewDelegateShelfLayout>)[[self collectionView] delegate];
