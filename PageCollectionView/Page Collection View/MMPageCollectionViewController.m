@@ -18,7 +18,7 @@
 #import "MMPageLayout.h"
 
 
-@interface MMPageCollectionViewController () <MMPageCollectionViewDelegate, MMPageCollectionViewDelegateShelfLayout>
+@interface MMPageCollectionViewController () <MMPageCollectionViewDelegate>
 
 @property(nonatomic, strong) UICollectionViewFlowLayout *pageLayout;
 @property(nonatomic, strong) UICollectionViewTransitionLayout *transitionLayout;
@@ -88,21 +88,21 @@
 
 - (MMPageLayout *)isPageLayout
 {
-    UICollectionViewLayout *currentLayout = _transitionLayout ? [_transitionLayout currentLayout] : [[self collectionView] collectionViewLayout];
+    UICollectionViewLayout *currentLayout = (_transitionLayout == [[self collectionView] collectionViewLayout]) ? [_transitionLayout currentLayout] : [[self collectionView] collectionViewLayout];
 
     return [currentLayout isMemberOfClass:[MMPageLayout class]] ? (MMPageLayout *)currentLayout : nil;
 }
 
 - (MMShelfLayout *)isShelfLayout
 {
-    UICollectionViewLayout *currentLayout = _transitionLayout ? [_transitionLayout currentLayout] : [[self collectionView] collectionViewLayout];
+    UICollectionViewLayout *currentLayout = (_transitionLayout == [[self collectionView] collectionViewLayout]) ? [_transitionLayout currentLayout] : [[self collectionView] collectionViewLayout];
 
     return [currentLayout isMemberOfClass:[MMShelfLayout class]] ? (MMShelfLayout *)currentLayout : nil;
 }
 
 - (MMGridLayout *)isGridLayout
 {
-    UICollectionViewLayout *currentLayout = _transitionLayout ? [_transitionLayout currentLayout] : [[self collectionView] collectionViewLayout];
+    UICollectionViewLayout *currentLayout = (_transitionLayout == [[self collectionView] collectionViewLayout]) ? [_transitionLayout currentLayout] : [[self collectionView] collectionViewLayout];
 
     return [currentLayout isMemberOfClass:[MMGridLayout class]] ? (MMGridLayout *)currentLayout : nil;
 }

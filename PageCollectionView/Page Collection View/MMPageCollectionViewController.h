@@ -7,10 +7,17 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "MMShelfLayout.h"
+
+@class MMPageLayout, MMGridLayout;
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface MMPageCollectionViewController : UICollectionViewController <UICollectionViewDelegateFlowLayout>
+@interface MMPageCollectionViewController : UICollectionViewController <MMPageCollectionViewDelegateShelfLayout>
+
+- (MMPageLayout *)isPageLayout;
+- (MMShelfLayout *)isShelfLayout;
+- (MMGridLayout *)isGridLayout;
 
 @end
 
