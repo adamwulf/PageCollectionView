@@ -343,7 +343,9 @@
         [updatedLayout setTargetIndexPath:indexPath];
     }
 
-    [[self collectionView] setCollectionViewLayout:updatedLayout animated:YES completion:nil];
+    if(updatedLayout){
+        [[self collectionView] setCollectionViewLayout:updatedLayout animated:YES completion:nil];
+    }
 }
 
 #pragma mark - Shelf Layout
