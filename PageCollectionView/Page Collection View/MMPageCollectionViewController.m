@@ -113,7 +113,7 @@
     if (!transitionLayout && [pinchGesture state] == UIGestureRecognizerStateBegan) {
         NSIndexPath *targetPath = [[self collectionView] indexPathForItemAtPoint:[pinchGesture locationInView:[self collectionView]]];
 
-        MMGridLayout *pageGridLayout = [[MMGridLayout alloc] initWithSection:[targetPath section]];
+        MMGridLayout *pageGridLayout = [self newGridLayoutForSection:[targetPath section]];
         [pageGridLayout setTargetIndexPath:targetPath];
 
         if (targetPath) {
@@ -180,12 +180,12 @@
             UICollectionViewLayout *nextLayout;
             if (pinchGesture.scaleDirection > 0) {
                 // transition into page view
-                MMPageLayout *pageLayout = [[MMPageLayout alloc] initWithSection:[[self currentLayout] section]];
+                MMPageLayout *pageLayout = [self newPageLayoutForSection:[[self currentLayout] section]];
                 [pageLayout setTargetIndexPath:_targetIndexPath];
                 nextLayout = pageLayout;
             } else {
                 // transition into shelf
-                MMShelfLayout *shelfLayout = [[MMShelfLayout alloc] init];
+                MMShelfLayout *shelfLayout = [self newShelfLayout];
                 [shelfLayout setTargetIndexPath:[NSIndexPath indexPathForRow:0 inSection:[[self currentLayout] section]]];
                 nextLayout = shelfLayout;
             }
@@ -220,7 +220,7 @@
         NSInteger targetSection = [[self currentLayout] section];
         NSIndexPath *targetPath = [[self collectionView] indexPathForItemAtPoint:[pinchGesture locationInView:[self collectionView]]];
 
-        MMGridLayout *pageGridLayout = [[MMGridLayout alloc] initWithSection:targetSection];
+        MMGridLayout *pageGridLayout = [self newGridLayoutForSection:targetSection];
         [pageGridLayout setTargetIndexPath:targetPath];
 
         if (targetPath) {
@@ -319,10 +319,10 @@
         MMShelfLayout *nextLayout;
 
         if ([[self currentLayout] isGridLayout]) {
-            nextLayout = [[MMShelfLayout alloc] init];
+            nextLayout = [self newShelfLayout];
             [nextLayout setTargetIndexPath:[NSIndexPath indexPathForRow:0 inSection:[[self currentLayout] section]]];
         } else if ([[self currentLayout] isPageLayout]) {
-            nextLayout = [[MMGridLayout alloc] initWithSection:[[self currentLayout] section]];
+            nextLayout = [self newGridLayoutForSection:[[self currentLayout] section]];
         }
 
         [[self collectionView] setCollectionViewLayout:nextLayout animated:YES completion:^(BOOL finished) {
@@ -337,9 +337,9 @@
 {
     MMGridLayout *updatedLayout;
     if ([[self currentLayout] isShelfLayout]) {
-        updatedLayout = [[MMGridLayout alloc] initWithSection:[indexPath section]];
+        updatedLayout = [self newGridLayoutForSection:[indexPath section]];
     } else if (![self activeTransitionLayout]) {
-        updatedLayout = [[MMPageLayout alloc] initWithSection:[indexPath section]];
+        updatedLayout = [self newPageLayoutForSection:[indexPath section]];
         [updatedLayout setTargetIndexPath:indexPath];
     }
 
@@ -394,6 +394,20 @@
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey, id> *)change context:(void *)context
 {
     [self collectionView:[self collectionView] willChangeToLayout:[[self collectionView] collectionViewLayout] fromLayout:[change objectForKey:NSKeyValueChangeOldKey]];
+}
+
+#pragma mark - Subclasses
+
+-(MMShelfLayout*)newShelfLayout{
+    return [[MMShelfLayout alloc] init];
+}
+
+-(MMGridLayout*)newGridLayoutForSection:(NSUInteger)section{
+    return [[MMGridLayout alloc] initWithSection:section];
+}
+
+-(MMPageLayout*)newPageLayoutForSection:(NSUInteger)section{
+    return [[MMPageLayout alloc] initWithSection:section];
 }
 
 @end

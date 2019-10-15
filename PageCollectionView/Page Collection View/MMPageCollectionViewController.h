@@ -19,6 +19,12 @@ NS_ASSUME_NONNULL_BEGIN
 /// then the current layout of that transition layout is returned
 - (__kindof MMShelfLayout*)currentLayout;
 
+#pragma mark - Subclasses
+
+-(MMShelfLayout*)newShelfLayout;
+-(MMGridLayout*)newGridLayoutForSection:(NSUInteger)section;
+-(MMPageLayout*)newPageLayoutForSection:(NSUInteger)section;
+
 @end
 
 NS_ASSUME_NONNULL_END
