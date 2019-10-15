@@ -258,12 +258,12 @@
 
 - (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView
 {
-    return 3;
+    @throw [NSException exceptionWithName:@"AbstractMethodException" reason:[NSString stringWithFormat:@"Must override %@", NSStringFromSelector(_cmd)] userInfo:nil];
 }
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
 {
-    return 20;
+    @throw [NSException exceptionWithName:@"AbstractMethodException" reason:[NSString stringWithFormat:@"Must override %@", NSStringFromSelector(_cmd)] userInfo:nil];
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
@@ -348,24 +348,8 @@
 
 #pragma mark - Shelf Layout
 
--(CGSize)collectionView:(UICollectionView *)collectionView layout:(MMShelfLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath{
-    CGSize size = [collectionViewLayout defaultItemSize];
-    
-    // handle different size items similar to flow layout
-    if(indexPath.row % 7 == 0){
-        size.height = 1.2 * size.width;
-    }else if(indexPath.row % 3 == 0){
-        size.height = .8 * size.width;
-    }
-    
-    if([collectionViewLayout isKindOfClass:[MMPageLayout class]]){
-        // it's in page view, so zoom it to full width of the collection view
-        CGFloat ratio = size.height / size.width;
-        size.width = CGRectGetWidth([collectionView bounds]);
-        size.height = size.width * ratio;
-    }
-
-    return size;
+- (id<MMShelfLayoutObject>)collectionView:(UICollectionView *)collectionView layout:(MMShelfLayout *)collectionViewLayout objectAtIndexPath:(NSIndexPath *)indexPath{
+    @throw [NSException exceptionWithName:@"AbstractMethodException" reason:[NSString stringWithFormat:@"Must override %@", NSStringFromSelector(_cmd)] userInfo:nil];
 }
 
 #pragma mark - Layout Changes

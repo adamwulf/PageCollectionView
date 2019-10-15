@@ -30,7 +30,7 @@
         _cache = [NSMutableArray array];
         _pageSpacing = 40;
         _defaultHeaderSize = CGSizeMake(200, 50);
-        _defaultItemSize = CGSizeMake(100, 100);
+        _maxDim = 140;
     }
     return self;
 }
@@ -42,7 +42,7 @@
         _cache = [NSMutableArray array];
         _pageSpacing = 40;
         _defaultHeaderSize = CGSizeMake(200, 50);
-        _defaultItemSize = CGSizeMake(100, 100);
+        _maxDim = 140;
     }
     return self;
 }
@@ -62,6 +62,13 @@
 - (id<MMPageCollectionViewDelegateShelfLayout>)delegate
 {
     return (id<MMPageCollectionViewDelegateShelfLayout>)[[self collectionView] delegate];
+}
+
+- (id<MMPageCollectionViewDataSourceShelfLayout>)datasource
+{
+    NSAssert([[[self collectionView] dataSource] conformsToProtocol:@protocol(MMPageCollectionViewDataSourceShelfLayout)], @"CollectionView data source must conform to MMPageCollectionViewDataSourceShelfLayout");
+    
+    return (id<MMPageCollectionViewDataSourceShelfLayout>)[[self collectionView] dataSource];
 }
 
 - (CGFloat)contentWidth
@@ -118,10 +125,16 @@
 
         // Calculate the size of each row
         for (NSInteger row = 0; row < rowCount; row++) {
-            CGSize itemSize = _defaultItemSize;
+            id<MMShelfLayoutObject>object = [[self datasource] collectionView:[self collectionView] layout:self objectAtIndexPath:[NSIndexPath indexPathForRow:row inSection:section]];
+            CGSize itemSize = [object idealSize];
+            CGFloat heightRatio = itemSize.height / itemSize.width;
 
-            if ([[self delegate] respondsToSelector:@selector(collectionView:layout:sizeForItemAtIndexPath:)]) {
-                itemSize = [[self delegate] collectionView:[self collectionView] layout:self sizeForItemAtIndexPath:[NSIndexPath indexPathForRow:row inSection:section]];
+            if (itemSize.height <= itemSize.width && itemSize.width > [self maxDim]) {
+                itemSize.height = [self maxDim] * heightRatio;
+                itemSize.width = [self maxDim];
+            }else if(itemSize.height >= itemSize.width && itemSize.height > [self maxDim]){
+                itemSize.height = [self maxDim];
+                itemSize.width = [self maxDim] / heightRatio;
             }
 
             if (!CGSizeEqualToSize(itemSize, CGSizeZero)) {

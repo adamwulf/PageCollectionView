@@ -95,15 +95,13 @@
 
     // Calculate the size of each row
     for (NSInteger row = 0; row < rowCount; row++) {
-        CGSize itemSize = [self defaultItemSize];
+        id<MMShelfLayoutObject>object = [[self datasource] collectionView:[self collectionView] layout:self objectAtIndexPath:[NSIndexPath indexPathForRow:row inSection:[self section]]];
+
+        CGSize itemSize = [object idealSize];
 
         // scale up our default item size so that it fits the screen width
         itemSize.height = CGRectGetWidth([[self collectionView] bounds]) / itemSize.width * itemSize.height;
         itemSize.width = CGRectGetWidth([[self collectionView] bounds]);
-
-        if ([[self delegate] respondsToSelector:@selector(collectionView:layout:sizeForItemAtIndexPath:)]) {
-            itemSize = [[self delegate] collectionView:[self collectionView] layout:self sizeForItemAtIndexPath:[NSIndexPath indexPathForRow:row inSection:[self section]]];
-        }
 
         CGFloat diff = (maxWidth - itemSize.width) / 2.0;
 

@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C554F8F72355961C000BBC01 /* MMShelfLayoutObject.h in Headers */ = {isa = PBXBuildFile; fileRef = C554F8F62355961C000BBC01 /* MMShelfLayoutObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		C554F8FA235599A4000BBC01 /* SampleCollectionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C554F8F9235599A4000BBC01 /* SampleCollectionViewController.m */; };
+		C554F8FD23559ABA000BBC01 /* SampleObject.m in Sources */ = {isa = PBXBuildFile; fileRef = C554F8FC23559ABA000BBC01 /* SampleObject.m */; };
 		C5722AA02352ED1F00C3E6D3 /* PageCollectionView.h in Headers */ = {isa = PBXBuildFile; fileRef = C5722A9E2352ED1F00C3E6D3 /* PageCollectionView.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		C5722AAE2352ED4C00C3E6D3 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = C5722AAD2352ED4C00C3E6D3 /* AppDelegate.m */; };
 		C5722AB12352ED4C00C3E6D3 /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = C5722AB02352ED4C00C3E6D3 /* SceneDelegate.m */; };
@@ -48,6 +51,11 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		C554F8F62355961C000BBC01 /* MMShelfLayoutObject.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MMShelfLayoutObject.h; sourceTree = "<group>"; };
+		C554F8F8235599A4000BBC01 /* SampleCollectionViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SampleCollectionViewController.h; sourceTree = "<group>"; };
+		C554F8F9235599A4000BBC01 /* SampleCollectionViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SampleCollectionViewController.m; sourceTree = "<group>"; };
+		C554F8FB23559ABA000BBC01 /* SampleObject.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SampleObject.h; sourceTree = "<group>"; };
+		C554F8FC23559ABA000BBC01 /* SampleObject.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SampleObject.m; sourceTree = "<group>"; };
 		C5722A9B2352ED1F00C3E6D3 /* PageCollectionView.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = PageCollectionView.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C5722A9E2352ED1F00C3E6D3 /* PageCollectionView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PageCollectionView.h; sourceTree = "<group>"; };
 		C5722A9F2352ED1F00C3E6D3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -137,6 +145,10 @@
 		C5722AAB2352ED4C00C3E6D3 /* PageCollectionViewSample */ = {
 			isa = PBXGroup;
 			children = (
+				C554F8F8235599A4000BBC01 /* SampleCollectionViewController.h */,
+				C554F8F9235599A4000BBC01 /* SampleCollectionViewController.m */,
+				C554F8FB23559ABA000BBC01 /* SampleObject.h */,
+				C554F8FC23559ABA000BBC01 /* SampleObject.m */,
 				C5722AAC2352ED4C00C3E6D3 /* AppDelegate.h */,
 				C5722AAD2352ED4C00C3E6D3 /* AppDelegate.m */,
 				C5722AAF2352ED4C00C3E6D3 /* SceneDelegate.h */,
@@ -168,6 +180,7 @@
 		C5722ACC2352ED5D00C3E6D3 /* Layouts */ = {
 			isa = PBXGroup;
 			children = (
+				C554F8F62355961C000BBC01 /* MMShelfLayoutObject.h */,
 				C5722ACD2352ED5D00C3E6D3 /* MMShelfLayout.h */,
 				C5722AD12352ED5D00C3E6D3 /* MMShelfLayout.m */,
 				C5722ACE2352ED5D00C3E6D3 /* MMGridLayout.h */,
@@ -216,6 +229,7 @@
 				C5722AEB2352ED5D00C3E6D3 /* MMPageIconView.h in Headers */,
 				C5722AE52352ED5D00C3E6D3 /* MMPageLayout.h in Headers */,
 				C5722ADB2352ED5D00C3E6D3 /* MMPageCollectionView.h in Headers */,
+				C554F8F72355961C000BBC01 /* MMShelfLayoutObject.h in Headers */,
 				C5722ADE2352ED5D00C3E6D3 /* MMPageCollectionHeader.h in Headers */,
 				C5722AEC2352ED5D00C3E6D3 /* MMGridIconView.h in Headers */,
 				C5722ADC2352ED5D00C3E6D3 /* MMPageCollectionViewController.h in Headers */,
@@ -343,8 +357,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C554F8FA235599A4000BBC01 /* SampleCollectionViewController.m in Sources */,
 				C5722AAE2352ED4C00C3E6D3 /* AppDelegate.m in Sources */,
 				C5722ABF2352ED4D00C3E6D3 /* main.m in Sources */,
+				C554F8FD23559ABA000BBC01 /* SampleObject.m in Sources */,
 				C5722AB12352ED4C00C3E6D3 /* SceneDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
