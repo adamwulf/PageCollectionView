@@ -7,13 +7,13 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "MMShelfLayout.h"
+#import "MMPageLayout.h"
 
 @class MMPageLayout, MMGridLayout;
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface MMPageCollectionViewController : UICollectionViewController <MMPageCollectionViewDelegateShelfLayout>
+@interface MMPageCollectionViewController : UICollectionViewController <MMPageCollectionViewDelegatePageLayout>
 
 /// Returns the current layout of the collection view. If the collectionview is in the middel of a transition layout,
 /// then the current layout of that transition layout is returned

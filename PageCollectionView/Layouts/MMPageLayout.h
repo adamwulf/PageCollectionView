@@ -10,8 +10,18 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class MMPageLayout;
+
+@protocol MMPageCollectionViewDelegatePageLayout <MMPageCollectionViewDelegateShelfLayout>
+@optional
+
+- (CGFloat)collectionView:(UICollectionView *)collectionView layout:(MMPageLayout *)collectionViewLayout zoomScaleForIndexPath:(NSIndexPath*)indexPath;
+
+@end
 
 @interface MMPageLayout : MMGridLayout
+
+@property(nonatomic, readonly) id<MMPageCollectionViewDelegatePageLayout> delegate;
 
 @end
 

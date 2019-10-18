@@ -21,6 +21,8 @@
     CGFloat _sectionHeight;
 }
 
+@dynamic delegate;
+
 - (instancetype)initWithCoder:(NSCoder *)coder
 {
     if (self = [super initWithCoder:coder]) {
@@ -95,14 +97,23 @@
 
     // Calculate the size of each row
     for (NSInteger row = 0; row < rowCount; row++) {
-        id<MMShelfLayoutObject>object = [[self datasource] collectionView:[self collectionView] layout:self objectAtIndexPath:[NSIndexPath indexPathForRow:row inSection:[self section]]];
+        NSIndexPath *indexPath = [NSIndexPath indexPathForRow:row inSection:[self section]];
+        id<MMShelfLayoutObject>object = [[self datasource] collectionView:[self collectionView] layout:self objectAtIndexPath:indexPath];
 
         CGSize itemSize = [object idealSize];
 
         // scale up our default item size so that it fits the screen width
         itemSize.height = CGRectGetWidth([[self collectionView] bounds]) / itemSize.width * itemSize.height;
         itemSize.width = CGRectGetWidth([[self collectionView] bounds]);
-
+        
+        CGFloat scale = 1;
+        
+        if([[self delegate] respondsToSelector:@selector(collectionView:layout:zoomScaleForIndexPath:)]){
+            scale = [[self delegate] collectionView:[self collectionView] layout:self zoomScaleForIndexPath:indexPath];
+        }
+        
+        NSLog(@"scale: %@", @(scale));
+        
         CGFloat diff = (maxWidth - itemSize.width) / 2.0;
 
         if (!CGSizeEqualToSize(itemSize, CGSizeZero)) {
@@ -112,8 +123,9 @@
 
             [itemAttrs setAlpha:1];
             [itemAttrs setHidden:NO];
+            [itemAttrs setTransform:CGAffineTransformMakeScale(scale, scale)];
 
-            yOffset += itemSize.height;
+            yOffset += itemSize.height * scale;
 
             [_cache addObject:itemAttrs];
         }
