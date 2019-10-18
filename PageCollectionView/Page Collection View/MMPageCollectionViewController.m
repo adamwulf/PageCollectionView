@@ -33,9 +33,10 @@
     
     CGPoint _zoomOffset;
     NSNumber *_isZoomingPage;
-    CGFloat _scale;
     MMPinchVelocityGestureRecognizer *_pinchGesture;
 }
+
+@synthesize scale = _scale;
 
 + (UICollectionViewLayout *)layout
 {
@@ -259,6 +260,10 @@
             UICollectionViewLayout *nextLayout;
             if ((!_isZoomingPage && pinchGesture.scaleDirection > 0) || [_isZoomingPage boolValue] || _scale > 1.0) {
                 // scale page up
+                if(![_isZoomingPage boolValue]){
+                    [self willBeginZoom];
+                }
+                
                 _isZoomingPage = @(YES);
                 [[self currentLayout] invalidateLayout];
                 
@@ -305,13 +310,17 @@
         }
         _transitionComplete = YES;
         _isZoomingPage = nil;
-    } else if ([pinchGesture state] == UIGestureRecognizerStateCancelled) {
+        [self didEndZoom];
+    } else {
         if(!_transitionComplete && transitionLayout){
             [[self collectionView] cancelInteractiveTransition];
+        }else{
+            [[self currentLayout] invalidateLayout];
         }
 
         _isZoomingPage = nil;
         _transitionComplete = YES;
+        [self didCancelZoom];
     }
 }
 
@@ -416,13 +425,7 @@
 }
 
 -(CGFloat)collectionView:(UICollectionView *)collectionView layout:(MMPageLayout *)collectionViewLayout zoomScaleForIndexPath:(NSIndexPath *)indexPath{
-    CGFloat scale = _scale;
-    
-    if([_isZoomingPage boolValue]){
-        scale = MAX(1.0, scale * [_pinchGesture scale]);
-    }
-    
-    return scale;
+    return [self scale];
 }
 
 #pragma mark - Layout Changes
@@ -455,6 +458,16 @@
 
 #pragma mark - Subclasses
 
+-(CGFloat)scale{
+    CGFloat scale = _scale;
+    
+    if([_isZoomingPage boolValue]){
+        scale = MAX(1.0, scale * [_pinchGesture scale]);
+    }
+    
+    return scale;
+}
+
 -(MMShelfLayout*)newShelfLayout{
     return [[MMShelfLayout alloc] init];
 }
@@ -465,6 +478,18 @@
 
 -(MMPageLayout*)newPageLayoutForSection:(NSUInteger)section{
     return [[MMPageLayout alloc] initWithSection:section];
+}
+
+-(void)willBeginZoom{
+    // noop, available for subclasses
+}
+
+-(void)didEndZoom{
+    // noop, available for subclasses
+}
+
+-(void)didCancelZoom{
+    // noop, available for subclasses
 }
 
 @end

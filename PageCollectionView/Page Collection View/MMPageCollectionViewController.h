@@ -21,9 +21,15 @@ NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark - Subclasses
 
+@property (nonatomic, readonly) CGFloat scale;
+
 -(MMShelfLayout*)newShelfLayout;
 -(MMGridLayout*)newGridLayoutForSection:(NSUInteger)section;
 -(MMPageLayout*)newPageLayoutForSection:(NSUInteger)section;
+
+-(void)willBeginZoom;
+-(void)didEndZoom;
+-(void)didCancelZoom;
 
 @end
 
