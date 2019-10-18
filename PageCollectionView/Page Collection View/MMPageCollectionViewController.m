@@ -31,6 +31,7 @@
     MMGridIconView *_collapseGridIcon;
     MMPageIconView *_collapsePageIcon;
     
+    CGPoint _zoomOffset;
     NSNumber *_isZoomingPage;
     CGFloat _scale;
     MMPinchVelocityGestureRecognizer *_pinchGesture;
@@ -220,9 +221,16 @@
 - (void)pinchFromPage:(MMPinchVelocityGestureRecognizer *)pinchGesture
 {
     UICollectionViewTransitionLayout *transitionLayout = [self activeTransitionLayout];
-    
+    CGPoint locInView = [pinchGesture locationInView:[[self collectionView] superview]];
+    locInView.x -= [[self collectionView] frame].origin.x;
+    locInView.y -= [[self collectionView] frame].origin.y;
+
     if ([pinchGesture state] == UIGestureRecognizerStateBegan) {
+
         _targetIndexPath = [[self collectionView] closestIndexPathForPoint:[pinchGesture locationInView:[self collectionView]]];
+        _zoomOffset = [[self collectionView] contentOffset];
+        _zoomOffset.x += locInView.x;
+        _zoomOffset.y += locInView.y;
     } else if ([pinchGesture state] == UIGestureRecognizerStateChanged) {
         if (transitionLayout) {
             BOOL toPage = [[transitionLayout nextLayout] isKindOfClass:[MMPageLayout class]];
@@ -253,6 +261,23 @@
                 // scale page up
                 _isZoomingPage = @(YES);
                 [[self currentLayout] invalidateLayout];
+                
+                CGPoint updatedOffset = _zoomOffset;
+                CGFloat minScale = 1.0 / _scale;
+                updatedOffset.x *= MAX(minScale, pinchGesture.scale);
+                updatedOffset.y *= MAX(minScale, pinchGesture.scale);
+                
+                updatedOffset.x -= locInView.x;
+                updatedOffset.y -= locInView.y;
+                
+                // now make sure our offset is sane according
+                // to the min/max allowed offset for ou content size
+                CGFloat offset = [[self currentLayout] collectionViewContentSize].width - CGRectGetWidth([[self collectionView] bounds]);
+                
+                updatedOffset.x = MAX(0, updatedOffset.x);
+                updatedOffset.x = MIN(offset, updatedOffset.x);
+
+                [[self collectionView] setContentOffset:updatedOffset animated:NO];
             } else if(!_isZoomingPage || ![_isZoomingPage boolValue]){
                 _isZoomingPage = @(NO);
                 // transition into grid
@@ -271,14 +296,15 @@
             if ([pinchGesture scaleDirection] < 0) {
                 [[self collectionView] finishInteractiveTransition];
             } else {
-                NSLog(@"end scale: %@", @(pinchGesture.scale));
                 [[self collectionView] cancelInteractiveTransition];
             }
 
         }
+        if([_isZoomingPage boolValue]){
+            _scale = MAX(1.0, _scale * [_pinchGesture scale]);
+        }
         _transitionComplete = YES;
         _isZoomingPage = nil;
-        _scale = MAX(1.0, _scale * [_pinchGesture scale]);
     } else if ([pinchGesture state] == UIGestureRecognizerStateCancelled) {
         if(!_transitionComplete && transitionLayout){
             [[self collectionView] cancelInteractiveTransition];

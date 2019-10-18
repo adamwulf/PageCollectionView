@@ -19,6 +19,7 @@
 @implementation MMPageLayout {
     CGFloat _sectionOffset;
     CGFloat _sectionHeight;
+    CGFloat _sectionWidth;
 }
 
 @dynamic delegate;
@@ -57,7 +58,7 @@
 {
     CGSize contentSize = [super collectionViewContentSize];
 
-    return CGSizeMake(contentSize.width, _sectionHeight);
+    return CGSizeMake(MAX(_sectionWidth, contentSize.width), _sectionHeight);
 }
 
 - (void)invalidateLayout
@@ -73,6 +74,7 @@
 
     UICollectionViewLayoutAttributes *header = [self layoutAttributesForSupplementaryViewOfKind:UICollectionElementKindSectionHeader atIndexPath:[NSIndexPath indexPathForRow:0 inSection:[self section]]];
     _sectionOffset = CGRectGetMinY([header frame]);
+    _sectionWidth = 0;
 
     CGFloat maxWidth = CGRectGetWidth([[self collectionView] bounds]);
     CGFloat yOffset = 0;
@@ -112,8 +114,6 @@
             scale = [[self delegate] collectionView:[self collectionView] layout:self zoomScaleForIndexPath:indexPath];
         }
         
-        NSLog(@"scale: %@", @(scale));
-        
         CGFloat diff = (maxWidth - itemSize.width) / 2.0;
 
         if (!CGSizeEqualToSize(itemSize, CGSizeZero)) {
@@ -121,13 +121,16 @@
             UICollectionViewLayoutAttributes *itemAttrs = [UICollectionViewLayoutAttributes layoutAttributesForCellWithIndexPath:[NSIndexPath indexPathForRow:row inSection:[self section]]];
             [itemAttrs setFrame:CGRectMake(diff, yOffset, itemSize.width, itemSize.height)];
 
+            CGAffineTransform transform = CGAffineTransformTranslate(CGAffineTransformScale(CGAffineTransformMakeTranslation(-itemSize.width/2, -itemSize.height/2), scale, scale), itemSize.width/2, itemSize.height/2);
+            
             [itemAttrs setAlpha:1];
             [itemAttrs setHidden:NO];
-            [itemAttrs setTransform:CGAffineTransformMakeScale(scale, scale)];
+            [itemAttrs setTransform:transform];
 
             yOffset += itemSize.height * scale;
 
             [_cache addObject:itemAttrs];
+            _sectionWidth = MAX(_sectionWidth, itemSize.width * scale);
         }
     }
 
