@@ -19,7 +19,7 @@
 - (instancetype)initWithCoder:(NSCoder *)coder
 {
     if (self = [super initWithCoder:coder]) {
-        [self finishInit];
+        [self _completePageCollectionCellInit];
     }
     return self;
 }
@@ -27,7 +27,7 @@
 - (instancetype)initWithFrame:(CGRect)frame
 {
     if (self = [super initWithFrame:frame]) {
-        [self finishInit];
+        [self _completePageCollectionCellInit];
     }
     return self;
 }
@@ -35,15 +35,15 @@
 - (instancetype)init
 {
     if (self = [super init]) {
-        [self finishInit];
+        [self _completePageCollectionCellInit];
     }
     return self;
 }
 
-- (void)finishInit
+- (void)_completePageCollectionCellInit
 {
-    _textLabel = [[UILabel alloc] initWithFrame:[self bounds]];
-    [_textLabel setAutoresizingMask:UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight];
+    _textLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 150, 150)];
+    [_textLabel setAutoresizingMask:UIViewAutoresizingNone];
     [_textLabel setTextAlignment:NSTextAlignmentCenter];
     [_textLabel setFont:[UIFont systemFontOfSize:22]];
 
@@ -61,6 +61,28 @@
     // UIKit bug, apply zPosition manually
     // https://stackoverflow.com/questions/31697578/uicollectionview-not-obeying-zindex-of-uicollectionviewlayoutattributes
     [[self layer] setZPosition:[layoutAttributes zIndex]];
+    [self updateTextLabelTransform];
+}
+
+#pragma mark - Frame and Bounds
+
+- (void)setFrame:(CGRect)frame
+{
+    [super setFrame:frame];
+    [self updateTextLabelTransform];
+}
+
+- (void)setBounds:(CGRect)bounds
+{
+    [super setBounds:bounds];
+    [self updateTextLabelTransform];
+}
+
+-(void)updateTextLabelTransform{
+    CGFloat scale = CGRectGetWidth([self bounds]) / CGRectGetWidth([[self textLabel] bounds]);
+    
+    [[self textLabel] setCenter:CGPointMake(CGRectGetMidX([self bounds]), CGRectGetMidY([self bounds]))];
+    [[self textLabel] setTransform:CGAffineTransformMakeScale(scale, scale)];
 }
 
 @end
