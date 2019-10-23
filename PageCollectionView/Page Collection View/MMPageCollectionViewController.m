@@ -408,7 +408,7 @@
     MMGridLayout *updatedLayout;
     if ([[self currentLayout] isShelfLayout]) {
         updatedLayout = [self newGridLayoutForSection:[indexPath section]];
-    } else if (![self activeTransitionLayout]) {
+    } else if ([[self currentLayout] isGridLayout] && ![self activeTransitionLayout]) {
         updatedLayout = [self newPageLayoutForSection:[indexPath section]];
         [updatedLayout setTargetIndexPath:indexPath];
     }

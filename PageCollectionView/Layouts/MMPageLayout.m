@@ -105,43 +105,57 @@
         CGSize itemSize = [object idealSize];
         CGFloat rotation = [object rotation];
 
+        CGRect bounds = CGRectMake(0, 0, itemSize.width, itemSize.height);
+        CGRect rotatedBounds = CGRectApplyAffineTransform(bounds, CGAffineTransformMakeRotation(rotation));
+        CGSize rotatedSize = rotatedBounds.size;
+
         // scale up our default item size so that it fits the screen width
-        itemSize.height = CGRectGetWidth([[self collectionView] bounds]) / itemSize.width * itemSize.height;
-        itemSize.width = CGRectGetWidth([[self collectionView] bounds]);
-        
+        rotatedSize.height = CGRectGetWidth([[self collectionView] bounds]) / rotatedSize.width * rotatedSize.height;
+        rotatedSize.width = CGRectGetWidth([[self collectionView] bounds]);
+
+        CGRect unrotatedBounds = CGRectApplyAffineTransform(CGRectMake(0, 0, rotatedSize.width, rotatedSize.height), CGAffineTransformInvert(CGAffineTransformMakeRotation(rotation)));
+        itemSize = unrotatedBounds.size;
+
         CGFloat scale = 1;
         
         if([[self delegate] respondsToSelector:@selector(collectionView:layout:zoomScaleForIndexPath:)]){
             scale = [[self delegate] collectionView:[self collectionView] layout:self zoomScaleForIndexPath:indexPath];
         }
         
-        CGFloat diff = (maxWidth - itemSize.width) / 2.0;
+        CGFloat diff = (maxWidth - itemSize.width) / 2.0 * scale;
 
         if (!CGSizeEqualToSize(itemSize, CGSizeZero)) {
             // set all the attributes
+            CGFloat yDiff = (itemSize.height - rotatedSize.height) / 2.0 * scale;
             UICollectionViewLayoutAttributes *itemAttrs = [UICollectionViewLayoutAttributes layoutAttributesForCellWithIndexPath:[NSIndexPath indexPathForRow:row inSection:[self section]]];
-            [itemAttrs setFrame:CGRectMake(diff, yOffset, itemSize.width, itemSize.height)];
+            CGRect frame = CGRectMake(diff, yOffset - yDiff, itemSize.width, itemSize.height);
+
+            frame.origin.x = round(frame.origin.x);
+            frame.origin.y = round(frame.origin.y);
+            frame.size.width = round(frame.size.width);
+            frame.size.height = round(frame.size.height);
+
+            [itemAttrs setFrame:frame];
 
             CGAffineTransform transform = CGAffineTransformTranslate(CGAffineTransformScale(CGAffineTransformMakeTranslation(-itemSize.width/2, -itemSize.height/2), scale, scale), itemSize.width/2, itemSize.height/2);
 
             if(rotation){
                 transform = CGAffineTransformRotate(transform, rotation);
-            }else{
-                [itemAttrs setTransform:CGAffineTransformIdentity];
             }
 
             [itemAttrs setAlpha:1];
             [itemAttrs setHidden:NO];
             [itemAttrs setTransform:transform];
 
-            yOffset += itemSize.height * scale;
+            yOffset += rotatedSize.height * scale;
 
 
             [_cache addObject:itemAttrs];
+
             _sectionWidth = MAX(_sectionWidth, itemSize.width * scale);
         }
     }
-
+    
     yOffset += maxItemHeight + [self sectionInsets].bottom;
 
     _sectionHeight = yOffset;
@@ -149,6 +163,9 @@
 
 - (NSArray<__kindof UICollectionViewLayoutAttributes *> *)layoutAttributesForElementsInRect:(CGRect)rect
 {
+    CGRect visibleRect = [[self collectionView] bounds];
+    visibleRect.origin = [[self collectionView] contentOffset];
+
     return [_cache filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id _Nullable obj, NSDictionary<NSString *, id> *_Nullable bindings) {
         return CGRectIntersectsRect([obj frame], rect);
     }]];
