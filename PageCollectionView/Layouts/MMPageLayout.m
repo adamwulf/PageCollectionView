@@ -105,17 +105,24 @@
         CGSize itemSize = [object idealSize];
         CGFloat rotation = [object rotation];
 
+        CGRect bounds = CGRectMake(0, 0, itemSize.width, itemSize.height);
+        CGRect rotatedBounds = CGRectApplyAffineTransform(bounds, CGAffineTransformMakeRotation(rotation));
+        CGSize rotatedSize = rotatedBounds.size;
+
         // scale up our default item size so that it fits the screen width
-        itemSize.height = CGRectGetWidth([[self collectionView] bounds]) / itemSize.width * itemSize.height;
-        itemSize.width = CGRectGetWidth([[self collectionView] bounds]);
-        
+        rotatedSize.height = CGRectGetWidth([[self collectionView] bounds]) / rotatedSize.width * rotatedSize.height;
+        rotatedSize.width = CGRectGetWidth([[self collectionView] bounds]);
+
+        CGRect unrotatedBounds = CGRectApplyAffineTransform(CGRectMake(0, 0, rotatedSize.width, rotatedSize.height), CGAffineTransformInvert(CGAffineTransformMakeRotation(rotation)));
+        itemSize = unrotatedBounds.size;
+
         CGFloat scale = 1;
         
         if([[self delegate] respondsToSelector:@selector(collectionView:layout:zoomScaleForIndexPath:)]){
             scale = [[self delegate] collectionView:[self collectionView] layout:self zoomScaleForIndexPath:indexPath];
         }
         
-        CGFloat diff = ((maxWidth - itemSize.width) / 2.0) * scale;
+        CGFloat diff = ((maxWidth - rotatedSize.width) / 2.0) * scale;
         
         itemSize.width *= scale;
         itemSize.height *= scale;
@@ -123,13 +130,18 @@
         if (!CGSizeEqualToSize(itemSize, CGSizeZero)) {
             // set all the attributes
             UICollectionViewLayoutAttributes *itemAttrs = [UICollectionViewLayoutAttributes layoutAttributesForCellWithIndexPath:[NSIndexPath indexPathForRow:row inSection:[self section]]];
-            CGRect frame = CGRectMake(diff, yOffset, itemSize.width, itemSize.height);
+            CGRect bounds = CGRectMake(0, 0, itemSize.width, itemSize.height);
+            CGPoint center = CGPointMake(diff + rotatedSize.width / 2.0, yOffset + rotatedSize.height / 2.0);
             
-            [itemAttrs setFrame:frame];
+            center.x *= scale;
+            center.y *= scale;
+            
+            [itemAttrs setBounds:bounds];
+            [itemAttrs setCenter:center];
             [itemAttrs setAlpha:1];
             [itemAttrs setHidden:NO];
 
-            yOffset += CGRectGetHeight(frame);
+            yOffset += rotatedSize.height;
             
             if(rotation){
                 [itemAttrs setTransform:CGAffineTransformMakeRotation(rotation)];
@@ -138,7 +150,7 @@
             }
             
             [_cache addObject:itemAttrs];
-            _sectionWidth = MAX(_sectionWidth, CGRectGetWidth(frame));
+            _sectionWidth = MAX(_sectionWidth, CGRectGetWidth(bounds));
         }
     }
 
