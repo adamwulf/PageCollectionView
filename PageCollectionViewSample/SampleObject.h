@@ -14,6 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface SampleObject : NSObject<MMShelfLayoutObject>
 
 @property(nonatomic, assign) CGSize idealSize;
+@property(nonatomic, assign) CGFloat rotation;
 
 @end
 

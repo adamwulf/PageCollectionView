@@ -103,6 +103,7 @@
         id<MMShelfLayoutObject>object = [[self datasource] collectionView:[self collectionView] layout:self objectAtIndexPath:indexPath];
 
         CGSize itemSize = [object idealSize];
+        CGFloat rotation = [object rotation];
 
         // scale up our default item size so that it fits the screen width
         itemSize.height = CGRectGetWidth([[self collectionView] bounds]) / itemSize.width * itemSize.height;
@@ -122,12 +123,19 @@
             [itemAttrs setFrame:CGRectMake(diff, yOffset, itemSize.width, itemSize.height)];
 
             CGAffineTransform transform = CGAffineTransformTranslate(CGAffineTransformScale(CGAffineTransformMakeTranslation(-itemSize.width/2, -itemSize.height/2), scale, scale), itemSize.width/2, itemSize.height/2);
-            
+
+            if(rotation){
+                transform = CGAffineTransformRotate(transform, rotation);
+            }else{
+                [itemAttrs setTransform:CGAffineTransformIdentity];
+            }
+
             [itemAttrs setAlpha:1];
             [itemAttrs setHidden:NO];
             [itemAttrs setTransform:transform];
 
             yOffset += itemSize.height * scale;
+
 
             [_cache addObject:itemAttrs];
             _sectionWidth = MAX(_sectionWidth, itemSize.width * scale);
