@@ -58,19 +58,20 @@
 {
     CGFloat widthDiff = [self collectionViewContentSize].width - rowWidth - [self sectionInsets].left - [self sectionInsets].right;
     CGFloat spacing = widthDiff / ([items count] - 1);
+    yOffset += maxItemHeight / 2.0; // so that the yoffset is based on the center instead of the top
 
     [items enumerateObjectsUsingBlock:^(UICollectionViewLayoutAttributes *_Nonnull obj, NSUInteger index, BOOL *_Nonnull stop) {
-        CGRect fr = [obj frame];
+        CGPoint center = [obj center];
 
-        fr.origin.x += [self sectionInsets].left;
+        center.x += [self sectionInsets].left;
 
         if (shouldStretch) {
-            fr.origin.x += spacing * index;
+            center.x += spacing * index;
         }
 
-        fr.origin.y = yOffset + (maxItemHeight - CGRectGetHeight(fr)) / 2.0;
+        center.y = yOffset;
 
-        [obj setFrame:fr];
+        [obj setCenter:center];
     }];
 
     return items;
@@ -129,6 +130,7 @@
     for (NSInteger row = 0; row < rowCount; row++) {
         id<MMShelfLayoutObject>object = [[self datasource] collectionView:[self collectionView] layout:self objectAtIndexPath:[NSIndexPath indexPathForRow:row inSection:[self section]]];
         CGSize itemSize = [object idealSize];
+        CGFloat rotation = [object rotation];
         CGFloat heightRatio = itemSize.height / itemSize.width;
         
         if (itemSize.height <= itemSize.width && itemSize.width > [self maxDim]) {
@@ -166,7 +168,13 @@
             lastItemWidth = itemSize.width;
             rowWidth += itemSize.width + _itemMargins.right + +_itemMargins.left;
             xOffset += itemSize.width + _itemMargins.right + +_itemMargins.left;
-
+            
+            if(rotation){
+                [itemAttrs setTransform:CGAffineTransformMakeRotation(rotation)];
+            }else{
+                [itemAttrs setTransform:CGAffineTransformIdentity];
+            }
+            
             [attributesPerRow addObject:itemAttrs];
         }
     }

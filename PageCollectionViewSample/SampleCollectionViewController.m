@@ -32,16 +32,18 @@
 - (id<MMShelfLayoutObject>)collectionView:(UICollectionView *)collectionView layout:(MMShelfLayout *)collectionViewLayout objectAtIndexPath:(NSIndexPath *)indexPath{
     CGFloat fullWidth = CGRectGetWidth([collectionView bounds]);
     CGSize size = CGSizeMake(fullWidth, fullWidth);
+    CGFloat rotation = 0;
     
     // handle different size items similar to flow layout
-    if(indexPath.row % 7 == 0){
-        size.height = 1.2 * size.width;
-    }else if(indexPath.row % 3 == 0){
-        size.height = .8 * size.width;
+    size.height = 1.4 * size.width;
+
+    if(indexPath.row % 5 == 0){
+        rotation = M_PI_2;
     }
     
     SampleObject *obj = [[SampleObject alloc] init];
     [obj setIdealSize:size];
+    [obj setRotation:rotation];
 
     return obj;
 }

@@ -127,6 +127,7 @@
         for (NSInteger row = 0; row < rowCount; row++) {
             id<MMShelfLayoutObject>object = [[self datasource] collectionView:[self collectionView] layout:self objectAtIndexPath:[NSIndexPath indexPathForRow:row inSection:section]];
             CGSize itemSize = [object idealSize];
+            CGFloat rotation = [object rotation];
             CGFloat heightRatio = itemSize.height / itemSize.width;
 
             if (itemSize.height <= itemSize.width && itemSize.width > [self maxDim]) {
@@ -151,6 +152,12 @@
                 } else {
                     [itemAttrs setAlpha:1];
                     [itemAttrs setHidden:NO];
+                }
+                
+                if(rotation){
+                    [itemAttrs setTransform:CGAffineTransformMakeRotation(rotation)];
+                }else{
+                    [itemAttrs setTransform:CGAffineTransformIdentity];
                 }
 
                 [_cache addObject:itemAttrs];
