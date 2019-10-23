@@ -114,23 +114,24 @@
             scale = [[self delegate] collectionView:[self collectionView] layout:self zoomScaleForIndexPath:indexPath];
         }
         
-        CGFloat diff = (maxWidth - itemSize.width) / 2.0;
-
+        CGFloat diff = ((maxWidth - itemSize.width) / 2.0) * scale;
+        
+        itemSize.width *= scale;
+        itemSize.height *= scale;
+        
         if (!CGSizeEqualToSize(itemSize, CGSizeZero)) {
             // set all the attributes
             UICollectionViewLayoutAttributes *itemAttrs = [UICollectionViewLayoutAttributes layoutAttributesForCellWithIndexPath:[NSIndexPath indexPathForRow:row inSection:[self section]]];
-            [itemAttrs setFrame:CGRectMake(diff, yOffset, itemSize.width, itemSize.height)];
-
-            CGAffineTransform transform = CGAffineTransformTranslate(CGAffineTransformScale(CGAffineTransformMakeTranslation(-itemSize.width/2, -itemSize.height/2), scale, scale), itemSize.width/2, itemSize.height/2);
+            CGRect frame = CGRectMake(diff, yOffset, itemSize.width, itemSize.height);
             
+            [itemAttrs setFrame:frame];
             [itemAttrs setAlpha:1];
             [itemAttrs setHidden:NO];
-            [itemAttrs setTransform:transform];
 
-            yOffset += itemSize.height * scale;
+            yOffset += CGRectGetHeight(frame);
 
             [_cache addObject:itemAttrs];
-            _sectionWidth = MAX(_sectionWidth, itemSize.width * scale);
+            _sectionWidth = MAX(_sectionWidth, CGRectGetWidth(frame));
         }
     }
 
