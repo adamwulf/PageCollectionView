@@ -163,9 +163,6 @@
 
 - (NSArray<__kindof UICollectionViewLayoutAttributes *> *)layoutAttributesForElementsInRect:(CGRect)rect
 {
-    CGRect visibleRect = [[self collectionView] bounds];
-    visibleRect.origin = [[self collectionView] contentOffset];
-
     return [_cache filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id _Nullable obj, NSDictionary<NSString *, id> *_Nullable bindings) {
         return CGRectIntersectsRect([obj frame], rect);
     }]];
