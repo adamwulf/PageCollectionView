@@ -13,23 +13,26 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface MMPageCollectionViewController : UICollectionViewController <MMPageCollectionViewDelegatePageLayout>
+
+@interface MMPageCollectionViewController : UIViewController <UICollectionViewDataSource, MMPageCollectionViewDelegatePageLayout>
+
+@property(nonatomic, strong, readonly) MMPageCollectionView *collectionView;
 
 /// Returns the current layout of the collection view. If the collectionview is in the middel of a transition layout,
 /// then the current layout of that transition layout is returned
-- (__kindof MMShelfLayout*)currentLayout;
+- (__kindof MMShelfLayout *)currentLayout;
 
 #pragma mark - Subclasses
 
-@property (nonatomic, readonly) CGFloat scale;
+@property(nonatomic, readonly) CGFloat scale;
 
--(MMShelfLayout*)newShelfLayout;
--(MMGridLayout*)newGridLayoutForSection:(NSUInteger)section;
--(MMPageLayout*)newPageLayoutForSection:(NSUInteger)section;
+- (MMShelfLayout *)newShelfLayout;
+- (MMGridLayout *)newGridLayoutForSection:(NSUInteger)section;
+- (MMPageLayout *)newPageLayoutForSection:(NSUInteger)section;
 
--(void)willBeginZoom;
--(void)didEndZoom;
--(void)didCancelZoom;
+- (void)willBeginZoom;
+- (void)didEndZoom;
+- (void)didCancelZoom;
 
 @end
 

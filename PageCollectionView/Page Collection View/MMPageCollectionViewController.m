@@ -20,6 +20,7 @@
 
 @interface MMPageCollectionViewController () <MMPageCollectionViewDelegate>
 
+@property(nonatomic, strong) IBOutlet MMPageCollectionView *collectionView;
 @property(nonatomic, strong) UICollectionViewFlowLayout *pageLayout;
 @property(nonatomic, assign) BOOL transitionComplete;
 
@@ -30,7 +31,7 @@
     NSIndexPath *_targetIndexPath;
     MMGridIconView *_collapseGridIcon;
     MMPageIconView *_collapsePageIcon;
-    
+
     CGPoint _zoomOffset;
     NSNumber *_isZoomingPage;
     MMPinchVelocityGestureRecognizer *_pinchGesture;
@@ -38,14 +39,9 @@
 
 @synthesize scale = _scale;
 
-+ (UICollectionViewLayout *)layout
-{
-    return [[MMShelfLayout alloc] init];
-}
-
 - (instancetype)init
 {
-    if (self = [super initWithCollectionViewLayout:[[self class] layout]]) {
+    if (self = [super init]) {
     }
 
     return self;
@@ -88,16 +84,21 @@
     _scale = 1.0;
 
     [[self collectionView] addObserver:self forKeyPath:@"collectionViewLayout" options:NSKeyValueObservingOptionOld context:nil];
+
+    [[self collectionView] setAlwaysBounceVertical:[[self currentLayout] bounceVertical]];
+    [[self collectionView] setAlwaysBounceHorizontal:[[self currentLayout] bounceHorizontal]];
 }
 
 #pragma mark - Layout Helpers
 
--(UICollectionViewTransitionLayout*)activeTransitionLayout{
-    return [[[self collectionView] collectionViewLayout] isKindOfClass:[UICollectionViewTransitionLayout class]] ? (UICollectionViewTransitionLayout*) [[self collectionView] collectionViewLayout] : nil;
+- (UICollectionViewTransitionLayout *)activeTransitionLayout
+{
+    return [[[self collectionView] collectionViewLayout] isKindOfClass:[UICollectionViewTransitionLayout class]] ? (UICollectionViewTransitionLayout *)[[self collectionView] collectionViewLayout] : nil;
 }
 
-- (__kindof MMShelfLayout*)currentLayout{
-    return (MMShelfLayout*)([self activeTransitionLayout] ? [[self activeTransitionLayout] currentLayout] : [[self collectionView] collectionViewLayout]);
+- (__kindof MMShelfLayout *)currentLayout
+{
+    return (MMShelfLayout *)([self activeTransitionLayout] ? [[self activeTransitionLayout] currentLayout] : [[self collectionView] collectionViewLayout]);
 }
 
 #pragma mark - Gestures
@@ -116,7 +117,7 @@
 - (void)pinchFromShelf:(MMPinchVelocityGestureRecognizer *)pinchGesture
 {
     UICollectionViewTransitionLayout *transitionLayout = [self activeTransitionLayout];
-    
+
     if (!transitionLayout && [pinchGesture state] == UIGestureRecognizerStateBegan) {
         NSIndexPath *targetPath = [[self collectionView] indexPathForItemAtPoint:[pinchGesture locationInView:[self collectionView]]];
 
@@ -158,7 +159,7 @@
 - (void)pinchFromGrid:(MMPinchVelocityGestureRecognizer *)pinchGesture
 {
     UICollectionViewTransitionLayout *transitionLayout = [self activeTransitionLayout];
-    
+
     if ([pinchGesture state] == UIGestureRecognizerStateBegan) {
         _targetIndexPath = [[self collectionView] closestIndexPathForPoint:[pinchGesture locationInView:[self collectionView]]];
     } else if (_targetIndexPath && [pinchGesture state] == UIGestureRecognizerStateChanged) {
@@ -227,7 +228,6 @@
     locInView.y -= [[self collectionView] frame].origin.y;
 
     if ([pinchGesture state] == UIGestureRecognizerStateBegan) {
-
         _targetIndexPath = [[self collectionView] closestIndexPathForPoint:[pinchGesture locationInView:[self collectionView]]];
         _zoomOffset = [[self collectionView] contentOffset];
         _zoomOffset.x += locInView.x;
@@ -260,30 +260,30 @@
             UICollectionViewLayout *nextLayout;
             if ((!_isZoomingPage && pinchGesture.scaleDirection > 0) || [_isZoomingPage boolValue] || _scale > 1.0) {
                 // scale page up
-                if(![_isZoomingPage boolValue]){
+                if (![_isZoomingPage boolValue]) {
                     [self willBeginZoom];
                 }
-                
+
                 _isZoomingPage = @(YES);
                 [[self currentLayout] invalidateLayout];
-                
+
                 CGPoint updatedOffset = _zoomOffset;
                 CGFloat minScale = 1.0 / _scale;
                 updatedOffset.x *= MAX(minScale, pinchGesture.scale);
                 updatedOffset.y *= MAX(minScale, pinchGesture.scale);
-                
+
                 updatedOffset.x -= locInView.x;
                 updatedOffset.y -= locInView.y;
-                
+
                 // now make sure our offset is sane according
                 // to the min/max allowed offset for ou content size
                 CGFloat offset = [[self currentLayout] collectionViewContentSize].width - CGRectGetWidth([[self collectionView] bounds]);
-                
+
                 updatedOffset.x = MAX(0, updatedOffset.x);
                 updatedOffset.x = MIN(offset, updatedOffset.x);
 
                 [[self collectionView] setContentOffset:updatedOffset animated:NO];
-            } else if(!_isZoomingPage || ![_isZoomingPage boolValue]){
+            } else if (!_isZoomingPage || ![_isZoomingPage boolValue]) {
                 _isZoomingPage = @(NO);
                 // transition into grid
                 MMGridLayout *gridLayout = [self newGridLayoutForSection:[targetPath section]];
@@ -297,24 +297,23 @@
             }
         }
     } else if ([pinchGesture state] == UIGestureRecognizerStateEnded) {
-        if(!_transitionComplete && transitionLayout){
+        if (!_transitionComplete && transitionLayout) {
             if ([pinchGesture scaleDirection] < 0) {
                 [[self collectionView] finishInteractiveTransition];
             } else {
                 [[self collectionView] cancelInteractiveTransition];
             }
-
         }
-        if([_isZoomingPage boolValue]){
+        if ([_isZoomingPage boolValue]) {
             _scale = MAX(1.0, _scale * [_pinchGesture scale]);
         }
         _transitionComplete = YES;
         _isZoomingPage = nil;
         [self didEndZoom];
     } else {
-        if(!_transitionComplete && transitionLayout){
+        if (!_transitionComplete && transitionLayout) {
             [[self collectionView] cancelInteractiveTransition];
-        }else{
+        } else {
             [[self currentLayout] invalidateLayout];
         }
 
@@ -413,18 +412,20 @@
         [updatedLayout setTargetIndexPath:indexPath];
     }
 
-    if(updatedLayout){
+    if (updatedLayout) {
         [[self collectionView] setCollectionViewLayout:updatedLayout animated:YES completion:nil];
     }
 }
 
 #pragma mark - Shelf Layout
 
-- (id<MMShelfLayoutObject>)collectionView:(UICollectionView *)collectionView layout:(MMShelfLayout *)collectionViewLayout objectAtIndexPath:(NSIndexPath *)indexPath{
+- (id<MMShelfLayoutObject>)collectionView:(UICollectionView *)collectionView layout:(MMShelfLayout *)collectionViewLayout objectAtIndexPath:(NSIndexPath *)indexPath
+{
     @throw [NSException exceptionWithName:@"AbstractMethodException" reason:[NSString stringWithFormat:@"Must override %@", NSStringFromSelector(_cmd)] userInfo:nil];
 }
 
--(CGFloat)collectionView:(UICollectionView *)collectionView layout:(MMPageLayout *)collectionViewLayout zoomScaleForIndexPath:(NSIndexPath *)indexPath{
+- (CGFloat)collectionView:(UICollectionView *)collectionView layout:(MMPageLayout *)collectionViewLayout zoomScaleForIndexPath:(NSIndexPath *)indexPath
+{
     return [self scale];
 }
 
@@ -448,6 +449,8 @@
 {
     if ([newLayout isKindOfClass:[MMShelfLayout class]]) {
         [(MMShelfLayout *)newLayout setTargetIndexPath:nil];
+        [[self collectionView] setAlwaysBounceVertical:[(MMShelfLayout *)newLayout bounceVertical]];
+        [[self collectionView] setAlwaysBounceHorizontal:[(MMShelfLayout *)newLayout bounceHorizontal]];
     }
 }
 
@@ -458,37 +461,44 @@
 
 #pragma mark - Subclasses
 
--(CGFloat)scale{
+- (CGFloat)scale
+{
     CGFloat scale = _scale;
-    
-    if([_isZoomingPage boolValue]){
+
+    if ([_isZoomingPage boolValue]) {
         scale = MAX(1.0, scale * [_pinchGesture scale]);
     }
-    
+
     return scale;
 }
 
--(MMShelfLayout*)newShelfLayout{
+- (MMShelfLayout *)newShelfLayout
+{
     return [[MMShelfLayout alloc] init];
 }
 
--(MMGridLayout*)newGridLayoutForSection:(NSUInteger)section{
+- (MMGridLayout *)newGridLayoutForSection:(NSUInteger)section
+{
     return [[MMGridLayout alloc] initWithSection:section];
 }
 
--(MMPageLayout*)newPageLayoutForSection:(NSUInteger)section{
+- (MMPageLayout *)newPageLayoutForSection:(NSUInteger)section
+{
     return [[MMPageLayout alloc] initWithSection:section];
 }
 
--(void)willBeginZoom{
+- (void)willBeginZoom
+{
     // noop, available for subclasses
 }
 
--(void)didEndZoom{
+- (void)didEndZoom
+{
     // noop, available for subclasses
 }
 
--(void)didCancelZoom{
+- (void)didCancelZoom
+{
     // noop, available for subclasses
 }
 

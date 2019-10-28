@@ -1,30 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="15400" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="YES-Q1-rW3">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="15400" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="noW-dQ-aLJ">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15404"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
         <!--Sample Collection View Controller-->
-        <scene sceneID="y6e-os-JPc">
+        <scene sceneID="PA7-yb-fBK">
             <objects>
-                <collectionViewController id="YES-Q1-rW3" customClass="SampleCollectionViewController" sceneMemberID="viewController">
-                    <collectionView key="view" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" id="eVd-yx-nhY" customClass="MMPageCollectionView">
+                <viewController id="noW-dQ-aLJ" customClass="SampleCollectionViewController" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="Vgn-0L-SEn">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" alwaysBounceVertical="YES" alwaysBounceHorizontal="YES" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="lut-G7-2nf" customClass="MMPageCollectionView">
+                                <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                <collectionViewLayout key="collectionViewLayout" id="xhn-0o-j6q" customClass="MMShelfLayout"/>
+                                <cells/>
+                                <connections>
+                                    <outlet property="dataSource" destination="noW-dQ-aLJ" id="Uvo-43-HK4"/>
+                                    <outlet property="delegate" destination="noW-dQ-aLJ" id="dYr-0s-4hJ"/>
+                                </connections>
+                            </collectionView>
+                        </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
-                        <collectionViewLayout key="collectionViewLayout" id="JXt-MZ-3Qf" customClass="MMShelfLayout"/>
-                        <cells/>
-                        <connections>
-                            <outlet property="dataSource" destination="YES-Q1-rW3" id="vXC-Ts-41J"/>
-                            <outlet property="delegate" destination="YES-Q1-rW3" id="3pi-XI-Vwn"/>
-                        </connections>
-                    </collectionView>
-                </collectionViewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="BzH-CQ-GXz" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+                        <constraints>
+                            <constraint firstItem="lut-G7-2nf" firstAttribute="top" secondItem="Vgn-0L-SEn" secondAttribute="top" id="CBQ-MS-aUz"/>
+                            <constraint firstItem="lut-G7-2nf" firstAttribute="leading" secondItem="Vgn-0L-SEn" secondAttribute="leading" id="NSp-1x-fBe"/>
+                            <constraint firstAttribute="trailing" secondItem="lut-G7-2nf" secondAttribute="trailing" id="VQ9-g2-E1R"/>
+                            <constraint firstAttribute="bottom" secondItem="lut-G7-2nf" secondAttribute="bottom" id="o64-sf-aqi"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="4TU-J1-1aD"/>
+                    </view>
+                    <connections>
+                        <outlet property="collectionView" destination="lut-G7-2nf" id="ShF-f8-aWe"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="mUN-pX-dgj" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="136" y="112"/>
+            <point key="canvasLocation" x="135" y="-562"/>
         </scene>
     </scenes>
 </document>

@@ -50,6 +50,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, readonly) BOOL isGridLayout;
 @property(nonatomic, readonly) BOOL isPageLayout;
 
+@property(nonatomic, readonly) BOOL bounceVertical;
+@property(nonatomic, readonly) BOOL bounceHorizontal;
+
+
 @end
 
 NS_ASSUME_NONNULL_END

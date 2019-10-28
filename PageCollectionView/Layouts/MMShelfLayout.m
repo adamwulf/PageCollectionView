@@ -47,15 +47,28 @@
     return self;
 }
 
--(BOOL)isShelfLayout{
+- (BOOL)isShelfLayout
+{
     return YES;
 }
 
--(BOOL)isGridLayout{
+- (BOOL)isGridLayout
+{
     return NO;
 }
 
--(BOOL)isPageLayout{
+- (BOOL)isPageLayout
+{
+    return NO;
+}
+
+- (BOOL)bounceVertical
+{
+    return YES;
+}
+
+- (BOOL)bounceHorizontal
+{
     return NO;
 }
 
@@ -67,7 +80,7 @@
 - (id<MMPageCollectionViewDataSourceShelfLayout>)datasource
 {
     NSAssert([[[self collectionView] dataSource] conformsToProtocol:@protocol(MMPageCollectionViewDataSourceShelfLayout)], @"CollectionView data source must conform to MMPageCollectionViewDataSourceShelfLayout");
-    
+
     return (id<MMPageCollectionViewDataSourceShelfLayout>)[[self collectionView] dataSource];
 }
 
@@ -125,7 +138,7 @@
 
         // Calculate the size of each row
         for (NSInteger row = 0; row < rowCount; row++) {
-            id<MMShelfLayoutObject>object = [[self datasource] collectionView:[self collectionView] layout:self objectAtIndexPath:[NSIndexPath indexPathForRow:row inSection:section]];
+            id<MMShelfLayoutObject> object = [[self datasource] collectionView:[self collectionView] layout:self objectAtIndexPath:[NSIndexPath indexPathForRow:row inSection:section]];
             CGSize itemSize = [object idealSize];
             CGFloat rotation = [object rotation];
             CGFloat heightRatio = itemSize.height / itemSize.width;
@@ -133,7 +146,7 @@
             if (itemSize.height <= itemSize.width && itemSize.width > [self maxDim]) {
                 itemSize.height = [self maxDim] * heightRatio;
                 itemSize.width = [self maxDim];
-            }else if(itemSize.height >= itemSize.width && itemSize.height > [self maxDim]){
+            } else if (itemSize.height >= itemSize.width && itemSize.height > [self maxDim]) {
                 itemSize.height = [self maxDim];
                 itemSize.width = [self maxDim] / heightRatio;
             }
@@ -153,10 +166,10 @@
                     [itemAttrs setAlpha:1];
                     [itemAttrs setHidden:NO];
                 }
-                
-                if(rotation){
+
+                if (rotation) {
                     [itemAttrs setTransform:CGAffineTransformMakeRotation(rotation)];
-                }else{
+                } else {
                     [itemAttrs setTransform:CGAffineTransformIdentity];
                 }
 
@@ -240,7 +253,7 @@
         CGFloat targetY = attrs.frame.origin.y;
         targetY = targetY < size.height - screenHeight ? targetY : size.height - screenHeight;
         targetY = targetY < inset ? inset : targetY;
-        
+
         return CGPointMake(0, targetY);
     }
 

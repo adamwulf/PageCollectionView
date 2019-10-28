@@ -40,16 +40,24 @@
     return self;
 }
 
--(BOOL)isShelfLayout{
+- (BOOL)isShelfLayout
+{
     return NO;
 }
 
--(BOOL)isGridLayout{
+- (BOOL)isGridLayout
+{
     return NO;
 }
 
--(BOOL)isPageLayout{
+- (BOOL)isPageLayout
+{
     return YES;
+}
+
+- (BOOL)bounceHorizontal
+{
+    return NO;
 }
 
 #pragma mark - UICollectionViewLayout
@@ -100,7 +108,7 @@
     // Calculate the size of each row
     for (NSInteger row = 0; row < rowCount; row++) {
         NSIndexPath *indexPath = [NSIndexPath indexPathForRow:row inSection:[self section]];
-        id<MMShelfLayoutObject>object = [[self datasource] collectionView:[self collectionView] layout:self objectAtIndexPath:indexPath];
+        id<MMShelfLayoutObject> object = [[self datasource] collectionView:[self collectionView] layout:self objectAtIndexPath:indexPath];
 
         CGSize itemSize = [object idealSize];
         CGFloat rotation = [object rotation];
@@ -117,11 +125,11 @@
         itemSize = unrotatedBounds.size;
 
         CGFloat scale = 1;
-        
-        if([[self delegate] respondsToSelector:@selector(collectionView:layout:zoomScaleForIndexPath:)]){
+
+        if ([[self delegate] respondsToSelector:@selector(collectionView:layout:zoomScaleForIndexPath:)]) {
             scale = [[self delegate] collectionView:[self collectionView] layout:self zoomScaleForIndexPath:indexPath];
         }
-        
+
         CGFloat diff = (maxWidth - itemSize.width) / 2.0 * scale;
 
         if (!CGSizeEqualToSize(itemSize, CGSizeZero)) {
@@ -137,9 +145,9 @@
 
             [itemAttrs setFrame:frame];
 
-            CGAffineTransform transform = CGAffineTransformTranslate(CGAffineTransformScale(CGAffineTransformMakeTranslation(-itemSize.width/2, -itemSize.height/2), scale, scale), itemSize.width/2, itemSize.height/2);
+            CGAffineTransform transform = CGAffineTransformTranslate(CGAffineTransformScale(CGAffineTransformMakeTranslation(-itemSize.width / 2, -itemSize.height / 2), scale, scale), itemSize.width / 2, itemSize.height / 2);
 
-            if(rotation){
+            if (rotation) {
                 transform = CGAffineTransformRotate(transform, rotation);
             }
 
@@ -155,7 +163,7 @@
             _sectionWidth = MAX(_sectionWidth, itemSize.width * scale);
         }
     }
-    
+
     yOffset += maxItemHeight + [self sectionInsets].bottom;
 
     _sectionHeight = yOffset;

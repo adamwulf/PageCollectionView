@@ -21,15 +21,18 @@
     CGFloat _sectionHeight;
 }
 
--(BOOL)isShelfLayout{
+- (BOOL)isShelfLayout
+{
     return NO;
 }
 
--(BOOL)isGridLayout{
+- (BOOL)isGridLayout
+{
     return YES;
 }
 
--(BOOL)isPageLayout{
+- (BOOL)isPageLayout
+{
     return NO;
 }
 
@@ -128,15 +131,15 @@
 
     // Calculate the size of each row
     for (NSInteger row = 0; row < rowCount; row++) {
-        id<MMShelfLayoutObject>object = [[self datasource] collectionView:[self collectionView] layout:self objectAtIndexPath:[NSIndexPath indexPathForRow:row inSection:[self section]]];
+        id<MMShelfLayoutObject> object = [[self datasource] collectionView:[self collectionView] layout:self objectAtIndexPath:[NSIndexPath indexPathForRow:row inSection:[self section]]];
         CGSize itemSize = [object idealSize];
         CGFloat rotation = [object rotation];
         CGFloat heightRatio = itemSize.height / itemSize.width;
-        
+
         if (itemSize.height <= itemSize.width && itemSize.width > [self maxDim]) {
             itemSize.height = [self maxDim] * heightRatio;
             itemSize.width = [self maxDim];
-        }else if(itemSize.height >= itemSize.width && itemSize.height > [self maxDim]){
+        } else if (itemSize.height >= itemSize.width && itemSize.height > [self maxDim]) {
             itemSize.height = [self maxDim];
             itemSize.width = [self maxDim] / heightRatio;
         }
@@ -168,13 +171,13 @@
             lastItemWidth = itemSize.width;
             rowWidth += itemSize.width + _itemMargins.right + +_itemMargins.left;
             xOffset += itemSize.width + _itemMargins.right + +_itemMargins.left;
-            
-            if(rotation){
+
+            if (rotation) {
                 [itemAttrs setTransform:CGAffineTransformMakeRotation(rotation)];
-            }else{
+            } else {
                 [itemAttrs setTransform:CGAffineTransformIdentity];
             }
-            
+
             [attributesPerRow addObject:itemAttrs];
         }
     }
@@ -261,8 +264,9 @@
         UICollectionViewLayoutAttributes *attrs = [self layoutAttributesForItemAtIndexPath:[self targetIndexPath]];
         CGRect itemFrame = [attrs frame];
         CGFloat diff = MAX(0, (CGRectGetHeight([[self collectionView] bounds]) - CGRectGetHeight(itemFrame)) / 2.0);
+        CGFloat const inset = [[self collectionView] safeAreaInsets].top;
 
-        p.y = MAX(0, CGRectGetMinY(itemFrame) - diff);
+        p.y = MAX(-inset, CGRectGetMinY(itemFrame) - diff - inset);
 
         return p;
     }
