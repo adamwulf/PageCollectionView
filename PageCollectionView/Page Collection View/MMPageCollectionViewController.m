@@ -274,6 +274,7 @@
 
                 updatedOffset.x -= locInView.x;
                 updatedOffset.y -= locInView.y;
+                updatedOffset.y = MAX(0, updatedOffset.y);
 
                 // now make sure our offset is sane according
                 // to the min/max allowed offset for ou content size

@@ -30,21 +30,19 @@
     NSMutableArray<SampleObject *> *arr = [NSMutableArray array];
 
     CGFloat fullWidth = CGRectGetWidth([[self collectionView] bounds]);
-    CGSize size = CGSizeMake(fullWidth, fullWidth);
-
-    // handle different size items similar to flow layout
-    size.height = 1.4 * size.width;
 
     for (NSInteger i = 0; i < 20; i++) {
-        CGFloat rotation = 0;
+        SampleObject *obj = [[SampleObject alloc] init];
 
         if (i % 5 == 0) {
-            rotation = M_PI_2;
+            [obj setRotation:M_PI_2];
         }
 
-        SampleObject *obj = [[SampleObject alloc] init];
-        [obj setIdealSize:size];
-        [obj setRotation:rotation];
+        if (i % 7 == 0) {
+            [obj setIdealSize:CGSizeMake(fullWidth / 2, 1.4 * fullWidth / 2)];
+        } else {
+            [obj setIdealSize:CGSizeMake(fullWidth, 1.4 * fullWidth)];
+        }
 
         [arr addObject:obj];
     }

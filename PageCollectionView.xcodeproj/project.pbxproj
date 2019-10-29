@@ -89,6 +89,7 @@
 		C5722AD82352ED5D00C3E6D3 /* MMGridIconView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MMGridIconView.h; sourceTree = "<group>"; };
 		C5722AD92352ED5D00C3E6D3 /* MMGridIconView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MMGridIconView.m; sourceTree = "<group>"; };
 		C5722ADA2352ED5D00C3E6D3 /* MMPageIconView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MMPageIconView.m; sourceTree = "<group>"; };
+		C5E6EBCF2367FC7000B5BBE1 /* Constants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Constants.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -137,6 +138,7 @@
 				C5722ACC2352ED5D00C3E6D3 /* Layouts */,
 				C5722AC32352ED5D00C3E6D3 /* Page Collection View */,
 				C5722A9E2352ED1F00C3E6D3 /* PageCollectionView.h */,
+				C5E6EBCF2367FC7000B5BBE1 /* Constants.h */,
 				C5722A9F2352ED1F00C3E6D3 /* Info.plist */,
 			);
 			path = PageCollectionView;

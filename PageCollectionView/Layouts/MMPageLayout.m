@@ -7,6 +7,7 @@
 //
 
 #import "MMPageLayout.h"
+#import "Constants.h"
 
 
 @interface MMPageLayout ()
@@ -84,10 +85,11 @@
     _sectionOffset = CGRectGetMinY([header frame]);
     _sectionWidth = 0;
 
-    CGFloat maxWidth = CGRectGetWidth([[self collectionView] bounds]);
+    CGFloat const kMaxWidth = CGRectGetWidth([[self collectionView] bounds]);
     CGFloat yOffset = 0;
-    NSInteger rowCount = [[self collectionView] numberOfItemsInSection:[self section]];
+    NSInteger const kRowCount = [[self collectionView] numberOfItemsInSection:[self section]];
     CGFloat maxItemHeight = 0;
+    CGFloat maxItemWidth = kMaxWidth;
     CGSize headerSize = [self defaultHeaderSize];
 
     // Calculate the header section size, if any
@@ -106,60 +108,35 @@
     yOffset += [self sectionInsets].top;
 
     // Calculate the size of each row
-    for (NSInteger row = 0; row < rowCount; row++) {
+    for (NSInteger row = 0; row < kRowCount; row++) {
         NSIndexPath *indexPath = [NSIndexPath indexPathForRow:row inSection:[self section]];
         id<MMShelfLayoutObject> object = [[self datasource] collectionView:[self collectionView] layout:self objectAtIndexPath:indexPath];
 
-        CGSize itemSize = [object idealSize];
+        CGSize idealSize = [object idealSize];
         CGFloat rotation = [object rotation];
-
-        CGRect bounds = CGRectMake(0, 0, itemSize.width, itemSize.height);
-        CGRect rotatedBounds = CGRectApplyAffineTransform(bounds, CGAffineTransformMakeRotation(rotation));
-        CGSize rotatedSize = rotatedBounds.size;
 
         // scale the page so that if fits in screen when its fully rotated.
         // This is the screen-aligned box that contains our rotated page
-        rotatedSize.height = CGRectGetWidth([[self collectionView] bounds]) / rotatedSize.width * rotatedSize.height;
-        rotatedSize.width = CGRectGetWidth([[self collectionView] bounds]);
-
+        CGSize boundingSize = MMFitSizeToWidth(MMBoundingSizeFor(idealSize, rotation), kMaxWidth);
         // now we need to find the unrotated size of the page that
         // fits in the above box when its rotated.
         //
         // If the page is the exact same size as the screen, we rotate it
         // and then we have to shrink it so that the corners of the page
         // are always barely touching the screen edges.
-        //
-        // to do that, if W is the scaled width of the page, H is the
-        // scaled height of of the page, and SW is the screen width, and
-        // A is the angle that the page has been rotated, then:
-        //
-        // SW == cos(A) * W + sin(A) * H
-        // and we know that H / W == R, so
-        // SW == cos(A) * W + sin(A) * W * R
-        // SW == (cos(A) + sin(A) * R) * W
-        // W == SW / (cos(A) + sin(A) * R)
-        // H = W * R
-        //
-        // care needs to be taken to use the ABS() of the sine and cosine
-        // otherwise the sum of the two will cancel out and leave us with
-        // the wrong ratio. Signs of these probably matter to tell us left/right
-        // or some other thing we can ignore.
-        CGFloat ratio = itemSize.height / itemSize.width;
-        CGFloat sw = CGRectGetWidth([[self collectionView] bounds]);
-        CGFloat newWidth = sw / (ABS(sin(rotation) * ratio) + ABS(cos(rotation)));
-        itemSize = CGSizeMake(ABS(newWidth), ABS(newWidth * ratio));
+        CGSize itemSize = CGSizeForInscribedWidth(idealSize.height / idealSize.width, boundingSize.width, rotation);
 
+        // Next, scale the page to account for our delegate's pinch-to-zoom.
         CGFloat scale = 1;
-
         if ([[self delegate] respondsToSelector:@selector(collectionView:layout:zoomScaleForIndexPath:)]) {
             scale = [[self delegate] collectionView:[self collectionView] layout:self zoomScaleForIndexPath:indexPath];
         }
 
-        CGFloat diff = (maxWidth - itemSize.width) / 2.0 * scale;
+        CGFloat diff = (kMaxWidth - itemSize.width) / 2.0 * scale;
 
         if (!CGSizeEqualToSize(itemSize, CGSizeZero)) {
             // set all the attributes
-            CGFloat yDiff = (itemSize.height - rotatedSize.height) / 2.0 * scale;
+            CGFloat yDiff = (itemSize.height - boundingSize.height) / 2.0 * scale;
             UICollectionViewLayoutAttributes *itemAttrs = [UICollectionViewLayoutAttributes layoutAttributesForCellWithIndexPath:[NSIndexPath indexPathForRow:row inSection:[self section]]];
             CGRect frame = CGRectMake(diff, yOffset - yDiff, itemSize.width, itemSize.height);
 
@@ -192,12 +169,25 @@
                 [itemAttrs setCenter:CGPointMake([itemAttrs center].x - bumpX, [itemAttrs center].y - bumpY)];
             }
 
-            yOffset += rotatedSize.height * scale;
+            yOffset += boundingSize.height * scale;
 
             [_cache addObject:itemAttrs];
 
-            _sectionWidth = MAX(_sectionWidth, itemSize.width * scale);
+            maxItemWidth = MAX(maxItemWidth, boundingSize.width * scale);
+            _sectionWidth = MAX(_sectionWidth, kMaxWidth * scale);
         }
+    }
+
+    if (maxItemWidth < _sectionWidth) {
+        CGFloat leftBump = (_sectionWidth - maxItemWidth) / 2;
+
+        for (UICollectionViewLayoutAttributes *attrs in _cache) {
+            CGPoint center = [attrs center];
+            center.x -= leftBump;
+            [attrs setCenter:center];
+        }
+
+        _sectionWidth = maxItemWidth;
     }
 
     yOffset += maxItemHeight + [self sectionInsets].bottom;
