@@ -25,18 +25,48 @@
                                     <outlet property="delegate" destination="noW-dQ-aLJ" id="dYr-0s-4hJ"/>
                                 </connections>
                             </collectionView>
+                            <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="N9y-6q-fg5">
+                                <rect key="frame" x="349" y="44" width="45" height="30"/>
+                                <state key="normal" title="Rotate"/>
+                                <connections>
+                                    <action selector="rotate:" destination="noW-dQ-aLJ" eventType="touchUpInside" id="gZE-7I-HxF"/>
+                                </connections>
+                            </button>
+                            <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Ukp-VQ-yqt">
+                                <rect key="frame" x="353" y="148" width="39" height="30"/>
+                                <state key="normal" title="Reset"/>
+                                <connections>
+                                    <action selector="reset:" destination="noW-dQ-aLJ" eventType="touchUpInside" id="jy2-65-tMw"/>
+                                </connections>
+                            </button>
+                            <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Wrm-7V-5wF">
+                                <rect key="frame" x="352" y="96" width="40" height="30"/>
+                                <state key="normal" title="Bump"/>
+                                <connections>
+                                    <action selector="bump:" destination="noW-dQ-aLJ" eventType="touchUpInside" id="Z25-Uo-Nuf"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                         <constraints>
+                            <constraint firstItem="N9y-6q-fg5" firstAttribute="top" secondItem="4TU-J1-1aD" secondAttribute="top" id="7Yh-ce-ZG9"/>
+                            <constraint firstItem="4TU-J1-1aD" firstAttribute="trailing" secondItem="Ukp-VQ-yqt" secondAttribute="trailing" constant="22" id="8OO-GU-jf0"/>
                             <constraint firstItem="lut-G7-2nf" firstAttribute="top" secondItem="Vgn-0L-SEn" secondAttribute="top" id="CBQ-MS-aUz"/>
                             <constraint firstItem="lut-G7-2nf" firstAttribute="leading" secondItem="Vgn-0L-SEn" secondAttribute="leading" id="NSp-1x-fBe"/>
+                            <constraint firstItem="Ukp-VQ-yqt" firstAttribute="top" secondItem="Wrm-7V-5wF" secondAttribute="bottom" constant="22" id="SSK-am-yD5"/>
+                            <constraint firstItem="4TU-J1-1aD" firstAttribute="trailing" secondItem="Wrm-7V-5wF" secondAttribute="trailing" constant="22" id="TLs-3R-lyf"/>
+                            <constraint firstItem="Wrm-7V-5wF" firstAttribute="top" secondItem="N9y-6q-fg5" secondAttribute="bottom" constant="22" id="U2j-ZB-BDm"/>
                             <constraint firstAttribute="trailing" secondItem="lut-G7-2nf" secondAttribute="trailing" id="VQ9-g2-E1R"/>
                             <constraint firstAttribute="bottom" secondItem="lut-G7-2nf" secondAttribute="bottom" id="o64-sf-aqi"/>
+                            <constraint firstItem="4TU-J1-1aD" firstAttribute="trailing" secondItem="N9y-6q-fg5" secondAttribute="trailing" constant="20" id="ygS-zr-a2G"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="4TU-J1-1aD"/>
                     </view>
                     <connections>
+                        <outlet property="bumpButton" destination="Wrm-7V-5wF" id="Nwz-a5-3Zd"/>
                         <outlet property="collectionView" destination="lut-G7-2nf" id="ShF-f8-aWe"/>
+                        <outlet property="resetButton" destination="Ukp-VQ-yqt" id="rUn-bc-R8U"/>
+                        <outlet property="rotateButton" destination="N9y-6q-fg5" id="MZB-eS-gIz"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="mUN-pX-dgj" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
