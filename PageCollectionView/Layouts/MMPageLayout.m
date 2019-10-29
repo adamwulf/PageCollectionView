@@ -117,12 +117,37 @@
         CGRect rotatedBounds = CGRectApplyAffineTransform(bounds, CGAffineTransformMakeRotation(rotation));
         CGSize rotatedSize = rotatedBounds.size;
 
-        // scale up our default item size so that it fits the screen width
+        // scale the page so that if fits in screen when its fully rotated.
+        // This is the screen-aligned box that contains our rotated page
         rotatedSize.height = CGRectGetWidth([[self collectionView] bounds]) / rotatedSize.width * rotatedSize.height;
         rotatedSize.width = CGRectGetWidth([[self collectionView] bounds]);
 
-        CGRect unrotatedBounds = CGRectApplyAffineTransform(CGRectMake(0, 0, rotatedSize.width, rotatedSize.height), CGAffineTransformInvert(CGAffineTransformMakeRotation(rotation)));
-        itemSize = unrotatedBounds.size;
+        // now we need to find the unrotated size of the page that
+        // fits in the above box when its rotated.
+        //
+        // If the page is the exact same size as the screen, we rotate it
+        // and then we have to shrink it so that the corners of the page
+        // are always barely touching the screen edges.
+        //
+        // to do that, if W is the scaled width of the page, H is the
+        // scaled height of of the page, and SW is the screen width, and
+        // A is the angle that the page has been rotated, then:
+        //
+        // SW == cos(A) * W + sin(A) * H
+        // and we know that H / W == R, so
+        // SW == cos(A) * W + sin(A) * W * R
+        // SW == (cos(A) + sin(A) * R) * W
+        // W == SW / (cos(A) + sin(A) * R)
+        // H = W * R
+        //
+        // care needs to be taken to use the ABS() of the sine and cosine
+        // otherwise the sum of the two will cancel out and leave us with
+        // the wrong ratio. Signs of these probably matter to tell us left/right
+        // or some other thing we can ignore.
+        CGFloat ratio = itemSize.height / itemSize.width;
+        CGFloat sw = CGRectGetWidth([[self collectionView] bounds]);
+        CGFloat newWidth = sw / (ABS(sin(rotation) * ratio) + ABS(cos(rotation)));
+        itemSize = CGSizeMake(ABS(newWidth), ABS(newWidth * ratio));
 
         CGFloat scale = 1;
 
