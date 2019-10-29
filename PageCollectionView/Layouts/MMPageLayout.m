@@ -138,10 +138,11 @@
             UICollectionViewLayoutAttributes *itemAttrs = [UICollectionViewLayoutAttributes layoutAttributesForCellWithIndexPath:[NSIndexPath indexPathForRow:row inSection:[self section]]];
             CGRect frame = CGRectMake(diff, yOffset - yDiff, itemSize.width, itemSize.height);
 
-            frame.origin.x = round(frame.origin.x);
-            frame.origin.y = round(frame.origin.y);
-            frame.size.width = round(frame.size.width);
-            frame.size.height = round(frame.size.height);
+            // For forcing the UICollectionViewBug described below.
+            // this doesn't need to be included, as a 180 degree
+            // rotation will also do this, but forcing it will
+            // help make sure our fix described below will always work
+            frame.origin.x -= -0.00000000000011368683772161603;
 
             [itemAttrs setFrame:frame];
 
@@ -155,8 +156,18 @@
             [itemAttrs setHidden:NO];
             [itemAttrs setTransform:transform];
 
-            yOffset += rotatedSize.height * scale;
+            {
+                // This block is for the UICollectionViewBug, where if a frame of an item
+                // has a tiny offset from a round pixel, then it might disappear from the
+                // collection view altogether.
+                // Filed at FB7415012
+                CGFloat bumpX = [itemAttrs frame].origin.x - floor([itemAttrs frame].origin.x);
+                CGFloat bumpY = [itemAttrs frame].origin.y - floor([itemAttrs frame].origin.y);
 
+                [itemAttrs setCenter:CGPointMake([itemAttrs center].x - bumpX, [itemAttrs center].y - bumpY)];
+            }
+
+            yOffset += rotatedSize.height * scale;
 
             [_cache addObject:itemAttrs];
 
