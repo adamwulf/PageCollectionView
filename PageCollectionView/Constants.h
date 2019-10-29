@@ -10,8 +10,8 @@
 #define Constants_h
 
 #define MMBoundingSizeFor(itemSize, rotation) _MMBoundingSizeFor(itemSize, rotation)
-#define MMFitSizeToWidth(itemSize, targetWidth) _MMFitSizeToWidth(itemSize, targetWidth, NO)
-#define CGSizeForInscribedWidth(ratio, width, rotation) _CGSizeForInscribedWidth(ratio, width, rotation, NO)
+#define MMFitSizeToWidth(itemSize, targetWidth, scaleUpToFit) _MMFitSizeToWidth(itemSize, targetWidth, scaleUpToFit)
+#define CGSizeForInscribedWidth(ratio, width, rotation) _CGSizeForInscribedWidth(ratio, width, rotation)
 
 /// @param itemSize the size of the box to rotate
 /// @param rotation the angle of the box to rotate
@@ -56,7 +56,7 @@ static inline CGSize _MMFitSizeToWidth(CGSize itemSize, CGFloat targetWidth, BOO
  * the wrong ratio. Signs of these probably matter to tell us left/right
  * or some other thing we can ignore.
  */
-static inline CGSize _CGSizeForInscribedWidth(CGFloat ratio, CGFloat width, CGFloat rotation, BOOL scale)
+static inline CGSize _CGSizeForInscribedWidth(CGFloat ratio, CGFloat width, CGFloat rotation)
 {
     CGFloat newWidth = width / (ABS(sin(rotation) * ratio) + ABS(cos(rotation)));
     return CGSizeMake(ABS(newWidth), ABS(newWidth * ratio));

@@ -85,10 +85,13 @@
     _sectionOffset = CGRectGetMinY([header frame]);
     _sectionWidth = 0;
 
+    /// When YES, all pages will scale to fit width of collection view.
+    /// When NO, pages will only scale to fit width when already too large. Small pages will stay small.
+    BOOL const forceToFitWidth = NO;
+
     CGFloat const kMaxWidth = CGRectGetWidth([[self collectionView] bounds]);
     CGFloat yOffset = 0;
     NSInteger const kRowCount = [[self collectionView] numberOfItemsInSection:[self section]];
-    CGFloat maxItemHeight = 0;
     CGFloat maxItemWidth = kMaxWidth;
     CGSize headerSize = [self defaultHeaderSize];
 
@@ -117,7 +120,7 @@
 
         // scale the page so that if fits in screen when its fully rotated.
         // This is the screen-aligned box that contains our rotated page
-        CGSize boundingSize = MMFitSizeToWidth(MMBoundingSizeFor(idealSize, rotation), kMaxWidth);
+        CGSize boundingSize = MMFitSizeToWidth(MMBoundingSizeFor(idealSize, rotation), kMaxWidth, forceToFitWidth);
         // now we need to find the unrotated size of the page that
         // fits in the above box when its rotated.
         //
@@ -179,6 +182,10 @@
     }
 
     if (maxItemWidth < _sectionWidth) {
+        // all of our pages were smaller than the width of our collection view.
+        // center these items in the available space left over. This lets us
+        // keep the collection view content size the same as its width for as
+        // long as possible when zooming collections of smaller pages
         CGFloat leftBump = (_sectionWidth - maxItemWidth) / 2;
 
         for (UICollectionViewLayoutAttributes *attrs in _cache) {
@@ -190,7 +197,7 @@
         _sectionWidth = maxItemWidth;
     }
 
-    yOffset += maxItemHeight + [self sectionInsets].bottom;
+    yOffset += [self sectionInsets].bottom;
 
     _sectionHeight = yOffset;
 }
