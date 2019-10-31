@@ -17,6 +17,7 @@
 @property(nonatomic, strong) IBOutlet UIButton *rotateButton;
 @property(nonatomic, strong) IBOutlet UIButton *bumpButton;
 @property(nonatomic, strong) IBOutlet UIButton *resetButton;
+@property(nonatomic, strong) IBOutlet UIButton *fitWidthButton;
 
 @end
 
@@ -119,6 +120,24 @@
     [[self collectionView] setCollectionViewLayout:layout animated:YES];
 }
 
+/// Change the scale from actual-size to fit-width
+- (IBAction)swapScale:(id)sender
+{
+    if ([[self currentLayout] isPageLayout]) {
+        CGPoint center = [[self collectionView] contentOffset];
+        center.x += [[self collectionView] bounds].size.width / 2;
+        center.y += 100;
+
+        NSIndexPath *indexPath = [[self collectionView] closestIndexPathForPoint:center];
+
+        MMPageLayout *layout = [[MMPageLayout alloc] initWithSection:[indexPath section]];
+        [layout setTargetIndexPath:indexPath];
+        [layout setFitWidth:![[self currentLayout] fitWidth]];
+
+        [[self collectionView] setCollectionViewLayout:layout animated:YES];
+    }
+}
+
 #pragma mark - Shelf Layout
 
 - (id<MMShelfLayoutObject>)collectionView:(UICollectionView *)collectionView layout:(MMShelfLayout *)collectionViewLayout objectAtIndexPath:(NSIndexPath *)indexPath
@@ -132,10 +151,12 @@
         [[self rotateButton] setHidden:NO];
         [[self bumpButton] setHidden:NO];
         [[self resetButton] setHidden:NO];
+        [[self fitWidthButton] setHidden:NO];
     } else {
         [[self rotateButton] setHidden:YES];
         [[self bumpButton] setHidden:YES];
         [[self resetButton] setHidden:YES];
+        [[self fitWidthButton] setHidden:YES];
     }
 }
 

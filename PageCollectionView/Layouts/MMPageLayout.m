@@ -29,6 +29,7 @@
 {
     if (self = [super initWithCoder:coder]) {
         _cache = [NSMutableArray array];
+        _fitWidth = YES;
     }
     return self;
 }
@@ -37,6 +38,7 @@
 {
     if (self = [super initWithSection:section]) {
         _cache = [NSMutableArray array];
+        _fitWidth = YES;
     }
     return self;
 }
@@ -85,10 +87,6 @@
     _sectionOffset = CGRectGetMinY([header frame]);
     _sectionWidth = 0;
 
-    /// When YES, all pages will scale to fit width of collection view.
-    /// When NO, pages will only scale to fit width when already too large. Small pages will stay small.
-    BOOL const forceToFitWidth = NO;
-
     CGFloat const kMaxWidth = CGRectGetWidth([[self collectionView] bounds]);
     CGFloat yOffset = 0;
     NSInteger const kRowCount = [[self collectionView] numberOfItemsInSection:[self section]];
@@ -120,7 +118,7 @@
 
         // scale the page so that if fits in screen when its fully rotated.
         // This is the screen-aligned box that contains our rotated page
-        CGSize boundingSize = MMFitSizeToWidth(MMBoundingSizeFor(idealSize, rotation), kMaxWidth, forceToFitWidth);
+        CGSize boundingSize = MMFitSizeToWidth(MMBoundingSizeFor(idealSize, rotation), kMaxWidth, [self fitWidth]);
         // now we need to find the unrotated size of the page that
         // fits in the above box when its rotated.
         //

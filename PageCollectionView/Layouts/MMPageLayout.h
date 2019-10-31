@@ -15,13 +15,18 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol MMPageCollectionViewDelegatePageLayout <MMPageCollectionViewDelegateShelfLayout>
 @optional
 
-- (CGFloat)collectionView:(UICollectionView *)collectionView layout:(MMPageLayout *)collectionViewLayout zoomScaleForIndexPath:(NSIndexPath*)indexPath;
+- (CGFloat)collectionView:(UICollectionView *)collectionView layout:(MMPageLayout *)collectionViewLayout zoomScaleForIndexPath:(NSIndexPath *)indexPath;
 
 @end
+
 
 @interface MMPageLayout : MMGridLayout
 
 @property(nonatomic, readonly) id<MMPageCollectionViewDelegatePageLayout> delegate;
+
+/// When YES, all pages will scale to fit width of collection view.
+/// When NO, pages will only scale to fit width when already too large. Small pages will stay small.
+@property(nonatomic, assign) BOOL fitWidth;
 
 @end
 

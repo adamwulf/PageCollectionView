@@ -46,9 +46,17 @@
                                     <action selector="bump:" destination="noW-dQ-aLJ" eventType="touchUpInside" id="Z25-Uo-Nuf"/>
                                 </connections>
                             </button>
+                            <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="h72-y6-wjx">
+                                <rect key="frame" x="354" y="200" width="38" height="30"/>
+                                <state key="normal" title="Scale"/>
+                                <connections>
+                                    <action selector="swapScale:" destination="noW-dQ-aLJ" eventType="touchUpInside" id="CTt-4I-3P5"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                         <constraints>
+                            <constraint firstItem="h72-y6-wjx" firstAttribute="top" secondItem="Ukp-VQ-yqt" secondAttribute="bottom" constant="22" id="7BL-ge-PJ5"/>
                             <constraint firstItem="N9y-6q-fg5" firstAttribute="top" secondItem="4TU-J1-1aD" secondAttribute="top" id="7Yh-ce-ZG9"/>
                             <constraint firstItem="4TU-J1-1aD" firstAttribute="trailing" secondItem="Ukp-VQ-yqt" secondAttribute="trailing" constant="22" id="8OO-GU-jf0"/>
                             <constraint firstItem="lut-G7-2nf" firstAttribute="top" secondItem="Vgn-0L-SEn" secondAttribute="top" id="CBQ-MS-aUz"/>
@@ -58,6 +66,7 @@
                             <constraint firstItem="Wrm-7V-5wF" firstAttribute="top" secondItem="N9y-6q-fg5" secondAttribute="bottom" constant="22" id="U2j-ZB-BDm"/>
                             <constraint firstAttribute="trailing" secondItem="lut-G7-2nf" secondAttribute="trailing" id="VQ9-g2-E1R"/>
                             <constraint firstAttribute="bottom" secondItem="lut-G7-2nf" secondAttribute="bottom" id="o64-sf-aqi"/>
+                            <constraint firstItem="4TU-J1-1aD" firstAttribute="trailing" secondItem="h72-y6-wjx" secondAttribute="trailing" constant="22" id="pCb-nk-6gI"/>
                             <constraint firstItem="4TU-J1-1aD" firstAttribute="trailing" secondItem="N9y-6q-fg5" secondAttribute="trailing" constant="20" id="ygS-zr-a2G"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="4TU-J1-1aD"/>
@@ -65,6 +74,7 @@
                     <connections>
                         <outlet property="bumpButton" destination="Wrm-7V-5wF" id="Nwz-a5-3Zd"/>
                         <outlet property="collectionView" destination="lut-G7-2nf" id="ShF-f8-aWe"/>
+                        <outlet property="fitWidthButton" destination="h72-y6-wjx" id="9y8-zh-BgN"/>
                         <outlet property="resetButton" destination="Ukp-VQ-yqt" id="rUn-bc-R8U"/>
                         <outlet property="rotateButton" destination="N9y-6q-fg5" id="MZB-eS-gIz"/>
                     </connections>
