@@ -11,6 +11,7 @@
 
 #define MMBoundingSizeFor(itemSize, rotation) _MMBoundingSizeFor(itemSize, rotation)
 #define MMFitSizeToWidth(itemSize, targetWidth, scaleUpToFit) _MMFitSizeToWidth(itemSize, targetWidth, scaleUpToFit)
+#define MMFitSizeToHeight(itemSize, targetHeight, scaleUpToFit) _MMFitSizeToHeight(itemSize, targetHeight, scaleUpToFit)
 #define CGSizeForInscribedWidth(ratio, width, rotation) _CGSizeForInscribedWidth(ratio, width, rotation)
 
 /// @param itemSize the size of the box to rotate
@@ -29,6 +30,15 @@ static inline CGSize _MMFitSizeToWidth(CGSize itemSize, CGFloat targetWidth, BOO
 {
     if (scaleUp || itemSize.width > targetWidth) {
         return CGSizeMake(targetWidth, targetWidth / itemSize.width * itemSize.height);
+    } else {
+        return itemSize;
+    }
+}
+
+static inline CGSize _MMFitSizeToHeight(CGSize itemSize, CGFloat targetHeight, BOOL scaleUp)
+{
+    if (scaleUp || itemSize.height > targetHeight) {
+        return CGSizeMake(targetHeight * itemSize.width / itemSize.height, targetHeight);
     } else {
         return itemSize;
     }

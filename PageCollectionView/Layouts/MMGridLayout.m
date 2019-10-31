@@ -7,6 +7,7 @@
 //
 
 #import "MMGridLayout.h"
+#import "Constants.h"
 
 
 @interface MMGridLayout ()
@@ -132,21 +133,16 @@
     // Calculate the size of each row
     for (NSInteger row = 0; row < rowCount; row++) {
         id<MMShelfLayoutObject> object = [[self datasource] collectionView:[self collectionView] layout:self objectAtIndexPath:[NSIndexPath indexPathForRow:row inSection:[self section]]];
-        CGSize itemSize = [object idealSize];
         CGFloat rotation = [object rotation];
-        CGFloat heightRatio = itemSize.height / itemSize.width;
+        CGSize idealSize = MMFitSizeToWidth([object idealSize], [self maxDim], NO);
+        CGSize boundingSize = MMBoundingSizeFor(idealSize, rotation);
+        ;
 
-        if (itemSize.height <= itemSize.width && itemSize.width > [self maxDim]) {
-            itemSize.height = [self maxDim] * heightRatio;
-            itemSize.width = [self maxDim];
-        } else if (itemSize.height >= itemSize.width && itemSize.height > [self maxDim]) {
-            itemSize.height = [self maxDim];
-            itemSize.width = [self maxDim] / heightRatio;
-        }
+        idealSize = MMFitSizeToWidth(idealSize, [self maxDim], NO);
 
-        if (!CGSizeEqualToSize(itemSize, CGSizeZero)) {
+        if (!CGSizeEqualToSize(boundingSize, CGSizeZero)) {
             // can it fit on this row?
-            if (xOffset + itemSize.width + [self sectionInsets].right > [self collectionViewContentSize].width) {
+            if (xOffset + boundingSize.width + [self sectionInsets].right > [self collectionViewContentSize].width) {
                 // the row is done, remove the next item margins
                 rowWidth -= _itemMargins.right + _itemMargins.left;
                 // now realign all the items into their row so that they stretch full width
@@ -159,18 +155,19 @@
                 rowWidth = 0;
             }
 
-            maxItemHeight = MAX(maxItemHeight, itemSize.height);
+            maxItemHeight = MAX(maxItemHeight, boundingSize.height);
 
             // set all the attributes
             UICollectionViewLayoutAttributes *itemAttrs = [UICollectionViewLayoutAttributes layoutAttributesForCellWithIndexPath:[NSIndexPath indexPathForRow:row inSection:_section]];
-            [itemAttrs setFrame:CGRectMake(rowWidth, 0, itemSize.width, itemSize.height)];
+            [itemAttrs setBounds:CGRectMake(0, 0, idealSize.width, idealSize.height)];
+            [itemAttrs setCenter:CGPointMake(rowWidth + boundingSize.width / 2, 0)];
             [itemAttrs setZIndex:rowCount - row];
             [itemAttrs setAlpha:1];
             [itemAttrs setHidden:NO];
 
-            lastItemWidth = itemSize.width;
-            rowWidth += itemSize.width + _itemMargins.right + +_itemMargins.left;
-            xOffset += itemSize.width + _itemMargins.right + +_itemMargins.left;
+            lastItemWidth = boundingSize.width;
+            rowWidth += boundingSize.width + _itemMargins.right + +_itemMargins.left;
+            xOffset += boundingSize.width + _itemMargins.right + +_itemMargins.left;
 
             if (rotation) {
                 [itemAttrs setTransform:CGAffineTransformMakeRotation(rotation)];
