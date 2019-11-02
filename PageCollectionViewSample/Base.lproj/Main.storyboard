@@ -53,20 +53,34 @@
                                     <action selector="swapScale:" destination="noW-dQ-aLJ" eventType="touchUpInside" id="CTt-4I-3P5"/>
                                 </connections>
                             </button>
+                            <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="a8M-Ug-p2l">
+                                <rect key="frame" x="332" y="250" width="62" height="30"/>
+                                <state key="normal" title="Direction"/>
+                                <connections>
+                                    <action selector="toggleDirection:" destination="noW-dQ-aLJ" eventType="touchUpInside" id="sLm-jR-Plb"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                         <constraints>
+                            <constraint firstItem="Ukp-VQ-yqt" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="4TU-J1-1aD" secondAttribute="leading" id="1J5-k5-cJf"/>
+                            <constraint firstItem="N9y-6q-fg5" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="4TU-J1-1aD" secondAttribute="leading" id="3GA-mb-5dD"/>
                             <constraint firstItem="h72-y6-wjx" firstAttribute="top" secondItem="Ukp-VQ-yqt" secondAttribute="bottom" constant="22" id="7BL-ge-PJ5"/>
                             <constraint firstItem="N9y-6q-fg5" firstAttribute="top" secondItem="4TU-J1-1aD" secondAttribute="top" id="7Yh-ce-ZG9"/>
                             <constraint firstItem="4TU-J1-1aD" firstAttribute="trailing" secondItem="Ukp-VQ-yqt" secondAttribute="trailing" constant="22" id="8OO-GU-jf0"/>
+                            <constraint firstItem="a8M-Ug-p2l" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="4TU-J1-1aD" secondAttribute="leading" id="9tz-EY-VGa"/>
                             <constraint firstItem="lut-G7-2nf" firstAttribute="top" secondItem="Vgn-0L-SEn" secondAttribute="top" id="CBQ-MS-aUz"/>
+                            <constraint firstItem="Wrm-7V-5wF" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="4TU-J1-1aD" secondAttribute="leading" id="CKx-MQ-6NI"/>
                             <constraint firstItem="lut-G7-2nf" firstAttribute="leading" secondItem="Vgn-0L-SEn" secondAttribute="leading" id="NSp-1x-fBe"/>
                             <constraint firstItem="Ukp-VQ-yqt" firstAttribute="top" secondItem="Wrm-7V-5wF" secondAttribute="bottom" constant="22" id="SSK-am-yD5"/>
                             <constraint firstItem="4TU-J1-1aD" firstAttribute="trailing" secondItem="Wrm-7V-5wF" secondAttribute="trailing" constant="22" id="TLs-3R-lyf"/>
                             <constraint firstItem="Wrm-7V-5wF" firstAttribute="top" secondItem="N9y-6q-fg5" secondAttribute="bottom" constant="22" id="U2j-ZB-BDm"/>
+                            <constraint firstItem="4TU-J1-1aD" firstAttribute="trailing" secondItem="a8M-Ug-p2l" secondAttribute="trailing" constant="20" id="UUc-8N-ddg"/>
                             <constraint firstAttribute="trailing" secondItem="lut-G7-2nf" secondAttribute="trailing" id="VQ9-g2-E1R"/>
+                            <constraint firstItem="h72-y6-wjx" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="4TU-J1-1aD" secondAttribute="leading" id="dVL-jB-0Qv"/>
                             <constraint firstAttribute="bottom" secondItem="lut-G7-2nf" secondAttribute="bottom" id="o64-sf-aqi"/>
                             <constraint firstItem="4TU-J1-1aD" firstAttribute="trailing" secondItem="h72-y6-wjx" secondAttribute="trailing" constant="22" id="pCb-nk-6gI"/>
+                            <constraint firstItem="a8M-Ug-p2l" firstAttribute="top" secondItem="h72-y6-wjx" secondAttribute="bottom" constant="20" id="pr4-eF-fNK"/>
                             <constraint firstItem="4TU-J1-1aD" firstAttribute="trailing" secondItem="N9y-6q-fg5" secondAttribute="trailing" constant="20" id="ygS-zr-a2G"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="4TU-J1-1aD"/>
@@ -74,6 +88,7 @@
                     <connections>
                         <outlet property="bumpButton" destination="Wrm-7V-5wF" id="Nwz-a5-3Zd"/>
                         <outlet property="collectionView" destination="lut-G7-2nf" id="ShF-f8-aWe"/>
+                        <outlet property="directionButton" destination="a8M-Ug-p2l" id="pdf-UK-7g1"/>
                         <outlet property="fitWidthButton" destination="h72-y6-wjx" id="9y8-zh-BgN"/>
                         <outlet property="resetButton" destination="Ukp-VQ-yqt" id="rUn-bc-R8U"/>
                         <outlet property="rotateButton" destination="N9y-6q-fg5" id="MZB-eS-gIz"/>

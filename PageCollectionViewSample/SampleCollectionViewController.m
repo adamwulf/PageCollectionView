@@ -18,6 +18,7 @@
 @property(nonatomic, strong) IBOutlet UIButton *bumpButton;
 @property(nonatomic, strong) IBOutlet UIButton *resetButton;
 @property(nonatomic, strong) IBOutlet UIButton *fitWidthButton;
+@property(nonatomic, strong) IBOutlet UIButton *directionButton;
 
 @end
 
@@ -80,6 +81,7 @@
 
     MMPageLayout *layout = [[MMPageLayout alloc] initWithSection:[indexPath section]];
     [layout setTargetIndexPath:indexPath];
+    [layout setDirection:[[self currentLayout] direction]];
 
     [[self collectionView] setCollectionViewLayout:layout animated:YES];
 }
@@ -98,6 +100,7 @@
 
     MMPageLayout *layout = [[MMPageLayout alloc] initWithSection:[indexPath section]];
     [layout setTargetIndexPath:indexPath];
+    [layout setDirection:[[self currentLayout] direction]];
 
     [[self collectionView] setCollectionViewLayout:layout animated:YES];
 }
@@ -116,6 +119,7 @@
 
     MMPageLayout *layout = [[MMPageLayout alloc] initWithSection:[indexPath section]];
     [layout setTargetIndexPath:indexPath];
+    [layout setDirection:[[self currentLayout] direction]];
 
     [[self collectionView] setCollectionViewLayout:layout animated:YES];
 }
@@ -138,6 +142,28 @@
     }
 }
 
+- (IBAction)toggleDirection:(id)sender
+{
+    if ([[self currentLayout] isPageLayout]) {
+        CGPoint center = [[self collectionView] contentOffset];
+        center.x += [[self collectionView] bounds].size.width / 2;
+        center.y += 100;
+
+        NSIndexPath *indexPath = [[self collectionView] closestIndexPathForPoint:center];
+
+        MMPageLayout *layout = [[MMPageLayout alloc] initWithSection:[indexPath section]];
+        [layout setTargetIndexPath:indexPath];
+
+        if ([[self currentLayout] direction] == MMPageLayoutVertical) {
+            [layout setDirection:MMPageLayoutHorizontal];
+        } else {
+            [layout setDirection:MMPageLayoutVertical];
+        }
+
+        [[self collectionView] setCollectionViewLayout:layout animated:YES];
+    }
+}
+
 #pragma mark - Shelf Layout
 
 - (id<MMShelfLayoutObject>)collectionView:(UICollectionView *)collectionView layout:(MMShelfLayout *)collectionViewLayout objectAtIndexPath:(NSIndexPath *)indexPath
@@ -152,11 +178,13 @@
         [[self bumpButton] setHidden:NO];
         [[self resetButton] setHidden:NO];
         [[self fitWidthButton] setHidden:NO];
+        [[self directionButton] setHidden:NO];
     } else {
         [[self rotateButton] setHidden:YES];
         [[self bumpButton] setHidden:YES];
         [[self resetButton] setHidden:YES];
         [[self fitWidthButton] setHidden:YES];
+        [[self directionButton] setHidden:YES];
     }
 }
 

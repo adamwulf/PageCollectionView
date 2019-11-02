@@ -13,6 +13,7 @@
 #define MMFitSizeToWidth(itemSize, targetWidth, scaleUpToFit) _MMFitSizeToWidth(itemSize, targetWidth, scaleUpToFit)
 #define MMFitSizeToHeight(itemSize, targetHeight, scaleUpToFit) _MMFitSizeToHeight(itemSize, targetHeight, scaleUpToFit)
 #define CGSizeForInscribedWidth(ratio, width, rotation) _CGSizeForInscribedWidth(ratio, width, rotation)
+#define CGSizeForInscribedHeight(ratio, height, rotation) _CGSizeForInscribedHeight(ratio, height, rotation)
 
 /// @param itemSize the size of the box to rotate
 /// @param rotation the angle of the box to rotate
@@ -48,16 +49,16 @@ static inline CGSize _MMFitSizeToHeight(CGSize itemSize, CGFloat targetHeight, B
  * Calculate the size of a box that will inscribe a containing box of input width. The incribed box
  * @param ratio the ratio of height / width for the box that will be inscribed
  * @param rotation the angle that the incribed box is rotated
- * @param width the width of the box that contains the inscribed box
+ * @param fitWidth the width of the box that contains the inscribed box
  *
  * to do that, if W is the scaled width of the page, H is the
- * scaled height of of the page, and SW is the screen width, and
+ * scaled height of of the page, and FW is the fitWidth, and
  * A is the angle that the page has been rotated, then:
  *
- * SW == cos(A) * W + sin(A) * H
+ * FW == cos(A) * W + sin(A) * H
  * and we know that H / W == R, so
- * SW == cos(A) * W + sin(A) * W * R
- * SW == (cos(A) + sin(A) * R) * W
+ * FW == cos(A) * W + sin(A) * W * R
+ * FW == (cos(A) + sin(A) * R) * W
  * W == SW / (cos(A) + sin(A) * R)
  * H = W * R
  *
@@ -66,10 +67,24 @@ static inline CGSize _MMFitSizeToHeight(CGSize itemSize, CGFloat targetHeight, B
  * the wrong ratio. Signs of these probably matter to tell us left/right
  * or some other thing we can ignore.
  */
-static inline CGSize _CGSizeForInscribedWidth(CGFloat ratio, CGFloat width, CGFloat rotation)
+static inline CGSize _CGSizeForInscribedWidth(CGFloat ratio, CGFloat fitWidth, CGFloat rotation)
 {
-    CGFloat newWidth = width / (ABS(sin(rotation) * ratio) + ABS(cos(rotation)));
+    CGFloat newWidth = fitWidth / (ABS(sin(rotation) * ratio) + ABS(cos(rotation)));
     return CGSizeMake(ABS(newWidth), ABS(newWidth * ratio));
+}
+
+/**
+ * FH == cos(A) * H + sin(A) * W
+ * and we know that H / W == R, so
+ * FH == cos(A) * H + sin(A) * H / R
+ * FH == (cos(A) + sin(A) / R) * H
+ * H == FH / (cos(A) + sin(A) / R)
+ * H = W * R
+ */
+static inline CGSize _CGSizeForInscribedHeight(CGFloat ratio, CGFloat fitHeight, CGFloat rotation)
+{
+    CGFloat newHeight = fitHeight / (ABS(cos(rotation)) + ABS(sin(rotation) / ratio));
+    return CGSizeMake(ABS(newHeight / ratio), ABS(newHeight));
 }
 
 

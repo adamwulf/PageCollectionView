@@ -89,7 +89,7 @@
 
     CGFloat const kMaxWidth = CGRectGetWidth([[self collectionView] bounds]);
     CGFloat yOffset = 0;
-    NSInteger const kRowCount = [[self collectionView] numberOfItemsInSection:[self section]];
+    NSInteger const kPageCount = [[self collectionView] numberOfItemsInSection:[self section]];
     CGFloat maxItemWidth = kMaxWidth;
     CGSize headerSize = [self defaultHeaderSize];
 
@@ -109,8 +109,8 @@
     yOffset += [self sectionInsets].top;
 
     // Calculate the size of each row
-    for (NSInteger row = 0; row < kRowCount; row++) {
-        NSIndexPath *indexPath = [NSIndexPath indexPathForRow:row inSection:[self section]];
+    for (NSInteger pageIdx = 0; pageIdx < kPageCount; pageIdx++) {
+        NSIndexPath *indexPath = [NSIndexPath indexPathForRow:pageIdx inSection:[self section]];
         id<MMShelfLayoutObject> object = [[self datasource] collectionView:[self collectionView] layout:self objectAtIndexPath:indexPath];
 
         CGSize idealSize = [object idealSize];
@@ -138,7 +138,7 @@
         if (!CGSizeEqualToSize(itemSize, CGSizeZero)) {
             // set all the attributes
             CGFloat yDiff = (itemSize.height - boundingSize.height) / 2.0 * scale;
-            UICollectionViewLayoutAttributes *itemAttrs = [UICollectionViewLayoutAttributes layoutAttributesForCellWithIndexPath:[NSIndexPath indexPathForRow:row inSection:[self section]]];
+            UICollectionViewLayoutAttributes *itemAttrs = [UICollectionViewLayoutAttributes layoutAttributesForCellWithIndexPath:[NSIndexPath indexPathForRow:pageIdx inSection:[self section]]];
             CGRect frame = CGRectMake(diff, yOffset - yDiff, itemSize.width, itemSize.height);
 
             // For forcing the UICollectionViewBug described below.

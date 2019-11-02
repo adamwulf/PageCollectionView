@@ -12,6 +12,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class MMPageLayout;
 
+typedef enum : NSUInteger {
+    MMPageLayoutHorizontal = 0,
+    MMPageLayoutVertical,
+} MMPageLayoutDirection;
+
 @protocol MMPageCollectionViewDelegatePageLayout <MMPageCollectionViewDelegateShelfLayout>
 @optional
 
@@ -27,6 +32,7 @@ NS_ASSUME_NONNULL_BEGIN
 /// When YES, all pages will scale to fit width of collection view.
 /// When NO, pages will only scale to fit width when already too large. Small pages will stay small.
 @property(nonatomic, assign) BOOL fitWidth;
+@property(nonatomic, assign) MMPageLayoutDirection direction;
 
 @end
 
