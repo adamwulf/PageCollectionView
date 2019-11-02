@@ -83,14 +83,13 @@
 {
     [super prepareLayout];
 
-    UICollectionViewLayoutAttributes *header = [self layoutAttributesForSupplementaryViewOfKind:UICollectionElementKindSectionHeader atIndexPath:[NSIndexPath indexPathForRow:0 inSection:[self section]]];
-    _sectionOffset = CGRectGetMinY([header frame]);
+    _sectionOffset = 0;
     _sectionWidth = 0;
 
-    CGFloat const kMaxWidth = CGRectGetWidth([[self collectionView] bounds]);
-    CGFloat yOffset = 0;
+    CGFloat const kMaxHeight = CGRectGetHeight([[self collectionView] bounds]);
+    CGFloat xOffset = 0;
     NSInteger const kPageCount = [[self collectionView] numberOfItemsInSection:[self section]];
-    CGFloat maxItemWidth = kMaxWidth;
+    CGFloat maxItemHeight = kMaxHeight;
     CGSize headerSize = [self defaultHeaderSize];
 
     // Calculate the header section size, if any
@@ -100,13 +99,13 @@
 
     if (!CGSizeEqualToSize(headerSize, CGSizeZero)) {
         UICollectionViewLayoutAttributes *headerAttrs = [UICollectionViewLayoutAttributes layoutAttributesForSupplementaryViewOfKind:UICollectionElementKindSectionHeader withIndexPath:[NSIndexPath indexPathForRow:0 inSection:[self section]]];
-        [headerAttrs setFrame:CGRectMake(0, yOffset, headerSize.width, headerSize.height)];
+        [headerAttrs setFrame:CGRectMake(xOffset, 0, headerSize.width, headerSize.height)];
         [_cache addObject:headerAttrs];
 
-        yOffset += headerSize.height;
+        xOffset += headerSize.width;
     }
 
-    yOffset += [self sectionInsets].top;
+    xOffset += [self sectionInsets].left;
 
     // Calculate the size of each row
     for (NSInteger pageIdx = 0; pageIdx < kPageCount; pageIdx++) {
@@ -118,14 +117,14 @@
 
         // scale the page so that if fits in screen when its fully rotated.
         // This is the screen-aligned box that contains our rotated page
-        CGSize boundingSize = MMFitSizeToWidth(MMBoundingSizeFor(idealSize, rotation), kMaxWidth, [self fitWidth]);
+        CGSize boundingSize = MMFitSizeToHeight(MMBoundingSizeFor(idealSize, rotation), kMaxHeight, [self fitWidth]);
         // now we need to find the unrotated size of the page that
         // fits in the above box when its rotated.
         //
         // If the page is the exact same size as the screen, we rotate it
         // and then we have to shrink it so that the corners of the page
         // are always barely touching the screen edges.
-        CGSize itemSize = CGSizeForInscribedWidth(idealSize.height / idealSize.width, boundingSize.width, rotation);
+        CGSize itemSize = CGSizeForInscribedHeight(idealSize.height / idealSize.width, boundingSize.height, rotation);
 
         // Next, scale the page to account for our delegate's pinch-to-zoom.
         CGFloat scale = 1;
@@ -133,13 +132,13 @@
             scale = [[self delegate] collectionView:[self collectionView] layout:self zoomScaleForIndexPath:indexPath];
         }
 
-        CGFloat diff = (kMaxWidth - itemSize.width) / 2.0 * scale;
+        CGFloat diff = (kMaxHeight - itemSize.height) / 2.0 * scale;
 
         if (!CGSizeEqualToSize(itemSize, CGSizeZero)) {
             // set all the attributes
-            CGFloat yDiff = (itemSize.height - boundingSize.height) / 2.0 * scale;
+            CGFloat xDiff = (itemSize.width - boundingSize.width) / 2.0 * scale;
             UICollectionViewLayoutAttributes *itemAttrs = [UICollectionViewLayoutAttributes layoutAttributesForCellWithIndexPath:[NSIndexPath indexPathForRow:pageIdx inSection:[self section]]];
-            CGRect frame = CGRectMake(diff, yOffset - yDiff, itemSize.width, itemSize.height);
+            CGRect frame = CGRectMake(xOffset - xDiff, diff, itemSize.width, itemSize.height);
 
             // For forcing the UICollectionViewBug described below.
             // this doesn't need to be included, as a 180 degree
@@ -170,34 +169,34 @@
                 [itemAttrs setCenter:CGPointMake([itemAttrs center].x - bumpX, [itemAttrs center].y - bumpY)];
             }
 
-            yOffset += boundingSize.height * scale;
+            xOffset += boundingSize.width * scale;
 
             [_cache addObject:itemAttrs];
 
-            maxItemWidth = MAX(maxItemWidth, boundingSize.width * scale);
-            _sectionWidth = MAX(_sectionWidth, kMaxWidth * scale);
+            maxItemHeight = MAX(maxItemHeight, boundingSize.height * scale);
+            _sectionHeight = MAX(_sectionHeight, kMaxHeight * scale);
         }
     }
 
-    if (maxItemWidth < _sectionWidth) {
+    if (maxItemHeight < _sectionHeight) {
         // all of our pages were smaller than the width of our collection view.
         // center these items in the available space left over. This lets us
         // keep the collection view content size the same as its width for as
         // long as possible when zooming collections of smaller pages
-        CGFloat leftBump = (_sectionWidth - maxItemWidth) / 2;
+        CGFloat leftBump = (_sectionHeight - maxItemHeight) / 2;
 
         for (UICollectionViewLayoutAttributes *attrs in _cache) {
             CGPoint center = [attrs center];
-            center.x -= leftBump;
+            center.y -= leftBump;
             [attrs setCenter:center];
         }
 
-        _sectionWidth = maxItemWidth;
+        _sectionHeight = maxItemHeight;
     }
 
-    yOffset += [self sectionInsets].bottom;
+    xOffset += [self sectionInsets].left;
 
-    _sectionHeight = yOffset;
+    _sectionWidth = xOffset;
 }
 
 - (NSArray<__kindof UICollectionViewLayoutAttributes *> *)layoutAttributesForElementsInRect:(CGRect)rect
@@ -235,18 +234,35 @@
 
 - (CGPoint)targetContentOffsetForProposedContentOffset:(CGPoint)proposedContentOffset
 {
-    if ([self targetIndexPath]) {
-        if ([[self targetIndexPath] row] == 0) {
-            UICollectionViewLayoutAttributes *attrs = [self layoutAttributesForItemAtIndexPath:[self targetIndexPath]];
+    if ([self direction] == MMPageLayoutHorizontal) {
+        if ([self targetIndexPath]) {
+            if ([[self targetIndexPath] row] == 0) {
+                UICollectionViewLayoutAttributes *attrs = [self layoutAttributesForItemAtIndexPath:[self targetIndexPath]];
 
-            return CGPointMake(0, CGRectGetMinY([attrs frame]));
-        } else {
-            UICollectionViewLayoutAttributes *attrs = [self layoutAttributesForItemAtIndexPath:[self targetIndexPath]];
+                return CGPointMake(CGRectGetMinX([attrs frame]), 0);
+            } else {
+                UICollectionViewLayoutAttributes *attrs = [self layoutAttributesForItemAtIndexPath:[self targetIndexPath]];
 
-            CGRect itemFrame = [attrs frame];
-            CGFloat diff = MAX(0, (CGRectGetHeight([[self collectionView] bounds]) - CGRectGetHeight(itemFrame)) / 2.0);
+                CGRect itemFrame = [attrs frame];
+                CGFloat diff = MAX(0, (CGRectGetWidth([[self collectionView] bounds]) - CGRectGetWidth(itemFrame)) / 2.0);
 
-            return CGPointMake(0, CGRectGetMinY(itemFrame) - diff);
+                return CGPointMake(CGRectGetMinX(itemFrame) - diff, 0);
+            }
+        }
+    } else {
+        if ([self targetIndexPath]) {
+            if ([[self targetIndexPath] row] == 0) {
+                UICollectionViewLayoutAttributes *attrs = [self layoutAttributesForItemAtIndexPath:[self targetIndexPath]];
+
+                return CGPointMake(0, CGRectGetMinY([attrs frame]));
+            } else {
+                UICollectionViewLayoutAttributes *attrs = [self layoutAttributesForItemAtIndexPath:[self targetIndexPath]];
+
+                CGRect itemFrame = [attrs frame];
+                CGFloat diff = MAX(0, (CGRectGetHeight([[self collectionView] bounds]) - CGRectGetHeight(itemFrame)) / 2.0);
+
+                return CGPointMake(0, CGRectGetMinY(itemFrame) - diff);
+            }
         }
     }
 
