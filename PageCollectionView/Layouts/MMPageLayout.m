@@ -86,7 +86,8 @@
     _sectionOffset = 0;
     _sectionWidth = 0;
 
-    CGFloat const kMaxHeight = CGRectGetHeight([[self collectionView] bounds]);
+    UIEdgeInsets insets = [[self collectionView] safeAreaInsets];
+    CGFloat const kMaxHeight = CGRectGetHeight([[self collectionView] bounds]) - insets.top - insets.bottom;
     CGFloat xOffset = 0;
     NSInteger const kPageCount = [[self collectionView] numberOfItemsInSection:[self section]];
     CGFloat maxItemHeight = kMaxHeight;
