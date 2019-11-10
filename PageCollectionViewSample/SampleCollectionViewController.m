@@ -82,6 +82,7 @@
     MMPageLayout *layout = [[MMPageLayout alloc] initWithSection:[indexPath section]];
     [layout setTargetIndexPath:indexPath];
     [layout setDirection:[[self currentLayout] direction]];
+    [layout setFitWidth:[[self currentLayout] fitWidth]];
 
     [[self collectionView] setCollectionViewLayout:layout animated:YES];
 }
@@ -101,6 +102,7 @@
     MMPageLayout *layout = [[MMPageLayout alloc] initWithSection:[indexPath section]];
     [layout setTargetIndexPath:indexPath];
     [layout setDirection:[[self currentLayout] direction]];
+    [layout setFitWidth:[[self currentLayout] fitWidth]];
 
     [[self collectionView] setCollectionViewLayout:layout animated:YES];
 }
@@ -120,6 +122,7 @@
     MMPageLayout *layout = [[MMPageLayout alloc] initWithSection:[indexPath section]];
     [layout setTargetIndexPath:indexPath];
     [layout setDirection:[[self currentLayout] direction]];
+    [layout setFitWidth:[[self currentLayout] fitWidth]];
 
     [[self collectionView] setCollectionViewLayout:layout animated:YES];
 }
