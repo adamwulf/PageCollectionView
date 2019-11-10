@@ -229,9 +229,12 @@
 
     if ([pinchGesture state] == UIGestureRecognizerStateBegan) {
         _targetIndexPath = [[self collectionView] closestIndexPathForPoint:[pinchGesture locationInView:[self collectionView]]];
-        _zoomOffset = [[self collectionView] contentOffset];
-        _zoomOffset.x += locInView.x;
-        _zoomOffset.y += locInView.y;
+
+        UICollectionViewCell *cell = [[self collectionView] cellForItemAtIndexPath:_targetIndexPath];
+
+        _zoomOffset = [pinchGesture locationInView:cell];
+        _zoomOffset.x /= CGRectGetWidth([cell bounds]);
+        _zoomOffset.y /= CGRectGetHeight([cell bounds]);
     } else if ([pinchGesture state] == UIGestureRecognizerStateChanged) {
         if (transitionLayout) {
             BOOL toPage = [[transitionLayout nextLayout] isKindOfClass:[MMPageLayout class]];
@@ -265,25 +268,18 @@
                 }
 
                 _isZoomingPage = @(YES);
-                [[self currentLayout] invalidateLayout];
 
-                CGPoint updatedOffset = _zoomOffset;
-                CGFloat minScale = 1.0 / _scale;
-                updatedOffset.x *= MAX(minScale, pinchGesture.scale);
-                updatedOffset.y *= MAX(minScale, pinchGesture.scale);
+                // when zooming, to get a clean zoom animation we need to
+                // reset the entire layout, as this will trigger targetContentOffsetForProposedContentOffset:
+                // so that our layout + offset change will happen at the exact same time.
+                // this prevents the offset from jumping around during the gesture, and also
+                // prevents us invalidating the layout when setting the offset manually.
+                MMPageLayout *layout = [[MMPageLayout alloc] initWithSection:[_targetIndexPath section]];
+                [layout setTargetIndexPath:_targetIndexPath];
+                [layout setFitWidth:[[self currentLayout] fitWidth]];
+                [layout setDirection:[[self currentLayout] direction]];
 
-                updatedOffset.x -= locInView.x;
-                updatedOffset.y -= locInView.y;
-                updatedOffset.y = MAX(0, updatedOffset.y);
-
-                // now make sure our offset is sane according
-                // to the min/max allowed offset for ou content size
-                CGFloat offset = [[self currentLayout] collectionViewContentSize].width - CGRectGetWidth([[self collectionView] bounds]);
-
-                updatedOffset.x = MAX(0, updatedOffset.x);
-                updatedOffset.x = MIN(offset, updatedOffset.x);
-
-                [[self collectionView] setContentOffset:updatedOffset animated:NO];
+                [[self collectionView] setCollectionViewLayout:layout animated:NO];
             } else if (!_isZoomingPage || ![_isZoomingPage boolValue]) {
                 _isZoomingPage = @(NO);
                 // transition into grid
