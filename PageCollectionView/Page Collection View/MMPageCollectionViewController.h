@@ -22,6 +22,12 @@ NS_ASSUME_NONNULL_BEGIN
 /// then the current layout of that transition layout is returned
 - (__kindof MMShelfLayout *)currentLayout;
 
+#pragma mark - MMPageCollectionViewDelegatePageLayout
+
+- (void)collectionView:(UICollectionView *)collectionView willChangeToLayout:(UICollectionViewLayout *)newLayout fromLayout:(UICollectionViewLayout *)oldLayout NS_REQUIRES_SUPER;
+
+- (void)collectionView:(UICollectionView *)collectionView didChangeToLayout:(UICollectionViewLayout *)newLayout fromLayout:(UICollectionViewLayout *)oldLayout NS_REQUIRES_SUPER;
+
 #pragma mark - Subclasses
 
 @property(nonatomic, readonly) CGFloat scale;

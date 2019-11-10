@@ -52,6 +52,29 @@
     _objects = arr;
 }
 
+- (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator
+{
+    [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
+
+    if ([[[self collectionView] collectionViewLayout] isMemberOfClass:[MMPageLayout class]]) {
+        MMPageLayout *layout = (MMPageLayout *)[[self collectionView] collectionViewLayout];
+        CGPoint center = [[self collectionView] contentOffset];
+        center.x += [[self collectionView] bounds].size.width / 2;
+        center.y += [[self collectionView] bounds].size.height / 2;
+
+        NSIndexPath *indexPath = [[self collectionView] closestIndexPathForPoint:center];
+
+        [layout setTargetIndexPath:indexPath];
+        [[[self collectionView] collectionViewLayout] invalidateLayout];
+
+        [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> _Nonnull context) {
+
+        } completion:^(id<UIViewControllerTransitionCoordinatorContext> _Nonnull context) {
+            [layout setTargetIndexPath:nil];
+        }];
+    }
+}
+
 #pragma mark - UICollectionViewDataSource
 
 - (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView
