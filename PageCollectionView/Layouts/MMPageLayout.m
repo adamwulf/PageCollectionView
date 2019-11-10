@@ -62,7 +62,12 @@
 
 - (BOOL)bounceHorizontal
 {
-    return NO;
+    return _direction == MMPageLayoutHorizontal;
+}
+
+- (BOOL)bounceVertical
+{
+    return _direction == MMPageLayoutVertical;
 }
 
 #pragma mark - UICollectionViewLayout
@@ -70,8 +75,13 @@
 - (CGSize)collectionViewContentSize
 {
     CGSize contentSize = [super collectionViewContentSize];
+    UIEdgeInsets insets = [[self collectionView] safeAreaInsets];
 
-    return CGSizeMake(MAX(_sectionWidth, contentSize.width), _sectionHeight);
+    if (_direction == MMPageLayoutVertical) {
+        return CGSizeMake(MAX(_sectionWidth, contentSize.width) + insets.left + insets.right, _sectionHeight);
+    } else {
+        return CGSizeMake(MAX(_sectionWidth, contentSize.width), _sectionHeight + insets.top + insets.bottom);
+    }
 }
 
 - (void)invalidateLayout
@@ -119,9 +129,9 @@
     if (!CGSizeEqualToSize(headerSize, CGSizeZero)) {
         UICollectionViewLayoutAttributes *headerAttrs = [UICollectionViewLayoutAttributes layoutAttributesForSupplementaryViewOfKind:UICollectionElementKindSectionHeader withIndexPath:[NSIndexPath indexPathForRow:0 inSection:[self section]]];
         if (_direction == MMPageLayoutVertical) {
-            [headerAttrs setFrame:CGRectMake(0, offset, headerSize.width, headerSize.height)];
+            [headerAttrs setFrame:CGRectMake(insets.left, offset, headerSize.width, headerSize.height)];
         } else {
-            [headerAttrs setFrame:CGRectMake(offset, 0, headerSize.width, headerSize.height)];
+            [headerAttrs setFrame:CGRectMake(offset, insets.top, headerSize.width, headerSize.height)];
         }
 
         [_cache addObject:headerAttrs];
@@ -177,9 +187,9 @@
         CGFloat diff;
 
         if (_direction == MMPageLayoutVertical) {
-            diff = (kMaxDim - itemSize.width) / 2.0 * scale;
+            diff = (kMaxDim - itemSize.width) / 2.0 * scale + insets.left;
         } else {
-            diff = (kMaxDim - itemSize.height) / 2.0 * scale;
+            diff = (kMaxDim - itemSize.height) / 2.0 * scale + insets.top;
         }
 
         if (!CGSizeEqualToSize(itemSize, CGSizeZero)) {

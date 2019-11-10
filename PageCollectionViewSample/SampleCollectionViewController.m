@@ -137,6 +137,7 @@
         MMPageLayout *layout = [[MMPageLayout alloc] initWithSection:[indexPath section]];
         [layout setTargetIndexPath:indexPath];
         [layout setFitWidth:![[self currentLayout] fitWidth]];
+        [layout setDirection:[[self currentLayout] direction]];
 
         [[self collectionView] setCollectionViewLayout:layout animated:YES];
     }
@@ -152,7 +153,9 @@
         NSIndexPath *indexPath = [[self collectionView] closestIndexPathForPoint:center];
 
         MMPageLayout *layout = [[MMPageLayout alloc] initWithSection:[indexPath section]];
+
         [layout setTargetIndexPath:indexPath];
+        [layout setFitWidth:[[self currentLayout] fitWidth]];
 
         if ([[self currentLayout] direction] == MMPageLayoutVertical) {
             [layout setDirection:MMPageLayoutHorizontal];
@@ -173,6 +176,8 @@
 
 - (void)collectionView:(UICollectionView *)collectionView didChangeToLayout:(UICollectionViewLayout *)newLayout fromLayout:(UICollectionViewLayout *)oldLayout
 {
+    [super collectionView:collectionView didChangeToLayout:newLayout fromLayout:oldLayout];
+
     if ([newLayout isMemberOfClass:[MMPageLayout class]]) {
         [[self rotateButton] setHidden:NO];
         [[self bumpButton] setHidden:NO];
