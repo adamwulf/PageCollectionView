@@ -136,7 +136,6 @@
         CGFloat rotation = [object rotation];
         CGSize idealSize = MMFitSizeToWidth([object idealSize], [self maxDim], NO);
         CGSize boundingSize = MMBoundingSizeFor(idealSize, rotation);
-        ;
 
         idealSize = MMFitSizeToWidth(idealSize, [self maxDim], NO);
 
@@ -214,15 +213,15 @@
 
     UICollectionViewLayoutAttributes *attrs = [super layoutAttributesForSupplementaryViewOfKind:elementKind atIndexPath:indexPath];
 
-    CGRect fr = [attrs frame];
+    CGPoint center = [attrs center];
 
-    fr.origin.y -= _sectionOffset;
+    center.y -= _sectionOffset;
 
     if ([indexPath section] > [self section]) {
-        fr.origin.y += _sectionHeight;
+        center.y += _sectionHeight;
     }
 
-    [attrs setFrame:fr];
+    [attrs setCenter:center];
     [attrs setAlpha:0];
 
     return attrs;
@@ -240,15 +239,15 @@
 
     UICollectionViewLayoutAttributes *attrs = [super layoutAttributesForItemAtIndexPath:indexPath];
 
-    CGRect fr = [attrs frame];
+    CGPoint center = [attrs center];
 
-    fr.origin.y -= _sectionOffset;
+    center.y -= _sectionOffset;
 
     if ([indexPath section] > [self section]) {
-        fr.origin.y += _sectionHeight;
+        center.y += _sectionHeight;
     }
 
-    [attrs setFrame:fr];
+    [attrs setCenter:center];
     [attrs setAlpha:0];
 
     return attrs;
