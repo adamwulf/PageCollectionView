@@ -33,6 +33,8 @@ typedef enum : NSUInteger {
 /// When NO, pages will only scale to fit width when already too large. Small pages will stay small.
 @property(nonatomic, assign) BOOL fitWidth;
 @property(nonatomic, assign) MMPageLayoutDirection direction;
+@property(nonatomic, assign) CGPoint targetOffset;
+@property(nonatomic, assign, nullable) UIGestureRecognizer *gestureRecognizer;
 
 @end
 

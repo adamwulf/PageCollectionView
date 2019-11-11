@@ -228,13 +228,10 @@
     locInView.y -= [[self collectionView] frame].origin.y;
 
     if ([pinchGesture state] == UIGestureRecognizerStateBegan) {
-        _targetIndexPath = [[self collectionView] closestIndexPathForPoint:[pinchGesture locationInView:[self collectionView]]];
-
-        UICollectionViewCell *cell = [[self collectionView] cellForItemAtIndexPath:_targetIndexPath];
-
-        _zoomOffset = [pinchGesture locationInView:cell];
-        _zoomOffset.x /= CGRectGetWidth([cell bounds]);
-        _zoomOffset.y /= CGRectGetHeight([cell bounds]);
+        CGPoint gestureLocInContent = [pinchGesture locationInView:[self collectionView]];
+        _targetIndexPath = [[self collectionView] closestIndexPathForPoint:gestureLocInContent];
+        _zoomOffset.x = gestureLocInContent.x / [[self collectionView] contentSize].width;
+        _zoomOffset.y = gestureLocInContent.y / [[self collectionView] contentSize].height;
     } else if ([pinchGesture state] == UIGestureRecognizerStateChanged) {
         if (transitionLayout) {
             BOOL toPage = [[transitionLayout nextLayout] isKindOfClass:[MMPageLayout class]];
@@ -275,9 +272,19 @@
                 // this prevents the offset from jumping around during the gesture, and also
                 // prevents us invalidating the layout when setting the offset manually.
                 MMPageLayout *layout = [[MMPageLayout alloc] initWithSection:[_targetIndexPath section]];
+                // which page is being held
                 [layout setTargetIndexPath:_targetIndexPath];
+                // what % in both direction its held
+                [layout setTargetOffset:_zoomOffset];
+                // where the gesture is in collection view coordiates
+                [layout setGestureRecognizer:_pinchGesture];
                 [layout setFitWidth:[[self currentLayout] fitWidth]];
                 [layout setDirection:[[self currentLayout] direction]];
+
+
+                [[self currentLayout] setTargetIndexPath:_targetIndexPath];
+                [[self currentLayout] setTargetOffset:_zoomOffset];
+                [[self currentLayout] setGestureRecognizer:_pinchGesture];
 
                 [[self collectionView] setCollectionViewLayout:layout animated:NO];
             } else if (!_isZoomingPage || ![_isZoomingPage boolValue]) {
@@ -306,6 +313,8 @@
         }
         _transitionComplete = YES;
         _isZoomingPage = nil;
+        [[self currentLayout] setTargetOffset:CGPointZero];
+        [[self currentLayout] setGestureRecognizer:nil];
         [self didEndZoom];
     } else {
         if (!_transitionComplete && transitionLayout) {
@@ -316,6 +325,8 @@
 
         _isZoomingPage = nil;
         _transitionComplete = YES;
+        [[self currentLayout] setTargetOffset:CGPointZero];
+        [[self currentLayout] setGestureRecognizer:nil];
         [self didCancelZoom];
     }
 }

@@ -333,7 +333,25 @@
 
 - (CGPoint)targetContentOffsetForProposedContentOffset:(CGPoint)proposedContentOffset
 {
-    if ([self direction] == MMPageLayoutHorizontal) {
+    if ([self gestureRecognizer]) {
+        UICollectionViewCell *cell = [[self collectionView] cellForItemAtIndexPath:[self targetIndexPath]];
+        UICollectionViewLayoutAttributes *attrs = [self layoutAttributesForItemAtIndexPath:[self targetIndexPath]];
+
+        [cell applyLayoutAttributes:attrs];
+
+        CGPoint gestureLocation = [[self gestureRecognizer] locationInView:[[self collectionView] superview]];
+        gestureLocation.x -= [[self collectionView] frame].origin.x;
+        gestureLocation.y -= [[self collectionView] frame].origin.y;
+
+        CGPoint locInContent;
+        locInContent.x = [self collectionViewContentSize].width * _targetOffset.x;
+        locInContent.y = [self collectionViewContentSize].height * _targetOffset.y;
+
+        locInContent.x -= gestureLocation.x;
+        locInContent.y -= gestureLocation.y;
+
+        return locInContent;
+    } else if ([self direction] == MMPageLayoutHorizontal) {
         if ([self targetIndexPath]) {
             if ([[self targetIndexPath] row] == 0) {
                 UICollectionViewLayoutAttributes *attrs = [self layoutAttributesForItemAtIndexPath:[self targetIndexPath]];
