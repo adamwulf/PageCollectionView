@@ -10,6 +10,7 @@
 		C554F8F72355961C000BBC01 /* MMShelfLayoutObject.h in Headers */ = {isa = PBXBuildFile; fileRef = C554F8F62355961C000BBC01 /* MMShelfLayoutObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		C554F8FA235599A4000BBC01 /* SampleCollectionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C554F8F9235599A4000BBC01 /* SampleCollectionViewController.m */; };
 		C554F8FD23559ABA000BBC01 /* SampleObject.m in Sources */ = {isa = PBXBuildFile; fileRef = C554F8FC23559ABA000BBC01 /* SampleObject.m */; };
+		C557318623C17F6E00D4BB57 /* PageCollectionView.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = C5722A9B2352ED1F00C3E6D3 /* PageCollectionView.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C5722AA02352ED1F00C3E6D3 /* PageCollectionView.h in Headers */ = {isa = PBXBuildFile; fileRef = C5722A9E2352ED1F00C3E6D3 /* PageCollectionView.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		C5722AAE2352ED4C00C3E6D3 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = C5722AAD2352ED4C00C3E6D3 /* AppDelegate.m */; };
 		C5722AB12352ED4C00C3E6D3 /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = C5722AB02352ED4C00C3E6D3 /* SceneDelegate.m */; };
@@ -49,6 +50,19 @@
 			remoteInfo = PageCollectionView;
 		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		C557318523C17F6000D4BB57 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				C557318623C17F6E00D4BB57 /* PageCollectionView.framework in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		C554F8F62355961C000BBC01 /* MMShelfLayoutObject.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MMShelfLayoutObject.h; sourceTree = "<group>"; };
@@ -270,6 +284,7 @@
 				C5722AA62352ED4C00C3E6D3 /* Sources */,
 				C5722AA72352ED4C00C3E6D3 /* Frameworks */,
 				C5722AA82352ED4C00C3E6D3 /* Resources */,
+				C557318523C17F6000D4BB57 /* CopyFiles */,
 			);
 			buildRules = (
 			);
