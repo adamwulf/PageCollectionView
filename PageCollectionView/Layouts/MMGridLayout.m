@@ -101,7 +101,9 @@
 {
     [super prepareLayout];
 
-    UICollectionViewLayoutAttributes *header = [self layoutAttributesForSupplementaryViewOfKind:UICollectionElementKindSectionHeader atIndexPath:[NSIndexPath indexPathForRow:0 inSection:_section]];
+    // Call [super] to get the attributes of our header in shelf mode. This will give us our section offset
+    // in shelf mode, which we'll use to adjust all other items so that our grid section will appear at 0,0
+    UICollectionViewLayoutAttributes *header = [super layoutAttributesForSupplementaryViewOfKind:UICollectionElementKindSectionHeader atIndexPath:[NSIndexPath indexPathForRow:0 inSection:_section]];
     _sectionOffset = CGRectGetMinY([header frame]);
 
 

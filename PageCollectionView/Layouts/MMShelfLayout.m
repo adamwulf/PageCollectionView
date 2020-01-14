@@ -114,6 +114,7 @@
     CGFloat yOffset = 0;
 
     if ([_shelfCache count]) {
+        // don't relayout if we haven't been invalidated.
         return;
     }
 
