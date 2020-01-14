@@ -11,7 +11,7 @@
 
 @interface MMShelfLayout ()
 
-@property(nonatomic, strong) NSMutableArray<UICollectionViewLayoutAttributes *> *cache;
+@property(nonatomic, strong) NSMutableArray<UICollectionViewLayoutAttributes *> *shelfCache;
 @property(nonatomic, assign) CGFloat contentHeight;
 @property(nonatomic, readonly) CGFloat contentWidth;
 
@@ -27,7 +27,7 @@
 {
     if (self = [super initWithCoder:coder]) {
         _sectionInsets = UIEdgeInsetsMake(10, 40, 40, 40);
-        _cache = [NSMutableArray array];
+        _shelfCache = [NSMutableArray array];
         _pageSpacing = 40;
         _defaultHeaderSize = CGSizeMake(200, 50);
         _maxDim = 140;
@@ -39,7 +39,7 @@
 {
     if (self = [super init]) {
         _sectionInsets = UIEdgeInsetsMake(10, 40, 40, 40);
-        _cache = [NSMutableArray array];
+        _shelfCache = [NSMutableArray array];
         _pageSpacing = 40;
         _defaultHeaderSize = CGSizeMake(200, 50);
         _maxDim = 140;
@@ -101,7 +101,7 @@
 {
     [super invalidateLayout];
 
-    [_cache removeAllObjects];
+    [_shelfCache removeAllObjects];
 }
 
 - (CGSize)collectionViewContentSize
@@ -112,6 +112,10 @@
 - (void)prepareLayout
 {
     CGFloat yOffset = 0;
+
+    if ([_shelfCache count]) {
+        return;
+    }
 
     for (NSInteger section = 0; section < [[self collectionView] numberOfSections]; section++) {
         NSInteger rowCount = [[self collectionView] numberOfItemsInSection:section];
@@ -126,7 +130,7 @@
         if (!CGSizeEqualToSize(headerSize, CGSizeZero)) {
             UICollectionViewLayoutAttributes *headerAttrs = [UICollectionViewLayoutAttributes layoutAttributesForSupplementaryViewOfKind:UICollectionElementKindSectionHeader withIndexPath:[NSIndexPath indexPathForRow:0 inSection:section]];
             [headerAttrs setFrame:CGRectMake(0, yOffset, headerSize.width, headerSize.height)];
-            [_cache addObject:headerAttrs];
+            [_shelfCache addObject:headerAttrs];
 
             yOffset += headerSize.height;
         }
@@ -173,7 +177,7 @@
                     [itemAttrs setTransform:CGAffineTransformIdentity];
                 }
 
-                [_cache addObject:itemAttrs];
+                [_shelfCache addObject:itemAttrs];
 
                 if (didFinish) {
                     CGFloat allowedWidth = [self collectionViewContentSize].width - [self sectionInsets].left - [self sectionInsets].right;
@@ -192,14 +196,14 @@
 
 - (NSArray<__kindof UICollectionViewLayoutAttributes *> *)layoutAttributesForElementsInRect:(CGRect)rect
 {
-    return [_cache filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id _Nullable obj, NSDictionary<NSString *, id> *_Nullable bindings) {
+    return [_shelfCache filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id _Nullable obj, NSDictionary<NSString *, id> *_Nullable bindings) {
         return CGRectIntersectsRect([obj frame], rect) && ![obj isHidden];
     }]];
 }
 
 - (UICollectionViewLayoutAttributes *)layoutAttributesForSupplementaryViewOfKind:(NSString *)elementKind atIndexPath:(NSIndexPath *)indexPath
 {
-    for (UICollectionViewLayoutAttributes *attrs in _cache) {
+    for (UICollectionViewLayoutAttributes *attrs in _shelfCache) {
         if ([attrs representedElementCategory] == UICollectionElementCategorySupplementaryView && [[attrs indexPath] isEqual:indexPath]) {
             return attrs;
         }
@@ -209,7 +213,7 @@
 
 - (UICollectionViewLayoutAttributes *)layoutAttributesForItemAtIndexPath:(NSIndexPath *)indexPath
 {
-    for (UICollectionViewLayoutAttributes *attrs in _cache) {
+    for (UICollectionViewLayoutAttributes *attrs in _shelfCache) {
         if ([attrs representedElementCategory] == UICollectionElementCategoryCell && [[attrs indexPath] isEqual:indexPath]) {
             return attrs;
         }

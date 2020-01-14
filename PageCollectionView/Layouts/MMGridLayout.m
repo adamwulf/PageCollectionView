@@ -12,7 +12,7 @@
 
 @interface MMGridLayout ()
 
-@property(nonatomic, strong) NSMutableArray<UICollectionViewLayoutAttributes *> *cache;
+@property(nonatomic, strong) NSMutableArray<UICollectionViewLayoutAttributes *> *gridCache;
 
 @end
 
@@ -40,7 +40,7 @@
 - (instancetype)initWithCoder:(NSCoder *)coder
 {
     if (self = [super initWithCoder:coder]) {
-        _cache = [NSMutableArray array];
+        _gridCache = [NSMutableArray array];
         _itemMargins = UIEdgeInsetsMake(10, 10, 10, 10);
     }
     return self;
@@ -50,7 +50,7 @@
 {
     if (self = [super init]) {
         _section = section;
-        _cache = [NSMutableArray array];
+        _gridCache = [NSMutableArray array];
         _itemMargins = UIEdgeInsetsMake(10, 10, 10, 10);
     }
     return self;
@@ -94,7 +94,7 @@
 {
     [super invalidateLayout];
 
-    [_cache removeAllObjects];
+    [_gridCache removeAllObjects];
 }
 
 - (void)prepareLayout
@@ -118,7 +118,7 @@
     if (!CGSizeEqualToSize(headerSize, CGSizeZero)) {
         UICollectionViewLayoutAttributes *headerAttrs = [UICollectionViewLayoutAttributes layoutAttributesForSupplementaryViewOfKind:UICollectionElementKindSectionHeader withIndexPath:[NSIndexPath indexPathForRow:0 inSection:_section]];
         [headerAttrs setFrame:CGRectMake(0, yOffset, headerSize.width, headerSize.height)];
-        [_cache addObject:headerAttrs];
+        [_gridCache addObject:headerAttrs];
 
         yOffset += headerSize.height;
     }
@@ -145,7 +145,7 @@
                 // the row is done, remove the next item margins
                 rowWidth -= _itemMargins.right + _itemMargins.left;
                 // now realign all the items into their row so that they stretch full width
-                [_cache addObjectsFromArray:[self alignItemsInRow:attributesPerRow maxItemHeight:maxItemHeight rowWidth:rowWidth yOffset:yOffset stretchWidth:YES]];
+                [_gridCache addObjectsFromArray:[self alignItemsInRow:attributesPerRow maxItemHeight:maxItemHeight rowWidth:rowWidth yOffset:yOffset stretchWidth:YES]];
                 [attributesPerRow removeAllObjects];
 
                 yOffset += maxItemHeight + [self itemMargins].bottom + [self itemMargins].top;
@@ -183,7 +183,7 @@
         BOOL stretch = xOffset + lastItemWidth + [self sectionInsets].right > [self collectionViewContentSize].width;
         rowWidth -= _itemMargins.right + _itemMargins.left;
 
-        [_cache addObjectsFromArray:[self alignItemsInRow:attributesPerRow maxItemHeight:maxItemHeight rowWidth:rowWidth yOffset:yOffset stretchWidth:stretch]];
+        [_gridCache addObjectsFromArray:[self alignItemsInRow:attributesPerRow maxItemHeight:maxItemHeight rowWidth:rowWidth yOffset:yOffset stretchWidth:stretch]];
     } else {
         // remove the top margin for the next row, since there is no next row
         yOffset -= [self itemMargins].top;
@@ -196,7 +196,7 @@
 
 - (NSArray<__kindof UICollectionViewLayoutAttributes *> *)layoutAttributesForElementsInRect:(CGRect)rect
 {
-    return [_cache filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id _Nullable obj, NSDictionary<NSString *, id> *_Nullable bindings) {
+    return [_gridCache filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id _Nullable obj, NSDictionary<NSString *, id> *_Nullable bindings) {
         return CGRectIntersectsRect([obj frame], rect);
     }]];
 }
@@ -204,14 +204,14 @@
 - (UICollectionViewLayoutAttributes *)layoutAttributesForSupplementaryViewOfKind:(NSString *)elementKind atIndexPath:(NSIndexPath *)indexPath
 {
     if ([indexPath section] == [self section]) {
-        for (UICollectionViewLayoutAttributes *attrs in _cache) {
+        for (UICollectionViewLayoutAttributes *attrs in _gridCache) {
             if ([attrs representedElementCategory] == UICollectionElementCategorySupplementaryView && [[attrs indexPath] isEqual:indexPath]) {
                 return attrs;
             }
         }
     }
 
-    UICollectionViewLayoutAttributes *attrs = [super layoutAttributesForSupplementaryViewOfKind:elementKind atIndexPath:indexPath];
+    UICollectionViewLayoutAttributes *attrs = [[super layoutAttributesForSupplementaryViewOfKind:elementKind atIndexPath:indexPath] copy];
 
     CGPoint center = [attrs center];
 
@@ -230,14 +230,14 @@
 - (UICollectionViewLayoutAttributes *)layoutAttributesForItemAtIndexPath:(NSIndexPath *)indexPath
 {
     if ([indexPath section] == [self section]) {
-        for (UICollectionViewLayoutAttributes *attrs in _cache) {
+        for (UICollectionViewLayoutAttributes *attrs in _gridCache) {
             if ([attrs representedElementCategory] == UICollectionElementCategoryCell && [[attrs indexPath] isEqual:indexPath]) {
                 return attrs;
             }
         }
     }
 
-    UICollectionViewLayoutAttributes *attrs = [super layoutAttributesForItemAtIndexPath:indexPath];
+    UICollectionViewLayoutAttributes *attrs = [[super layoutAttributesForItemAtIndexPath:indexPath] copy];
 
     CGPoint center = [attrs center];
 

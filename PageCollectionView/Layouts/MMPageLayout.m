@@ -12,7 +12,7 @@
 
 @interface MMPageLayout ()
 
-@property(nonatomic, strong) NSMutableArray<UICollectionViewLayoutAttributes *> *cache;
+@property(nonatomic, strong) NSMutableArray<UICollectionViewLayoutAttributes *> *pageCache;
 
 @end
 
@@ -28,7 +28,7 @@
 - (instancetype)initWithCoder:(NSCoder *)coder
 {
     if (self = [super initWithCoder:coder]) {
-        _cache = [NSMutableArray array];
+        _pageCache = [NSMutableArray array];
         _fitWidth = YES;
         _direction = MMPageLayoutVertical;
     }
@@ -38,7 +38,7 @@
 - (instancetype)initWithSection:(NSInteger)section
 {
     if (self = [super initWithSection:section]) {
-        _cache = [NSMutableArray array];
+        _pageCache = [NSMutableArray array];
         _fitWidth = YES;
         _direction = MMPageLayoutVertical;
     }
@@ -88,7 +88,7 @@
 {
     [super invalidateLayout];
 
-    [_cache removeAllObjects];
+    [_pageCache removeAllObjects];
 }
 
 - (void)prepareLayout
@@ -134,7 +134,7 @@
             [headerAttrs setFrame:CGRectMake(offset, insets.top, headerSize.width, headerSize.height)];
         }
 
-        [_cache addObject:headerAttrs];
+        [_pageCache addObject:headerAttrs];
 
 
         if (_direction == MMPageLayoutVertical) {
@@ -243,7 +243,7 @@
                 offset += boundingSize.width * scale;
             }
 
-            [_cache addObject:itemAttrs];
+            [_pageCache addObject:itemAttrs];
 
             if (_direction == MMPageLayoutVertical) {
                 maxActualItemDim = MAX(maxActualItemDim, boundingSize.width * scale);
@@ -263,7 +263,7 @@
             // long as possible when zooming collections of smaller pages
             CGFloat leftBump = (_sectionWidth - maxActualItemDim) / 2;
 
-            for (UICollectionViewLayoutAttributes *attrs in _cache) {
+            for (UICollectionViewLayoutAttributes *attrs in _pageCache) {
                 CGPoint center = [attrs center];
                 center.x -= leftBump;
                 [attrs setCenter:center];
@@ -279,7 +279,7 @@
             // long as possible when zooming collections of smaller pages
             CGFloat topBump = (_sectionHeight - maxActualItemDim) / 2;
 
-            for (UICollectionViewLayoutAttributes *attrs in _cache) {
+            for (UICollectionViewLayoutAttributes *attrs in _pageCache) {
                 CGPoint center = [attrs center];
                 center.y -= topBump;
                 [attrs setCenter:center];
@@ -300,7 +300,7 @@
 
 - (NSArray<__kindof UICollectionViewLayoutAttributes *> *)layoutAttributesForElementsInRect:(CGRect)rect
 {
-    return [_cache filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id _Nullable obj, NSDictionary<NSString *, id> *_Nullable bindings) {
+    return [_pageCache filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id _Nullable obj, NSDictionary<NSString *, id> *_Nullable bindings) {
         return CGRectIntersectsRect([obj frame], rect);
     }]];
 }
@@ -308,7 +308,7 @@
 - (UICollectionViewLayoutAttributes *)layoutAttributesForSupplementaryViewOfKind:(NSString *)elementKind atIndexPath:(NSIndexPath *)indexPath
 {
     if ([indexPath section] == [self section]) {
-        for (UICollectionViewLayoutAttributes *attrs in _cache) {
+        for (UICollectionViewLayoutAttributes *attrs in _pageCache) {
             if ([attrs representedElementCategory] == UICollectionElementCategorySupplementaryView && [[attrs indexPath] isEqual:indexPath]) {
                 return attrs;
             }
@@ -321,7 +321,7 @@
 - (UICollectionViewLayoutAttributes *)layoutAttributesForItemAtIndexPath:(NSIndexPath *)indexPath
 {
     if ([indexPath section] == [self section]) {
-        for (UICollectionViewLayoutAttributes *attrs in _cache) {
+        for (UICollectionViewLayoutAttributes *attrs in _pageCache) {
             if ([attrs representedElementCategory] == UICollectionElementCategoryCell && [[attrs indexPath] isEqual:indexPath]) {
                 return attrs;
             }
