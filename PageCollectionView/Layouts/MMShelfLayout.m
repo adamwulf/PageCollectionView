@@ -250,7 +250,7 @@
         CGFloat const inset = -[[self collectionView] safeAreaInsets].top;
         CGFloat const screenHeight = CGRectGetHeight([[self collectionView] bounds]);
         CGSize const size = [self collectionViewContentSize];
-        CGFloat targetY = attrs.frame.origin.y;
+        CGFloat targetY = attrs.frame.origin.y + inset;
         targetY = targetY < size.height - screenHeight ? targetY : size.height - screenHeight;
         targetY = targetY < inset ? inset : targetY;
 
