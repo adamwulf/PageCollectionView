@@ -181,6 +181,8 @@
                 [_shelfCache addObject:itemAttrs];
 
                 if (didFinish) {
+                    // These pages are invisible, so place them randomly throughout the line
+                    // of visible pages so that they animate interestingly to/from grid layout
                     CGFloat allowedWidth = [self collectionViewContentSize].width - [self sectionInsets].left - [self sectionInsets].right;
                     xOffset = rand() % (int)(allowedWidth - itemSize.width);
                 } else {
