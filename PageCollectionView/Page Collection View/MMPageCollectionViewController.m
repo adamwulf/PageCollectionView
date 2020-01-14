@@ -392,7 +392,6 @@
     if (scrollView.contentOffset.y < -100 && ([[self currentLayout] isGridLayout] || [[self currentLayout] isPageLayout])) {
         // turn off bounce during this animation, as the bounce from the scrollview
         // being overscrolled conflicts with the layout animation
-        [[self collectionView] setBounces:NO];
         MMShelfLayout *nextLayout;
 
         if ([[self currentLayout] isGridLayout]) {
@@ -402,9 +401,9 @@
             nextLayout = [self newGridLayoutForSection:[[self currentLayout] section]];
         }
 
-        [[self collectionView] setCollectionViewLayout:nextLayout animated:YES completion:^(BOOL finished) {
-            [[self collectionView] setBounces:YES];
-        }];
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [[self collectionView] setCollectionViewLayout:nextLayout animated:YES completion:nil];
+        });
     }
 }
 

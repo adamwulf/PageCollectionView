@@ -60,8 +60,9 @@
     }
 
     [super setCollectionViewLayout:layout animated:animated completion:^(BOOL finished) {
-        if (completion)
+        if (completion) {
             completion(finished);
+        }
 
         if (animated && finished && [[self delegate] respondsToSelector:@selector(collectionView:didChangeToLayout:fromLayout:)]) {
             [[weakSelf delegate] collectionView:weakSelf didChangeToLayout:layout fromLayout:previousLayout];
