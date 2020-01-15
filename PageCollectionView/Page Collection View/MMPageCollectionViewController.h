@@ -17,6 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MMPageCollectionViewController : UIViewController <UICollectionViewDataSource, MMPageCollectionViewDelegatePageLayout>
 
 @property(nonatomic, strong, readonly) MMPageCollectionView *collectionView;
+@property(nonatomic, readonly) CGFloat maxPageScale;
 
 /// Returns the current layout of the collection view. If the collectionview is in the middel of a transition layout,
 /// then the current layout of that transition layout is returned

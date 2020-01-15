@@ -309,7 +309,7 @@
             }
         }
         if ([_isZoomingPage boolValue]) {
-            _scale = MAX(1.0, _scale * [_pinchGesture scale]);
+            _scale = MIN(MAX(1.0, _scale * [_pinchGesture scale]), [self maxPageScale]);
         }
         _transitionComplete = YES;
         _isZoomingPage = nil;
@@ -468,12 +468,17 @@
 
 #pragma mark - Subclasses
 
+- (CGFloat)maxPageScale
+{
+    return 300;
+}
+
 - (CGFloat)scale
 {
     CGFloat scale = _scale;
 
     if ([_isZoomingPage boolValue]) {
-        scale = MAX(1.0, scale * [_pinchGesture scale]);
+        scale = MIN(MAX(1.0, scale * [_pinchGesture scale]), [self maxPageScale]);
     }
 
     return scale;
