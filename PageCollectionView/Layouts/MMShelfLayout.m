@@ -94,7 +94,7 @@
 
 - (BOOL)shouldInvalidateLayoutForBoundsChange:(CGRect)newBounds
 {
-    return YES;
+    return !CGSizeEqualToSize([[self collectionView] bounds].size, newBounds.size);
 }
 
 - (void)invalidateLayout
