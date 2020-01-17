@@ -266,7 +266,7 @@
         CGSize contentSize = [self collectionViewContentSize];
         CGSize viewSize = [[self collectionView] bounds].size;
 
-        p.y = MIN(contentSize.height - viewSize.height, MAX(-inset, CGRectGetMinY(itemFrame) - diff - inset));
+        p.y = MAX(-inset, MIN(contentSize.height - viewSize.height, CGRectGetMinY(itemFrame) - diff - inset));
 
         return p;
     }
