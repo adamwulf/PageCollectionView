@@ -281,7 +281,6 @@
                 [layout setFitWidth:[[self currentLayout] fitWidth]];
                 [layout setDirection:[[self currentLayout] direction]];
 
-
                 [[self currentLayout] setTargetIndexPath:_targetIndexPath];
                 [[self currentLayout] setTargetOffset:_zoomOffset];
                 [[self currentLayout] setGestureRecognizer:_pinchGesture];

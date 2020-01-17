@@ -33,7 +33,7 @@
 
     CGFloat fullWidth = CGRectGetWidth([[self collectionView] bounds]);
 
-    for (NSInteger i = 0; i < 20; i++) {
+    for (NSInteger i = 0; i < 100; i++) {
         SampleObject *obj = [[SampleObject alloc] init];
 
         if (i % 5 == 0) {

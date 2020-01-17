@@ -199,6 +199,7 @@
 
 - (NSArray<__kindof UICollectionViewLayoutAttributes *> *)layoutAttributesForElementsInRect:(CGRect)rect
 {
+    // TODO: the cache could be sorted by y value, and we can use this to binary search for the items in the rect
     return [_shelfCache filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id _Nullable obj, NSDictionary<NSString *, id> *_Nullable bindings) {
         return CGRectIntersectsRect([obj frame], rect) && ![obj isHidden];
     }]];
