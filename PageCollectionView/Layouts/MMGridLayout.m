@@ -263,8 +263,10 @@
         CGRect itemFrame = [attrs frame];
         CGFloat diff = MAX(0, (CGRectGetHeight([[self collectionView] bounds]) - CGRectGetHeight(itemFrame)) / 2.0);
         CGFloat const inset = [[self collectionView] safeAreaInsets].top;
+        CGSize contentSize = [self collectionViewContentSize];
+        CGSize viewSize = [[self collectionView] bounds].size;
 
-        p.y = MAX(-inset, CGRectGetMinY(itemFrame) - diff - inset);
+        p.y = MIN(contentSize.height - viewSize.height, MAX(-inset, CGRectGetMinY(itemFrame) - diff - inset));
 
         return p;
     }
