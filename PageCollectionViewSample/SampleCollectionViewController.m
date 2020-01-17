@@ -156,14 +156,16 @@
     if ([[self currentLayout] isPageLayout]) {
         CGPoint center = [[self collectionView] contentOffset];
         center.x += [[self collectionView] bounds].size.width / 2;
-        center.y += 100;
+        center.y += [[self collectionView] bounds].size.height / 2;
 
         NSIndexPath *indexPath = [[self collectionView] closestIndexPathForPoint:center];
-
         MMPageLayout *layout = [[MMPageLayout alloc] initWithSection:[indexPath section]];
+
         [layout setTargetIndexPath:indexPath];
         [layout setFitWidth:![[self currentLayout] fitWidth]];
         [layout setDirection:[[self currentLayout] direction]];
+
+        _scale = 1.0;
 
         [[self collectionView] setCollectionViewLayout:layout animated:YES];
     }
@@ -174,7 +176,7 @@
     if ([[self currentLayout] isPageLayout]) {
         CGPoint center = [[self collectionView] contentOffset];
         center.x += [[self collectionView] bounds].size.width / 2;
-        center.y += 100;
+        center.y += [[self collectionView] bounds].size.height / 2;
 
         NSIndexPath *indexPath = [[self collectionView] closestIndexPathForPoint:center];
 

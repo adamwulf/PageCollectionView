@@ -14,7 +14,9 @@
 NS_ASSUME_NONNULL_BEGIN
 
 
-@interface MMPageCollectionViewController : UIViewController <UICollectionViewDataSource, MMPageCollectionViewDelegatePageLayout>
+@interface MMPageCollectionViewController : UIViewController <UICollectionViewDataSource, MMPageCollectionViewDelegatePageLayout> {
+    CGFloat _scale;
+}
 
 @property(nonatomic, strong, readonly) MMPageCollectionView *collectionView;
 @property(nonatomic, readonly) CGFloat maxPageScale;

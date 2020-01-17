@@ -79,6 +79,10 @@
     UICollectionViewCell *closest = nil;
 
     for (UICollectionViewCell *cell in [self visibleCells]) {
+        if ([cell pointInside:[self convertPoint:point toView:cell] withEvent:nil]) {
+            return [self indexPathForCell:cell];
+        }
+
         if (!closest) {
             closest = cell;
         } else {
