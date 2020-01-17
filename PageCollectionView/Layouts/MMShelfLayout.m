@@ -18,10 +18,7 @@
 @end
 
 
-@implementation MMShelfLayout {
-    UICollectionViewLayout *_fromLayout;
-    UICollectionViewLayout *_toLayout;
-}
+@implementation MMShelfLayout
 
 - (instancetype)initWithCoder:(NSCoder *)coder
 {
@@ -224,28 +221,6 @@
     }
 
     return nil;
-}
-
-- (void)prepareForTransitionFromLayout:(UICollectionViewLayout *)oldLayout
-{
-    [super prepareForTransitionFromLayout:oldLayout];
-
-    _fromLayout = [oldLayout isKindOfClass:[UICollectionViewTransitionLayout class]] ? [(UICollectionViewTransitionLayout *)oldLayout currentLayout] : oldLayout;
-}
-
-- (void)prepareForTransitionToLayout:(UICollectionViewLayout *)newLayout
-{
-    [super prepareForTransitionToLayout:newLayout];
-
-    _toLayout = [newLayout isKindOfClass:[UICollectionViewTransitionLayout class]] ? [(UICollectionViewTransitionLayout *)newLayout nextLayout] : newLayout;
-}
-
-- (void)finalizeLayoutTransition
-{
-    [super finalizeLayoutTransition];
-
-    _fromLayout = nil;
-    _toLayout = nil;
 }
 
 - (CGPoint)targetContentOffsetForProposedContentOffset:(CGPoint)proposedContentOffset
