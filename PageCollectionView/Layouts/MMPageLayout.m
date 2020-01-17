@@ -350,6 +350,15 @@
         locInContent.x -= gestureLocation.x;
         locInContent.y -= gestureLocation.y;
 
+        // now that our content is aligned with our gesture,
+        // clamp it to the edges of our content
+        CGSize contentSize = [self collectionViewContentSize];
+        CGSize viewSize = [[self collectionView] bounds].size;
+        UIEdgeInsets insets = [[self collectionView] safeAreaInsets];
+
+        locInContent.x = MAX(0, MIN(contentSize.width - viewSize.width, locInContent.x));
+        locInContent.y = MAX(-insets.top, MIN(contentSize.height - viewSize.height, locInContent.y));
+
         return locInContent;
     } else if ([self direction] == MMPageLayoutHorizontal) {
         if ([self targetIndexPath]) {
