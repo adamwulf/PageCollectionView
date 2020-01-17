@@ -298,6 +298,8 @@
     }
 }
 
+#pragma mark - Fetch Attributes
+
 - (NSArray<__kindof UICollectionViewLayoutAttributes *> *)layoutAttributesForElementsInRect:(CGRect)rect
 {
     return [_pageCache filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id _Nullable obj, NSDictionary<NSString *, id> *_Nullable bindings) {
@@ -330,6 +332,8 @@
 
     return [super layoutAttributesForItemAtIndexPath:indexPath];
 }
+
+#pragma mark - Content Offset
 
 - (CGPoint)targetContentOffsetForProposedContentOffset:(CGPoint)proposedContentOffset
 {

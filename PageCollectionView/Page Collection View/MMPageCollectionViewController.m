@@ -285,6 +285,10 @@
                 [[self currentLayout] setTargetOffset:_zoomOffset];
                 [[self currentLayout] setGestureRecognizer:_pinchGesture];
 
+                // Can't call [invalidateLayout] here, as this won't cause the collectionView to
+                // ask for targetContentOffsetForProposedContentOffset:. This means the contentOffset
+                // will remain exactly in place as the content scales. Setting a layout will
+                // ask for a targetContentOffset, so we can keep the page in view while we scale.
                 [[self collectionView] setCollectionViewLayout:layout animated:NO];
             } else if (!_isZoomingPage || ![_isZoomingPage boolValue]) {
                 _isZoomingPage = @(NO);

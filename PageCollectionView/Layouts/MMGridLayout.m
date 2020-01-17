@@ -196,6 +196,8 @@
     _sectionHeight = yOffset;
 }
 
+#pragma mark - Fetch Attributes
+
 - (NSArray<__kindof UICollectionViewLayoutAttributes *> *)layoutAttributesForElementsInRect:(CGRect)rect
 {
     return [_gridCache filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id _Nullable obj, NSDictionary<NSString *, id> *_Nullable bindings) {
@@ -254,6 +256,8 @@
 
     return attrs;
 }
+
+#pragma mark - Content Offset
 
 - (CGPoint)targetContentOffsetForProposedContentOffset:(CGPoint)proposedContentOffset
 {

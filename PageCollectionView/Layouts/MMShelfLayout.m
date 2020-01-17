@@ -194,6 +194,8 @@
     _contentHeight = yOffset;
 }
 
+#pragma mark - Fetch Attributes
+
 - (NSArray<__kindof UICollectionViewLayoutAttributes *> *)layoutAttributesForElementsInRect:(CGRect)rect
 {
     // TODO: the cache could be sorted by y value, and we can use this to binary search for the items in the rect
@@ -222,6 +224,8 @@
 
     return nil;
 }
+
+#pragma mark - Content Offset
 
 - (CGPoint)targetContentOffsetForProposedContentOffset:(CGPoint)proposedContentOffset
 {
