@@ -31,12 +31,19 @@
 @end
 
 
+typedef enum : NSUInteger {
+    MMScalingNone = 0,
+    MMScalingPage,
+    MMScalingToGrid,
+} MMScalingDirection;
+
+
 @implementation MMPageCollectionViewController {
     NSIndexPath *_targetIndexPath;
     MMGridIconView *_collapseGridIcon;
     MMPageIconView *_collapsePageIcon;
     CGPoint _zoomOffset;
-    NSNumber *_isZoomingPage;
+    MMScalingDirection _isZoomingPage;
     MMPinchVelocityGestureRecognizer *_pinchGesture;
 }
 
@@ -87,7 +94,6 @@
     _pageScale = 1.0;
 
     [[self collectionView] addObserver:self forKeyPath:@"collectionViewLayout" options:NSKeyValueObservingOptionOld context:nil];
-
     [[self collectionView] setAlwaysBounceVertical:[[[self collectionView] currentLayout] bounceVertical]];
     [[self collectionView] setAlwaysBounceHorizontal:[[[self collectionView] currentLayout] bounceHorizontal]];
 }
@@ -249,9 +255,9 @@
             NSIndexPath *targetPath = [[self collectionView] indexPathForItemAtPoint:[pinchGesture locationInView:[self collectionView]]];
 
             UICollectionViewLayout *nextLayout;
-            if ((!_isZoomingPage && pinchGesture.scaleDirection > 0) || [_isZoomingPage boolValue] || _pageScale > 1.0) {
+            if ((_isZoomingPage == MMScalingNone && pinchGesture.scaleDirection > 0) || _isZoomingPage == MMScalingPage || _pageScale > 1.0) {
                 // scale page up
-                _isZoomingPage = @(YES);
+                _isZoomingPage = MMScalingPage;
 
                 // when zooming, to get a clean zoom animation we need to
                 // reset the entire layout, as this will trigger targetContentOffsetForProposedContentOffset:
@@ -277,8 +283,8 @@
                 // will remain exactly in place as the content scales. Setting a layout will
                 // ask for a targetContentOffset, so we can keep the page in view while we scale.
                 [[self collectionView] setCollectionViewLayout:layout animated:NO];
-            } else if (!_isZoomingPage || ![_isZoomingPage boolValue]) {
-                _isZoomingPage = @(NO);
+            } else if (_isZoomingPage == MMScalingNone || _isZoomingPage == MMScalingToGrid) {
+                _isZoomingPage = MMScalingToGrid;
                 // transition into grid
                 MMGridLayout *gridLayout = [self newGridLayoutForSection:[targetPath section]];
                 [gridLayout setTargetIndexPath:targetPath];
@@ -298,11 +304,12 @@
                 [[self collectionView] cancelInteractiveTransition];
             }
         }
-        if ([_isZoomingPage boolValue]) {
+        if (_isZoomingPage == MMScalingPage) {
+            // we've finished zoom into our page, save the final scale
             _pageScale = MIN(MAX(1.0, _pageScale * [_pinchGesture scale]), [self maxPageScale]);
         }
         _transitionComplete = YES;
-        _isZoomingPage = nil;
+        _isZoomingPage = MMScalingNone;
         [[[self collectionView] currentLayout] setTargetOffset:CGPointZero];
         [[[self collectionView] currentLayout] setGestureRecognizer:nil];
     } else {
@@ -312,7 +319,7 @@
             [[[self collectionView] currentLayout] invalidateLayout];
         }
 
-        _isZoomingPage = nil;
+        _isZoomingPage = MMScalingNone;
         _transitionComplete = YES;
         [[[self collectionView] currentLayout] setTargetOffset:CGPointZero];
         [[[self collectionView] currentLayout] setGestureRecognizer:nil];
@@ -465,7 +472,7 @@
 {
     CGFloat scale = _pageScale;
 
-    if ([_isZoomingPage boolValue]) {
+    if (_isZoomingPage == MMScalingPage) {
         scale = MIN(MAX(1.0, scale * [_pinchGesture scale]), [self maxPageScale]);
     }
 
