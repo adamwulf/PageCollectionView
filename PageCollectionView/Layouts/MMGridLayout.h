@@ -16,7 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithSection:(NSInteger)section;
 
 @property(nonatomic, assign, readonly) NSInteger section;
-@property(nonatomic, assign) UIEdgeInsets itemMargins;
+@property(nonatomic, assign) UIEdgeInsets itemSpacing;
 
 @end
 

@@ -41,7 +41,7 @@
 {
     if (self = [super initWithCoder:coder]) {
         _gridCache = [NSMutableArray array];
-        _itemMargins = UIEdgeInsetsMake(10, 10, 10, 10);
+        _itemSpacing = UIEdgeInsetsMake(10, 10, 10, 10);
     }
     return self;
 }
@@ -51,7 +51,7 @@
     if (self = [super init]) {
         _section = section;
         _gridCache = [NSMutableArray array];
-        _itemMargins = UIEdgeInsetsMake(10, 10, 10, 10);
+        _itemSpacing = UIEdgeInsetsMake(10, 10, 10, 10);
     }
     return self;
 }
@@ -108,7 +108,7 @@
 
 
     CGFloat yOffset = 0;
-    NSInteger rowCount = [[self collectionView] numberOfItemsInSection:_section];
+    NSInteger pageCount = [[self collectionView] numberOfItemsInSection:_section];
     CGFloat maxItemHeight = 0;
     CGSize headerSize = [self defaultHeaderSize];
 
@@ -128,13 +128,17 @@
     CGFloat xOffset = [self sectionInsets].left;
     yOffset += [self sectionInsets].top;
 
+    // a running list of all item attributes in the calculated row
     NSMutableArray *attributesPerRow = [NSMutableArray array];
+    // track each rowWidth so that we can center all of the items in the row for equal left/right margins
     CGFloat rowWidth = 0;
+    // track the row's last item's width, so that on our very last row we can see if we're within ~ 1 item from the edge
     CGFloat lastItemWidth = 0;
 
     // Calculate the size of each row
-    for (NSInteger row = 0; row < rowCount; row++) {
-        id<MMShelfLayoutObject> object = [[self datasource] collectionView:[self collectionView] layout:self objectAtIndexPath:[NSIndexPath indexPathForRow:row inSection:[self section]]];
+    for (NSInteger pageIndex = 0; pageIndex < pageCount; pageIndex++) {
+        NSIndexPath *indexPath = [NSIndexPath indexPathForRow:pageIndex inSection:[self section]];
+        id<MMShelfLayoutObject> object = [[self datasource] collectionView:[self collectionView] layout:self objectAtIndexPath:indexPath];
         CGFloat rotation = [object rotation];
         CGSize idealSize = MMFitSizeToWidth([object idealSize], [self maxDim], NO);
         CGSize boundingSize = MMBoundingSizeFor(idealSize, rotation);
@@ -144,31 +148,34 @@
         if (!CGSizeEqualToSize(boundingSize, CGSizeZero)) {
             // can it fit on this row?
             if (xOffset + boundingSize.width + [self sectionInsets].right > [self collectionViewContentSize].width) {
-                // the row is done, remove the next item margins
-                rowWidth -= _itemMargins.right + _itemMargins.left;
+                // the row is done, remove the next item spacing. the item spacing do not sum with the sectionInsets,
+                // so the right+left spacing are added after every item to separate it from the following item. but there
+                // is no following item, so remove those trailing margins.
+                rowWidth -= _itemSpacing.right + _itemSpacing.left;
                 // now realign all the items into their row so that they stretch full width
                 [_gridCache addObjectsFromArray:[self alignItemsInRow:attributesPerRow maxItemHeight:maxItemHeight rowWidth:rowWidth yOffset:yOffset stretchWidth:YES]];
                 [attributesPerRow removeAllObjects];
 
-                yOffset += maxItemHeight + [self itemMargins].bottom + [self itemMargins].top;
+                yOffset += maxItemHeight + [self itemSpacing].bottom + [self itemSpacing].top;
                 xOffset = [self sectionInsets].left;
                 maxItemHeight = 0;
                 rowWidth = 0;
             }
 
+            // track this row's tallest item, so we can vertically center them all when the row is done
             maxItemHeight = MAX(maxItemHeight, boundingSize.height);
 
             // set all the attributes
-            UICollectionViewLayoutAttributes *itemAttrs = [UICollectionViewLayoutAttributes layoutAttributesForCellWithIndexPath:[NSIndexPath indexPathForRow:row inSection:_section]];
+            UICollectionViewLayoutAttributes *itemAttrs = [UICollectionViewLayoutAttributes layoutAttributesForCellWithIndexPath:indexPath];
             [itemAttrs setBounds:CGRectMake(0, 0, idealSize.width, idealSize.height)];
             [itemAttrs setCenter:CGPointMake(rowWidth + boundingSize.width / 2, 0)];
-            [itemAttrs setZIndex:rowCount - row];
+            [itemAttrs setZIndex:pageCount - pageIndex];
             [itemAttrs setAlpha:1];
             [itemAttrs setHidden:NO];
 
             lastItemWidth = boundingSize.width;
-            rowWidth += boundingSize.width + _itemMargins.right + +_itemMargins.left;
-            xOffset += boundingSize.width + _itemMargins.right + +_itemMargins.left;
+            rowWidth += boundingSize.width + _itemSpacing.right + _itemSpacing.left;
+            xOffset += boundingSize.width + _itemSpacing.right + _itemSpacing.left;
 
             if (rotation) {
                 [itemAttrs setTransform:CGAffineTransformMakeRotation(rotation)];
@@ -183,12 +190,12 @@
     if ([attributesPerRow count]) {
         // we should stretch the last row if we're close to the edge anyways
         BOOL stretch = xOffset + lastItemWidth + [self sectionInsets].right > [self collectionViewContentSize].width;
-        rowWidth -= _itemMargins.right + _itemMargins.left;
+        rowWidth -= _itemSpacing.right + _itemSpacing.left;
 
         [_gridCache addObjectsFromArray:[self alignItemsInRow:attributesPerRow maxItemHeight:maxItemHeight rowWidth:rowWidth yOffset:yOffset stretchWidth:stretch]];
     } else {
         // remove the top margin for the next row, since there is no next row
-        yOffset -= [self itemMargins].top;
+        yOffset -= [self itemSpacing].top;
     }
 
     yOffset += maxItemHeight + [self sectionInsets].bottom;
@@ -241,10 +248,13 @@
         }
     }
 
+    // always [copy] from our [super] so that we don't accidentally modify our superclass's cached attributes
     UICollectionViewLayoutAttributes *attrs = [[super layoutAttributesForItemAtIndexPath:indexPath] copy];
 
     CGPoint center = [attrs center];
 
+    // adjust any non-visible sections to be further above or below our section
+    // so that they animate nicely offscreen as we transition from shelf->grid
     center.y -= _sectionOffset;
 
     if ([indexPath section] > [self section]) {
@@ -262,6 +272,10 @@
 - (CGPoint)targetContentOffsetForProposedContentOffset:(CGPoint)proposedContentOffset
 {
     if ([self targetIndexPath]) {
+        // when pinching from PageLayout, we'd like to focus the grid view so that
+        // the page is centered in the view. To do that, calculate that target page's
+        // offset within our content, and return a content offset that will align
+        // with the middle of the screen
         CGPoint p = [super targetContentOffsetForProposedContentOffset:proposedContentOffset];
         UICollectionViewLayoutAttributes *attrs = [self layoutAttributesForItemAtIndexPath:[self targetIndexPath]];
         CGRect itemFrame = [attrs frame];
