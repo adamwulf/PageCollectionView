@@ -145,6 +145,7 @@
             CGFloat rotation = [object rotation];
             CGFloat heightRatio = itemSize.height / itemSize.width;
 
+            // calculate the dimensions of each item so that it fits within itemSize
             if (itemSize.height <= itemSize.width && itemSize.width > [self maxDim]) {
                 itemSize.height = [self maxDim] * heightRatio;
                 itemSize.width = [self maxDim];
@@ -160,31 +161,35 @@
                 [itemAttrs setFrame:CGRectMake(xOffset, yOffset, itemSize.width, itemSize.height)];
                 [itemAttrs setZIndex:rowCount - row];
 
-                if (didFinish || xOffset + itemSize.width >= [self collectionViewContentSize].width - [self sectionInsets].right) {
-                    didFinish = YES;
-                    [itemAttrs setAlpha:0];
-                    [itemAttrs setHidden:YES];
-                } else {
-                    [itemAttrs setAlpha:1];
-                    [itemAttrs setHidden:NO];
-                }
-
                 if (rotation) {
                     [itemAttrs setTransform:CGAffineTransformMakeRotation(rotation)];
                 } else {
                     [itemAttrs setTransform:CGAffineTransformIdentity];
                 }
 
-                [_shelfCache addObject:itemAttrs];
+                // we've finished our row if the item would step into our section inset area.
+                // we need to || because our xOffset is going to be randomly distributed after
+                // this item, and our inequality won't always be true after the first hidden item
+                didFinish = didFinish || xOffset + itemSize.width >= [self collectionViewContentSize].width - [self sectionInsets].right;
 
                 if (didFinish) {
+                    didFinish = YES;
+                    [itemAttrs setAlpha:0];
+                    [itemAttrs setHidden:YES];
+
                     // These pages are invisible, so place them randomly throughout the line
                     // of visible pages so that they animate interestingly to/from grid layout
                     CGFloat allowedWidth = [self collectionViewContentSize].width - [self sectionInsets].left - [self sectionInsets].right;
                     xOffset = rand() % (int)(allowedWidth - itemSize.width);
                 } else {
+                    [itemAttrs setAlpha:1];
+                    [itemAttrs setHidden:NO];
+
+                    // this page is visible, so adjust spacing to align the next page in the list
                     xOffset += _pageSpacing;
                 }
+
+                [_shelfCache addObject:itemAttrs];
             }
         }
 
@@ -230,6 +235,9 @@
 - (CGPoint)targetContentOffsetForProposedContentOffset:(CGPoint)proposedContentOffset
 {
     if ([self targetIndexPath]) {
+        // when pinching from grid to shelf view, we want to keep the visible document
+        // in the middle of the shelf. this will calculate its offset within our content size
+        // and then clamp it to our min/max allowed content offset
         UICollectionViewLayoutAttributes *attrs = [self layoutAttributesForSupplementaryViewOfKind:UICollectionElementKindSectionHeader atIndexPath:[self targetIndexPath]];
 
         attrs = attrs ?: [self layoutAttributesForItemAtIndexPath:[self targetIndexPath]];
@@ -238,6 +246,8 @@
         CGFloat const screenHeight = CGRectGetHeight([[self collectionView] bounds]);
         CGSize const size = [self collectionViewContentSize];
         CGFloat targetY = attrs.frame.origin.y + inset;
+
+        // clamp the target Y to our content size
         targetY = targetY < size.height - screenHeight ? targetY : size.height - screenHeight;
         targetY = targetY < inset ? inset : targetY;
 
