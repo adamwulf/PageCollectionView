@@ -26,7 +26,6 @@
 
 @property(nonatomic, strong) IBOutlet MMPageCollectionView *collectionView;
 @property(nonatomic, strong) UICollectionViewFlowLayout *pageLayout;
-@property(nonatomic, assign) BOOL transitionComplete;
 
 @end
 
@@ -90,7 +89,6 @@ typedef enum : NSUInteger {
     [_collapseGridIcon setAlpha:0];
     [_collapsePageIcon setAlpha:0];
 
-    _transitionComplete = YES;
     _pageScale = 1.0;
 
     [[self collectionView] addObserver:self forKeyPath:@"collectionViewLayout" options:NSKeyValueObservingOptionOld context:nil];
@@ -122,7 +120,6 @@ typedef enum : NSUInteger {
         [pageGridLayout setTargetIndexPath:targetPath];
 
         if (targetPath) {
-            _transitionComplete = NO;
             [[self collectionView] startInteractiveTransitionToCollectionViewLayout:pageGridLayout completion:^(BOOL completed, BOOL finished) {
                 self->_targetIndexPath = nil;
             }];
@@ -140,15 +137,13 @@ typedef enum : NSUInteger {
 
         transitionLayout.transitionProgress = progress;
         [transitionLayout invalidateLayout];
-    } else if (!_transitionComplete && transitionLayout && [pinchGesture state] == UIGestureRecognizerStateEnded) {
-        _transitionComplete = YES;
+    } else if (transitionLayout && [pinchGesture state] == UIGestureRecognizerStateEnded) {
         if ([pinchGesture scaleDirection] > 0) {
             [[self collectionView] finishInteractiveTransition];
         } else {
             [[self collectionView] cancelInteractiveTransition];
         }
-    } else if (!_transitionComplete && transitionLayout) {
-        _transitionComplete = YES;
+    } else if (transitionLayout) {
         [[self collectionView] cancelInteractiveTransition];
     }
 }
@@ -195,14 +190,12 @@ typedef enum : NSUInteger {
                 nextLayout = shelfLayout;
             }
 
-            _transitionComplete = NO;
             [[self collectionView] startInteractiveTransitionToCollectionViewLayout:nextLayout completion:^(BOOL completed, BOOL finished) {
                 self->_targetIndexPath = nil;
             }];
         }
-    } else if (!_transitionComplete && transitionLayout && [pinchGesture state] == UIGestureRecognizerStateEnded) {
+    } else if (transitionLayout && [pinchGesture state] == UIGestureRecognizerStateEnded) {
         BOOL toPage = [[transitionLayout nextLayout] isKindOfClass:[MMPageLayout class]];
-        _transitionComplete = YES;
 
         if (toPage && pinchGesture.scaleDirection > 0) {
             [[self collectionView] finishInteractiveTransition];
@@ -211,8 +204,7 @@ typedef enum : NSUInteger {
         } else {
             [[self collectionView] cancelInteractiveTransition];
         }
-    } else if (!_transitionComplete && transitionLayout) {
-        _transitionComplete = YES;
+    } else if (transitionLayout) {
         [[self collectionView] cancelInteractiveTransition];
     }
 }
@@ -290,14 +282,13 @@ typedef enum : NSUInteger {
                 [gridLayout setTargetIndexPath:targetPath];
                 nextLayout = gridLayout;
 
-                _transitionComplete = NO;
                 [[self collectionView] startInteractiveTransitionToCollectionViewLayout:nextLayout completion:^(BOOL completed, BOOL finished) {
                     self->_targetIndexPath = nil;
                 }];
             }
         }
     } else if ([pinchGesture state] == UIGestureRecognizerStateEnded) {
-        if (!_transitionComplete && transitionLayout) {
+        if (transitionLayout) {
             if ([pinchGesture scaleDirection] < 0) {
                 [[self collectionView] finishInteractiveTransition];
             } else {
@@ -308,19 +299,17 @@ typedef enum : NSUInteger {
             // we've finished zoom into our page, save the final scale
             _pageScale = MIN(MAX(1.0, _pageScale * [_pinchGesture scale]), [self maxPageScale]);
         }
-        _transitionComplete = YES;
         _isZoomingPage = MMScalingNone;
         [[[self collectionView] currentLayout] setTargetOffset:CGPointZero];
         [[[self collectionView] currentLayout] setGestureRecognizer:nil];
     } else {
-        if (!_transitionComplete && transitionLayout) {
+        if (transitionLayout) {
             [[self collectionView] cancelInteractiveTransition];
         } else {
             [[[self collectionView] currentLayout] invalidateLayout];
         }
 
         _isZoomingPage = MMScalingNone;
-        _transitionComplete = YES;
         [[[self collectionView] currentLayout] setTargetOffset:CGPointZero];
         [[[self collectionView] currentLayout] setGestureRecognizer:nil];
     }
