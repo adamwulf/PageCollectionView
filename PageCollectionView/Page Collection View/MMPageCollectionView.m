@@ -7,24 +7,25 @@
 //
 
 #import "MMPageCollectionView.h"
+#import "MMPageCollectionView+Protected.h"
 
 /// useful when comparing to another squared distance
 #define sqDist(p1, p2) ((p2.x - p1.x) * (p2.x - p1.x) + (p2.y - p1.y) * (p2.y - p1.y))
 
 
 @implementation MMPageCollectionView
+
 @dynamic delegate;
 
 #pragma mark - Layout Helpers
 
-- (UICollectionViewTransitionLayout *)activeTransitionLayout
-{
-    return [[self collectionViewLayout] isKindOfClass:[UICollectionViewTransitionLayout class]] ? (UICollectionViewTransitionLayout *)[self collectionViewLayout] : nil;
-}
-
 - (__kindof MMShelfLayout *)currentLayout
 {
-    return (MMShelfLayout *)([self activeTransitionLayout] ? [[self activeTransitionLayout] currentLayout] : [self collectionViewLayout]);
+    // we can't use activeTransitionLayout because will be nil after finishing or cancelling a transition
+    // even though the transition layout is still technically installed as it finishes its animations
+    UICollectionViewTransitionLayout *transitionLayout = [[self collectionViewLayout] isKindOfClass:[UICollectionViewTransitionLayout class]] ? (UICollectionViewTransitionLayout *)[self collectionViewLayout] : nil;
+
+    return (MMShelfLayout *)(transitionLayout ? [transitionLayout currentLayout] : [self collectionViewLayout]);
 }
 
 #pragma mark - UICollectionView
@@ -88,6 +89,13 @@
     }
 }
 
+- (UICollectionViewTransitionLayout *)startInteractiveTransitionToCollectionViewLayout:(UICollectionViewLayout *)layout completion:(UICollectionViewLayoutInteractiveTransitionCompletion)completion
+{
+    _activeTransitionLayout = [super startInteractiveTransitionToCollectionViewLayout:layout completion:completion];
+
+    return _activeTransitionLayout;
+}
+
 - (void)cancelInteractiveTransition
 {
     [super cancelInteractiveTransition];
@@ -95,6 +103,8 @@
     if ([[self delegate] respondsToSelector:@selector(collectionView:didFinalizeTransitionLayout:)]) {
         [[self delegate] collectionView:self didFinalizeTransitionLayout:[self activeTransitionLayout]];
     }
+
+    _activeTransitionLayout = nil;
 }
 
 - (void)finishInteractiveTransition
@@ -104,6 +114,8 @@
     if ([[self delegate] respondsToSelector:@selector(collectionView:didFinalizeTransitionLayout:)]) {
         [[self delegate] collectionView:self didFinalizeTransitionLayout:[self activeTransitionLayout]];
     }
+
+    _activeTransitionLayout = nil;
 }
 
 #pragma mark - Public API
@@ -131,5 +143,6 @@
 
     return closest ? [self indexPathForCell:closest] : nil;
 }
+
 
 @end

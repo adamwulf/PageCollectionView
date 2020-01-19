@@ -40,6 +40,7 @@
 		C5722AEE2352ED5D00C3E6D3 /* MMPageIconView.m in Sources */ = {isa = PBXBuildFile; fileRef = C5722ADA2352ED5D00C3E6D3 /* MMPageIconView.m */; };
 		C5722AF22352EDBD00C3E6D3 /* PageCollectionView.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C5722A9B2352ED1F00C3E6D3 /* PageCollectionView.framework */; };
 		C594FF8223D4172100C6A6FF /* MMPageCollectionViewController+Protected.h in Headers */ = {isa = PBXBuildFile; fileRef = C594FF8123D4172100C6A6FF /* MMPageCollectionViewController+Protected.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		C594FF8423D4436B00C6A6FF /* MMPageCollectionView+Protected.h in Headers */ = {isa = PBXBuildFile; fileRef = C594FF8323D4436B00C6A6FF /* MMPageCollectionView+Protected.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -105,6 +106,7 @@
 		C5722AD92352ED5D00C3E6D3 /* MMGridIconView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MMGridIconView.m; sourceTree = "<group>"; };
 		C5722ADA2352ED5D00C3E6D3 /* MMPageIconView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MMPageIconView.m; sourceTree = "<group>"; };
 		C594FF8123D4172100C6A6FF /* MMPageCollectionViewController+Protected.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "MMPageCollectionViewController+Protected.h"; sourceTree = "<group>"; };
+		C594FF8323D4436B00C6A6FF /* MMPageCollectionView+Protected.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "MMPageCollectionView+Protected.h"; sourceTree = "<group>"; };
 		C5E6EBCF2367FC7000B5BBE1 /* Constants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Constants.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -184,6 +186,7 @@
 			isa = PBXGroup;
 			children = (
 				C5722AC42352ED5D00C3E6D3 /* MMPageCollectionView.h */,
+				C594FF8323D4436B00C6A6FF /* MMPageCollectionView+Protected.h */,
 				C5722AC82352ED5D00C3E6D3 /* MMPageCollectionView.m */,
 				C5722AC52352ED5D00C3E6D3 /* MMPageCollectionViewController.h */,
 				C594FF8123D4172100C6A6FF /* MMPageCollectionViewController+Protected.h */,
@@ -256,6 +259,7 @@
 				C5722AA02352ED1F00C3E6D3 /* PageCollectionView.h in Headers */,
 				C5722ADD2352ED5D00C3E6D3 /* MMPageCollectionCell.h in Headers */,
 				C594FF8223D4172100C6A6FF /* MMPageCollectionViewController+Protected.h in Headers */,
+				C594FF8423D4436B00C6A6FF /* MMPageCollectionView+Protected.h in Headers */,
 				C5722AE32352ED5D00C3E6D3 /* MMShelfLayout.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

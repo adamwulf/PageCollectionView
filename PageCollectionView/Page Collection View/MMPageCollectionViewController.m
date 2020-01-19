@@ -10,6 +10,7 @@
 #import "MMPageCollectionViewController+Protected.h"
 #import "MMPinchVelocityGestureRecognizer.h"
 #import "MMPageCollectionView.h"
+#import "MMPageCollectionView+Protected.h"
 #import "MMPageCollectionCell.h"
 #import "MMPageCollectionHeader.h"
 #import "MMGridIconView.h"
@@ -17,6 +18,11 @@
 #import "MMShelfLayout.h"
 #import "MMGridLayout.h"
 #import "MMPageLayout.h"
+
+#define CLAMPF(v, minFr, maxFr, minTo, maxTo) (((v - minFr) / (maxFr - minFr)) * (maxTo - minTo) + minTo)
+
+static CGFloat const kMinGestureScale = 1.0;
+static CGFloat const kMaxGestureScale = 4.0;
 
 
 @interface MMPageCollectionViewController () <MMPageCollectionViewDelegate>
@@ -157,8 +163,11 @@ typedef enum : NSUInteger {
         CGFloat progress;
 
         if (pinchGesture.scale > 1) {
-            CGFloat const kMaxGestureScale = 3.0;
-            progress = MAX(0, MIN(kMaxGestureScale, ABS(pinchGesture.scale - 1))) / kMaxGestureScale;
+            // when pinching to zoom into a document from the shelf, the gesture scale
+            // starts at 1 and increases with the zoom. Below, we clamp the pinch
+            //  from 1x -> 4x and divide that by 3.0 to get a smooth transition from
+            // 1x -> 3x maps to  0 -> 1
+            progress = CLAMPF(pinchGesture.scale, kMinGestureScale, kMaxGestureScale, 0, 1);
         } else {
             progress = 0;
         }
@@ -189,8 +198,7 @@ typedef enum : NSUInteger {
 
             if (toPage) {
                 if (pinchGesture.scale > 1) {
-                    CGFloat const kMaxGestureScale = 3.0;
-                    progress = MAX(0, MIN(kMaxGestureScale, ABS(pinchGesture.scale - 1))) / kMaxGestureScale;
+                    progress = CLAMPF(pinchGesture.scale, kMinGestureScale, kMaxGestureScale, 0, 1);
                 } else {
                     progress = 0;
                 }
@@ -256,8 +264,7 @@ typedef enum : NSUInteger {
 
             if (toPage) {
                 if (pinchGesture.scale > 1) {
-                    CGFloat const kMaxGestureScale = 3.0;
-                    progress = MAX(0, MIN(kMaxGestureScale, ABS(pinchGesture.scale - 1))) / kMaxGestureScale;
+                    progress = CLAMPF(pinchGesture.scale, kMinGestureScale, kMaxGestureScale, 0, 1);
                 } else {
                     progress = 0;
                 }
