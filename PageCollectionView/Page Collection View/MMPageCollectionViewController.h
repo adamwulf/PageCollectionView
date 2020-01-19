@@ -15,29 +15,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 @interface MMPageCollectionViewController : UIViewController <UICollectionViewDataSource, MMPageCollectionViewDelegatePageLayout> {
-    CGFloat _scale;
+    CGFloat _pageScale;
 }
 
 @property(nonatomic, strong, readonly) MMPageCollectionView *collectionView;
-@property(nonatomic, readonly) CGFloat maxPageScale;
-
-#pragma mark - MMPageCollectionViewDelegatePageLayout
-
-- (void)collectionView:(UICollectionView *)collectionView willChangeToLayout:(UICollectionViewLayout *)newLayout fromLayout:(UICollectionViewLayout *)oldLayout NS_REQUIRES_SUPER;
-
-- (void)collectionView:(UICollectionView *)collectionView didChangeToLayout:(UICollectionViewLayout *)newLayout fromLayout:(UICollectionViewLayout *)oldLayout NS_REQUIRES_SUPER;
-
-#pragma mark - Subclasses
-
-@property(nonatomic, readonly) CGFloat scale;
-
-- (MMShelfLayout *)newShelfLayout;
-- (MMGridLayout *)newGridLayoutForSection:(NSUInteger)section;
-- (MMPageLayout *)newPageLayoutForSection:(NSUInteger)section;
-
-- (void)willBeginZoom;
-- (void)didEndZoom;
-- (void)didCancelZoom;
 
 @end
 

@@ -7,6 +7,7 @@
 //
 
 #import "MMPageCollectionViewController.h"
+#import "MMPageCollectionViewController+Protected.h"
 #import "MMPinchVelocityGestureRecognizer.h"
 #import "MMPageCollectionView.h"
 #import "MMPageCollectionCell.h"
@@ -20,6 +21,9 @@
 
 @interface MMPageCollectionViewController () <MMPageCollectionViewDelegate>
 
+@property(nonatomic, readonly) CGFloat maxPageScale;
+@property(nonatomic, readonly) CGFloat pageScale;
+
 @property(nonatomic, strong) IBOutlet MMPageCollectionView *collectionView;
 @property(nonatomic, strong) UICollectionViewFlowLayout *pageLayout;
 @property(nonatomic, assign) BOOL transitionComplete;
@@ -31,13 +35,12 @@
     NSIndexPath *_targetIndexPath;
     MMGridIconView *_collapseGridIcon;
     MMPageIconView *_collapsePageIcon;
-
     CGPoint _zoomOffset;
     NSNumber *_isZoomingPage;
     MMPinchVelocityGestureRecognizer *_pinchGesture;
 }
 
-@synthesize scale = _scale;
+@synthesize pageScale = _pageScale;
 
 - (instancetype)init
 {
@@ -81,7 +84,7 @@
     [_collapsePageIcon setAlpha:0];
 
     _transitionComplete = YES;
-    _scale = 1.0;
+    _pageScale = 1.0;
 
     [[self collectionView] addObserver:self forKeyPath:@"collectionViewLayout" options:NSKeyValueObservingOptionOld context:nil];
 
@@ -246,12 +249,8 @@
             NSIndexPath *targetPath = [[self collectionView] indexPathForItemAtPoint:[pinchGesture locationInView:[self collectionView]]];
 
             UICollectionViewLayout *nextLayout;
-            if ((!_isZoomingPage && pinchGesture.scaleDirection > 0) || [_isZoomingPage boolValue] || _scale > 1.0) {
+            if ((!_isZoomingPage && pinchGesture.scaleDirection > 0) || [_isZoomingPage boolValue] || _pageScale > 1.0) {
                 // scale page up
-                if (![_isZoomingPage boolValue]) {
-                    [self willBeginZoom];
-                }
-
                 _isZoomingPage = @(YES);
 
                 // when zooming, to get a clean zoom animation we need to
@@ -300,13 +299,12 @@
             }
         }
         if ([_isZoomingPage boolValue]) {
-            _scale = MIN(MAX(1.0, _scale * [_pinchGesture scale]), [self maxPageScale]);
+            _pageScale = MIN(MAX(1.0, _pageScale * [_pinchGesture scale]), [self maxPageScale]);
         }
         _transitionComplete = YES;
         _isZoomingPage = nil;
         [[[self collectionView] currentLayout] setTargetOffset:CGPointZero];
         [[[self collectionView] currentLayout] setGestureRecognizer:nil];
-        [self didEndZoom];
     } else {
         if (!_transitionComplete && transitionLayout) {
             [[self collectionView] cancelInteractiveTransition];
@@ -318,7 +316,6 @@
         _transitionComplete = YES;
         [[[self collectionView] currentLayout] setTargetOffset:CGPointZero];
         [[[self collectionView] currentLayout] setGestureRecognizer:nil];
-        [self didCancelZoom];
     }
 }
 
@@ -424,7 +421,7 @@
 
 - (CGFloat)collectionView:(UICollectionView *)collectionView layout:(MMPageLayout *)collectionViewLayout zoomScaleForIndexPath:(NSIndexPath *)indexPath
 {
-    return [self scale];
+    return [self pageScale];
 }
 
 #pragma mark - Layout Changes
@@ -464,9 +461,9 @@
     return 300;
 }
 
-- (CGFloat)scale
+- (CGFloat)pageScale
 {
-    CGFloat scale = _scale;
+    CGFloat scale = _pageScale;
 
     if ([_isZoomingPage boolValue]) {
         scale = MIN(MAX(1.0, scale * [_pinchGesture scale]), [self maxPageScale]);
@@ -488,21 +485,6 @@
 - (MMPageLayout *)newPageLayoutForSection:(NSUInteger)section
 {
     return [[MMPageLayout alloc] initWithSection:section];
-}
-
-- (void)willBeginZoom
-{
-    // noop, available for subclasses
-}
-
-- (void)didEndZoom
-{
-    // noop, available for subclasses
-}
-
-- (void)didCancelZoom
-{
-    // noop, available for subclasses
 }
 
 @end
