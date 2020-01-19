@@ -116,9 +116,9 @@ typedef enum : NSUInteger {
     UICollectionViewTransitionLayout *transitionLayout = [[self collectionView] activeTransitionLayout];
 
     if (!transitionLayout && [pinchGesture state] == UIGestureRecognizerStateBegan) {
-        NSIndexPath *targetPath = [[self collectionView] indexPathForItemAtPoint:[pinchGesture locationInView:[self collectionView]]];
-
+        NSIndexPath *targetPath = [[self collectionView] closestIndexPathForPoint:[pinchGesture locationInView:[self collectionView]]];
         MMGridLayout *pageGridLayout = [self newGridLayoutForSection:[targetPath section]];
+
         [pageGridLayout setTargetIndexPath:targetPath];
 
         if (targetPath) {
@@ -252,9 +252,9 @@ typedef enum : NSUInteger {
             transitionLayout.transitionProgress = progress;
             [transitionLayout invalidateLayout];
         } else {
-            NSIndexPath *targetPath = [[self collectionView] indexPathForItemAtPoint:[pinchGesture locationInView:[self collectionView]]];
-
+            NSIndexPath *targetPath = [[self collectionView] closestIndexPathForPoint:[pinchGesture locationInView:[self collectionView]]];
             UICollectionViewLayout *nextLayout;
+
             if ((_isZoomingPage == MMScalingNone && pinchGesture.scaleDirection > 0) || _isZoomingPage == MMScalingPage || _pageScale > 1.0) {
                 // scale page up
                 _isZoomingPage = MMScalingPage;
