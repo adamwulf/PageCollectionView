@@ -98,6 +98,17 @@ typedef enum : NSUInteger {
 
 #pragma mark - Gestures
 
+- (void)reenablePinchGesture
+{
+    [_pinchGesture setEnabled:YES];
+}
+
+- (void)brieflyDisablePinchGesture
+{
+    [_pinchGesture setEnabled:NO];
+    [self performSelector:@selector(reenablePinchGesture) withObject:nil afterDelay:.5];
+}
+
 - (void)pinchGesture:(MMPinchVelocityGestureRecognizer *)pinchGesture
 {
     if ([[[self collectionView] currentLayout] isShelfLayout]) {
@@ -443,6 +454,14 @@ typedef enum : NSUInteger {
         [[self collectionView] setAlwaysBounceVertical:[(MMShelfLayout *)newLayout bounceVertical]];
         [[self collectionView] setAlwaysBounceHorizontal:[(MMShelfLayout *)newLayout bounceHorizontal]];
     }
+}
+
+- (void)collectionView:(UICollectionView *)collectionView didFinalizeTransitionLayout:(UICollectionViewTransitionLayout *)transitionLayout
+{
+    // Disable pinching during a transition animation. This delegate method is called for any
+    // finishInteractiveTransition or cancelInteractiveTransition. This lets us turn off the
+    // pinch gesture for a small time while the animation completes, then it will re-enable.
+    [self brieflyDisablePinchGesture];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey, id> *)change context:(void *)context

@@ -19,6 +19,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)collectionView:(UICollectionView *)collectionView didChangeToLayout:(UICollectionViewLayout *)newLayout fromLayout:(UICollectionViewLayout *)oldLayout;
 
+- (void)collectionView:(UICollectionView *)collectionView didFinalizeTransitionLayout:(UICollectionViewTransitionLayout *)transitionLayout;
+
 @end
 
 

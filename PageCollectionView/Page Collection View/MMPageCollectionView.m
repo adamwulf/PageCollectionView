@@ -88,6 +88,26 @@
     }
 }
 
+- (void)cancelInteractiveTransition
+{
+    [super cancelInteractiveTransition];
+
+    if ([[self delegate] respondsToSelector:@selector(collectionView:didFinalizeTransitionLayout:)]) {
+        [[self delegate] collectionView:self didFinalizeTransitionLayout:[self activeTransitionLayout]];
+    }
+}
+
+- (void)finishInteractiveTransition
+{
+    [super finishInteractiveTransition];
+
+    if ([[self delegate] respondsToSelector:@selector(collectionView:didFinalizeTransitionLayout:)]) {
+        [[self delegate] collectionView:self didFinalizeTransitionLayout:[self activeTransitionLayout]];
+    }
+}
+
+#pragma mark - Public API
+
 - (NSIndexPath *)closestIndexPathForPoint:(CGPoint)point
 {
     UICollectionViewCell *closest = nil;
