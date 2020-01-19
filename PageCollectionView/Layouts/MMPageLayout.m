@@ -337,6 +337,10 @@
 
 - (CGPoint)targetContentOffsetForProposedContentOffset:(CGPoint)proposedContentOffset
 {
+    CGSize contentSize = [self collectionViewContentSize];
+    CGSize viewSize = [[self collectionView] bounds].size;
+    UIEdgeInsets insets = [[self collectionView] safeAreaInsets];
+
     if ([self gestureRecognizer]) {
         UICollectionViewCell *cell = [[self collectionView] cellForItemAtIndexPath:[self targetIndexPath]];
         UICollectionViewLayoutAttributes *attrs = [self layoutAttributesForItemAtIndexPath:[self targetIndexPath]];
@@ -356,43 +360,51 @@
 
         // now that our content is aligned with our gesture,
         // clamp it to the edges of our content
-        CGSize contentSize = [self collectionViewContentSize];
-        CGSize viewSize = [[self collectionView] bounds].size;
-        UIEdgeInsets insets = [[self collectionView] safeAreaInsets];
-
-        locInContent.x = MAX(0, MIN(contentSize.width - viewSize.width, locInContent.x));
+        locInContent.x = MAX(-insets.left, MIN(contentSize.width - viewSize.width, locInContent.x));
         locInContent.y = MAX(-insets.top, MIN(contentSize.height - viewSize.height, locInContent.y));
 
         return locInContent;
     } else if ([self direction] == MMPageLayoutHorizontal) {
         if ([self targetIndexPath]) {
+            CGPoint locInContent;
+
             if ([[self targetIndexPath] row] == 0) {
                 UICollectionViewLayoutAttributes *attrs = [self layoutAttributesForItemAtIndexPath:[self targetIndexPath]];
 
-                return CGPointMake(CGRectGetMinX([attrs frame]), 0);
+                locInContent = CGPointMake(CGRectGetMinX([attrs frame]), 0);
             } else {
                 UICollectionViewLayoutAttributes *attrs = [self layoutAttributesForItemAtIndexPath:[self targetIndexPath]];
 
                 CGRect itemFrame = [attrs frame];
                 CGFloat diff = MAX(0, (CGRectGetWidth([[self collectionView] bounds]) - CGRectGetWidth(itemFrame)) / 2.0);
 
-                return CGPointMake(CGRectGetMinX(itemFrame) - diff, 0);
+                locInContent = CGPointMake(CGRectGetMinX(itemFrame) - diff, 0);
             }
+
+            locInContent.x = MAX(-insets.left, MIN(contentSize.width - viewSize.width, locInContent.x));
+
+            return locInContent;
         }
     } else {
         if ([self targetIndexPath]) {
+            CGPoint locInContent;
+
             if ([[self targetIndexPath] row] == 0) {
                 UICollectionViewLayoutAttributes *attrs = [self layoutAttributesForItemAtIndexPath:[self targetIndexPath]];
 
-                return CGPointMake(0, CGRectGetMinY([attrs frame]));
+                locInContent = CGPointMake(0, CGRectGetMinY([attrs frame]));
             } else {
                 UICollectionViewLayoutAttributes *attrs = [self layoutAttributesForItemAtIndexPath:[self targetIndexPath]];
 
                 CGRect itemFrame = [attrs frame];
                 CGFloat diff = MAX(0, (CGRectGetHeight([[self collectionView] bounds]) - CGRectGetHeight(itemFrame)) / 2.0);
 
-                return CGPointMake(0, CGRectGetMinY(itemFrame) - diff);
+                locInContent = CGPointMake(0, CGRectGetMinY(itemFrame) - diff);
             }
+
+            locInContent.y = MAX(-insets.top, MIN(contentSize.height - viewSize.height, locInContent.y));
+
+            return locInContent;
         }
     }
 
