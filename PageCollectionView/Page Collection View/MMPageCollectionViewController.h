@@ -21,10 +21,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, strong, readonly) MMPageCollectionView *collectionView;
 @property(nonatomic, readonly) CGFloat maxPageScale;
 
-/// Returns the current layout of the collection view. If the collectionview is in the middel of a transition layout,
-/// then the current layout of that transition layout is returned
-- (__kindof MMShelfLayout *)currentLayout;
-
 #pragma mark - MMPageCollectionViewDelegatePageLayout
 
 - (void)collectionView:(UICollectionView *)collectionView willChangeToLayout:(UICollectionViewLayout *)newLayout fromLayout:(UICollectionViewLayout *)oldLayout NS_REQUIRES_SUPER;

@@ -104,8 +104,8 @@
 
     MMPageLayout *layout = [[MMPageLayout alloc] initWithSection:[indexPath section]];
     [layout setTargetIndexPath:indexPath];
-    [layout setDirection:[[self currentLayout] direction]];
-    [layout setFitWidth:[[self currentLayout] fitWidth]];
+    [layout setDirection:[[[self collectionView] currentLayout] direction]];
+    [layout setFitWidth:[[[self collectionView] currentLayout] fitWidth]];
 
     [[self collectionView] setCollectionViewLayout:layout animated:YES];
 }
@@ -124,8 +124,8 @@
 
     MMPageLayout *layout = [[MMPageLayout alloc] initWithSection:[indexPath section]];
     [layout setTargetIndexPath:indexPath];
-    [layout setDirection:[[self currentLayout] direction]];
-    [layout setFitWidth:[[self currentLayout] fitWidth]];
+    [layout setDirection:[[[self collectionView] currentLayout] direction]];
+    [layout setFitWidth:[[[self collectionView] currentLayout] fitWidth]];
 
     [[self collectionView] setCollectionViewLayout:layout animated:YES];
 }
@@ -144,8 +144,8 @@
 
     MMPageLayout *layout = [[MMPageLayout alloc] initWithSection:[indexPath section]];
     [layout setTargetIndexPath:indexPath];
-    [layout setDirection:[[self currentLayout] direction]];
-    [layout setFitWidth:[[self currentLayout] fitWidth]];
+    [layout setDirection:[[[self collectionView] currentLayout] direction]];
+    [layout setFitWidth:[[[self collectionView] currentLayout] fitWidth]];
 
     [[self collectionView] setCollectionViewLayout:layout animated:YES];
 }
@@ -153,7 +153,7 @@
 /// Change the scale from actual-size to fit-width
 - (IBAction)swapScale:(id)sender
 {
-    if ([[self currentLayout] isPageLayout]) {
+    if ([[[self collectionView] currentLayout] isPageLayout]) {
         CGPoint center = [[self collectionView] contentOffset];
         center.x += [[self collectionView] bounds].size.width / 2;
         center.y += [[self collectionView] bounds].size.height / 2;
@@ -162,8 +162,8 @@
         MMPageLayout *layout = [[MMPageLayout alloc] initWithSection:[indexPath section]];
 
         [layout setTargetIndexPath:indexPath];
-        [layout setFitWidth:![[self currentLayout] fitWidth]];
-        [layout setDirection:[[self currentLayout] direction]];
+        [layout setFitWidth:![[[self collectionView] currentLayout] fitWidth]];
+        [layout setDirection:[[[self collectionView] currentLayout] direction]];
 
         _scale = 1.0;
 
@@ -173,7 +173,7 @@
 
 - (IBAction)toggleDirection:(id)sender
 {
-    if ([[self currentLayout] isPageLayout]) {
+    if ([[[self collectionView] currentLayout] isPageLayout]) {
         CGPoint center = [[self collectionView] contentOffset];
         center.x += [[self collectionView] bounds].size.width / 2;
         center.y += [[self collectionView] bounds].size.height / 2;
@@ -183,9 +183,9 @@
         MMPageLayout *layout = [[MMPageLayout alloc] initWithSection:[indexPath section]];
 
         [layout setTargetIndexPath:indexPath];
-        [layout setFitWidth:[[self currentLayout] fitWidth]];
+        [layout setFitWidth:[[[self collectionView] currentLayout] fitWidth]];
 
-        if ([[self currentLayout] direction] == MMPageLayoutVertical) {
+        if ([[[self collectionView] currentLayout] direction] == MMPageLayoutVertical) {
             [layout setDirection:MMPageLayoutHorizontal];
         } else {
             [layout setDirection:MMPageLayoutVertical];

@@ -10,6 +10,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class MMShelfLayout;
+
 @protocol MMPageCollectionViewDelegate <UICollectionViewDelegate>
 @optional
 
@@ -25,6 +27,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, weak) id<MMPageCollectionViewDelegate> delegate;
 
 - (NSIndexPath *)closestIndexPathForPoint:(CGPoint)point;
+
+/// Returns the current layout of the collection view. If the collectionview is in the middel of a transition layout,
+/// then the current layout of that transition layout is returned
+- (__kindof MMShelfLayout *)currentLayout;
+- (nullable UICollectionViewTransitionLayout *)activeTransitionLayout;
 
 @end
 

@@ -85,38 +85,26 @@
 
     [[self collectionView] addObserver:self forKeyPath:@"collectionViewLayout" options:NSKeyValueObservingOptionOld context:nil];
 
-    [[self collectionView] setAlwaysBounceVertical:[[self currentLayout] bounceVertical]];
-    [[self collectionView] setAlwaysBounceHorizontal:[[self currentLayout] bounceHorizontal]];
-}
-
-#pragma mark - Layout Helpers
-
-- (UICollectionViewTransitionLayout *)activeTransitionLayout
-{
-    return [[[self collectionView] collectionViewLayout] isKindOfClass:[UICollectionViewTransitionLayout class]] ? (UICollectionViewTransitionLayout *)[[self collectionView] collectionViewLayout] : nil;
-}
-
-- (__kindof MMShelfLayout *)currentLayout
-{
-    return (MMShelfLayout *)([self activeTransitionLayout] ? [[self activeTransitionLayout] currentLayout] : [[self collectionView] collectionViewLayout]);
+    [[self collectionView] setAlwaysBounceVertical:[[[self collectionView] currentLayout] bounceVertical]];
+    [[self collectionView] setAlwaysBounceHorizontal:[[[self collectionView] currentLayout] bounceHorizontal]];
 }
 
 #pragma mark - Gestures
 
 - (void)pinchGesture:(MMPinchVelocityGestureRecognizer *)pinchGesture
 {
-    if ([[self currentLayout] isShelfLayout]) {
+    if ([[[self collectionView] currentLayout] isShelfLayout]) {
         [self pinchFromShelf:pinchGesture];
-    } else if ([[self currentLayout] isPageLayout]) {
+    } else if ([[[self collectionView] currentLayout] isPageLayout]) {
         [self pinchFromPage:pinchGesture];
-    } else if ([[self currentLayout] isGridLayout]) {
+    } else if ([[[self collectionView] currentLayout] isGridLayout]) {
         [self pinchFromGrid:pinchGesture];
     }
 }
 
 - (void)pinchFromShelf:(MMPinchVelocityGestureRecognizer *)pinchGesture
 {
-    UICollectionViewTransitionLayout *transitionLayout = [self activeTransitionLayout];
+    UICollectionViewTransitionLayout *transitionLayout = [[self collectionView] activeTransitionLayout];
 
     if (!transitionLayout && [pinchGesture state] == UIGestureRecognizerStateBegan) {
         NSIndexPath *targetPath = [[self collectionView] indexPathForItemAtPoint:[pinchGesture locationInView:[self collectionView]]];
@@ -158,7 +146,7 @@
 
 - (void)pinchFromGrid:(MMPinchVelocityGestureRecognizer *)pinchGesture
 {
-    UICollectionViewTransitionLayout *transitionLayout = [self activeTransitionLayout];
+    UICollectionViewTransitionLayout *transitionLayout = [[self collectionView] activeTransitionLayout];
 
     if ([pinchGesture state] == UIGestureRecognizerStateBegan) {
         _targetIndexPath = [[self collectionView] closestIndexPathForPoint:[pinchGesture locationInView:[self collectionView]]];
@@ -188,13 +176,13 @@
             UICollectionViewLayout *nextLayout;
             if (pinchGesture.scaleDirection > 0) {
                 // transition into page view
-                MMPageLayout *pageLayout = [self newPageLayoutForSection:[[self currentLayout] section]];
+                MMPageLayout *pageLayout = [self newPageLayoutForSection:[[[self collectionView] currentLayout] section]];
                 [pageLayout setTargetIndexPath:_targetIndexPath];
                 nextLayout = pageLayout;
             } else {
                 // transition into shelf
                 MMShelfLayout *shelfLayout = [self newShelfLayout];
-                [shelfLayout setTargetIndexPath:[NSIndexPath indexPathForRow:0 inSection:[[self currentLayout] section]]];
+                [shelfLayout setTargetIndexPath:[NSIndexPath indexPathForRow:0 inSection:[[[self collectionView] currentLayout] section]]];
                 nextLayout = shelfLayout;
             }
 
@@ -222,7 +210,7 @@
 
 - (void)pinchFromPage:(MMPinchVelocityGestureRecognizer *)pinchGesture
 {
-    UICollectionViewTransitionLayout *transitionLayout = [self activeTransitionLayout];
+    UICollectionViewTransitionLayout *transitionLayout = [[self collectionView] activeTransitionLayout];
     CGPoint locInView = [pinchGesture locationInView:[[self collectionView] superview]];
     locInView.x -= [[self collectionView] frame].origin.x;
     locInView.y -= [[self collectionView] frame].origin.y;
@@ -278,12 +266,12 @@
                 [layout setTargetOffset:_zoomOffset];
                 // where the gesture is in collection view coordiates
                 [layout setGestureRecognizer:_pinchGesture];
-                [layout setFitWidth:[[self currentLayout] fitWidth]];
-                [layout setDirection:[[self currentLayout] direction]];
+                [layout setFitWidth:[[[self collectionView] currentLayout] fitWidth]];
+                [layout setDirection:[[[self collectionView] currentLayout] direction]];
 
-                [[self currentLayout] setTargetIndexPath:_targetIndexPath];
-                [[self currentLayout] setTargetOffset:_zoomOffset];
-                [[self currentLayout] setGestureRecognizer:_pinchGesture];
+                [[[self collectionView] currentLayout] setTargetIndexPath:_targetIndexPath];
+                [[[self collectionView] currentLayout] setTargetOffset:_zoomOffset];
+                [[[self collectionView] currentLayout] setGestureRecognizer:_pinchGesture];
 
                 // Can't call [invalidateLayout] here, as this won't cause the collectionView to
                 // ask for targetContentOffsetForProposedContentOffset:. This means the contentOffset
@@ -316,20 +304,20 @@
         }
         _transitionComplete = YES;
         _isZoomingPage = nil;
-        [[self currentLayout] setTargetOffset:CGPointZero];
-        [[self currentLayout] setGestureRecognizer:nil];
+        [[[self collectionView] currentLayout] setTargetOffset:CGPointZero];
+        [[[self collectionView] currentLayout] setGestureRecognizer:nil];
         [self didEndZoom];
     } else {
         if (!_transitionComplete && transitionLayout) {
             [[self collectionView] cancelInteractiveTransition];
         } else {
-            [[self currentLayout] invalidateLayout];
+            [[[self collectionView] currentLayout] invalidateLayout];
         }
 
         _isZoomingPage = nil;
         _transitionComplete = YES;
-        [[self currentLayout] setTargetOffset:CGPointZero];
-        [[self currentLayout] setGestureRecognizer:nil];
+        [[[self collectionView] currentLayout] setTargetOffset:CGPointZero];
+        [[[self collectionView] currentLayout] setGestureRecognizer:nil];
         [self didCancelZoom];
     }
 }
@@ -378,10 +366,10 @@
     CGFloat progress = MIN(-min, MAX(-(min + dist), scrollView.contentOffset.y));
     progress = ABS(min + progress) / dist;
 
-    if ([[self currentLayout] isGridLayout]) {
+    if ([[[self collectionView] currentLayout] isGridLayout]) {
         [_collapseGridIcon setProgress:progress];
         [_collapsePageIcon setProgress:0];
-    } else if ([[self currentLayout] isPageLayout]) {
+    } else if ([[[self collectionView] currentLayout] isPageLayout]) {
         [_collapseGridIcon setProgress:0];
         [_collapsePageIcon setProgress:progress];
     } else {
@@ -392,16 +380,16 @@
 
 - (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
 {
-    if (scrollView.contentOffset.y < -100 && ([[self currentLayout] isGridLayout] || [[self currentLayout] isPageLayout])) {
+    if (scrollView.contentOffset.y < -100 && ([[[self collectionView] currentLayout] isGridLayout] || [[[self collectionView] currentLayout] isPageLayout])) {
         // turn off bounce during this animation, as the bounce from the scrollview
         // being overscrolled conflicts with the layout animation
         MMShelfLayout *nextLayout;
 
-        if ([[self currentLayout] isGridLayout]) {
+        if ([[[self collectionView] currentLayout] isGridLayout]) {
             nextLayout = [self newShelfLayout];
-            [nextLayout setTargetIndexPath:[NSIndexPath indexPathForRow:0 inSection:[[self currentLayout] section]]];
-        } else if ([[self currentLayout] isPageLayout]) {
-            nextLayout = [self newGridLayoutForSection:[[self currentLayout] section]];
+            [nextLayout setTargetIndexPath:[NSIndexPath indexPathForRow:0 inSection:[[[self collectionView] currentLayout] section]]];
+        } else if ([[[self collectionView] currentLayout] isPageLayout]) {
+            nextLayout = [self newGridLayoutForSection:[[[self collectionView] currentLayout] section]];
         }
 
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
@@ -415,9 +403,9 @@
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 {
     MMGridLayout *updatedLayout;
-    if ([[self currentLayout] isShelfLayout]) {
+    if ([[[self collectionView] currentLayout] isShelfLayout]) {
         updatedLayout = [self newGridLayoutForSection:[indexPath section]];
-    } else if ([[self currentLayout] isGridLayout] && ![self activeTransitionLayout]) {
+    } else if ([[[self collectionView] currentLayout] isGridLayout] && ![[self collectionView] activeTransitionLayout]) {
         updatedLayout = [self newPageLayoutForSection:[indexPath section]];
         [updatedLayout setTargetIndexPath:indexPath];
     }

@@ -15,6 +15,20 @@
 @implementation MMPageCollectionView
 @dynamic delegate;
 
+#pragma mark - Layout Helpers
+
+- (UICollectionViewTransitionLayout *)activeTransitionLayout
+{
+    return [[self collectionViewLayout] isKindOfClass:[UICollectionViewTransitionLayout class]] ? (UICollectionViewTransitionLayout *)[self collectionViewLayout] : nil;
+}
+
+- (__kindof MMShelfLayout *)currentLayout
+{
+    return (MMShelfLayout *)([self activeTransitionLayout] ? [[self activeTransitionLayout] currentLayout] : [self collectionViewLayout]);
+}
+
+#pragma mark - UICollectionView
+
 - (void)setCollectionViewLayout:(UICollectionViewLayout *)layout
 {
     UICollectionViewLayout *previousLayout = [self collectionViewLayout];
