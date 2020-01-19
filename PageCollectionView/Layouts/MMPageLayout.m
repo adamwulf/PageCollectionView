@@ -58,21 +58,6 @@
     return self;
 }
 
-- (BOOL)isShelfLayout
-{
-    return NO;
-}
-
-- (BOOL)isGridLayout
-{
-    return NO;
-}
-
-- (BOOL)isPageLayout
-{
-    return YES;
-}
-
 - (BOOL)bounceHorizontal
 {
     return _direction == MMPageLayoutHorizontal;

@@ -22,6 +22,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)collectionView:(UICollectionView *)collectionView didChangeToLayout:(UICollectionViewLayout *)newLayout fromLayout:(UICollectionViewLayout *)oldLayout NS_REQUIRES_SUPER;
 
+#pragma mark - Layout Helpers
+
+- (BOOL)isDisplayingShelf;
+- (BOOL)isDisplayingGrid;
+- (BOOL)isDisplayingPage;
+
 #pragma mark - Subclasses
 
 - (MMShelfLayout *)newShelfLayout;

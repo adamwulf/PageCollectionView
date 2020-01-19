@@ -96,6 +96,23 @@ typedef enum : NSUInteger {
     [[self collectionView] setAlwaysBounceHorizontal:[[[self collectionView] currentLayout] bounceHorizontal]];
 }
 
+#pragma mark - Layout Helpers
+
+- (BOOL)isDisplayingShelf
+{
+    return [[[self collectionView] currentLayout] isMemberOfClass:[MMShelfLayout class]];
+}
+
+- (BOOL)isDisplayingGrid
+{
+    return [[[self collectionView] currentLayout] isMemberOfClass:[MMGridLayout class]];
+}
+
+- (BOOL)isDisplayingPage
+{
+    return [[[self collectionView] currentLayout] isMemberOfClass:[MMPageLayout class]];
+}
+
 #pragma mark - Gestures
 
 - (void)reenablePinchGesture
@@ -111,11 +128,11 @@ typedef enum : NSUInteger {
 
 - (void)pinchGesture:(MMPinchVelocityGestureRecognizer *)pinchGesture
 {
-    if ([[[self collectionView] currentLayout] isShelfLayout]) {
+    if ([self isDisplayingShelf]) {
         [self pinchFromShelf:pinchGesture];
-    } else if ([[[self collectionView] currentLayout] isPageLayout]) {
+    } else if ([self isDisplayingPage]) {
         [self pinchFromPage:pinchGesture];
-    } else if ([[[self collectionView] currentLayout] isGridLayout]) {
+    } else if ([self isDisplayingGrid]) {
         [self pinchFromGrid:pinchGesture];
     }
 }
@@ -370,10 +387,10 @@ typedef enum : NSUInteger {
     CGFloat progress = MIN(-min, MAX(-(min + dist), scrollView.contentOffset.y));
     progress = ABS(min + progress) / dist;
 
-    if ([[[self collectionView] currentLayout] isGridLayout]) {
+    if ([self isDisplayingGrid]) {
         [_collapseGridIcon setProgress:progress];
         [_collapsePageIcon setProgress:0];
-    } else if ([[[self collectionView] currentLayout] isPageLayout]) {
+    } else if ([self isDisplayingPage]) {
         [_collapseGridIcon setProgress:0];
         [_collapsePageIcon setProgress:progress];
     } else {
@@ -384,15 +401,15 @@ typedef enum : NSUInteger {
 
 - (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
 {
-    if (scrollView.contentOffset.y < -100 && ([[[self collectionView] currentLayout] isGridLayout] || [[[self collectionView] currentLayout] isPageLayout])) {
+    if (scrollView.contentOffset.y < -100 && ([self isDisplayingGrid] || [self isDisplayingPage])) {
         // turn off bounce during this animation, as the bounce from the scrollview
         // being overscrolled conflicts with the layout animation
         MMShelfLayout *nextLayout;
 
-        if ([[[self collectionView] currentLayout] isGridLayout]) {
+        if ([self isDisplayingGrid]) {
             nextLayout = [self newShelfLayout];
             [nextLayout setTargetIndexPath:[NSIndexPath indexPathForRow:0 inSection:[[[self collectionView] currentLayout] section]]];
-        } else if ([[[self collectionView] currentLayout] isPageLayout]) {
+        } else if ([self isDisplayingPage]) {
             nextLayout = [self newGridLayoutForSection:[[[self collectionView] currentLayout] section]];
         }
 
@@ -407,9 +424,9 @@ typedef enum : NSUInteger {
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 {
     MMGridLayout *updatedLayout;
-    if ([[[self collectionView] currentLayout] isShelfLayout]) {
+    if ([self isDisplayingShelf]) {
         updatedLayout = [self newGridLayoutForSection:[indexPath section]];
-    } else if ([[[self collectionView] currentLayout] isGridLayout] && ![[self collectionView] activeTransitionLayout]) {
+    } else if ([self isDisplayingGrid] && ![[self collectionView] activeTransitionLayout]) {
         updatedLayout = [self newPageLayoutForSection:[indexPath section]];
         [updatedLayout setTargetIndexPath:indexPath];
     }

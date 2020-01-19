@@ -44,21 +44,6 @@
     return self;
 }
 
-- (BOOL)isShelfLayout
-{
-    return YES;
-}
-
-- (BOOL)isGridLayout
-{
-    return NO;
-}
-
-- (BOOL)isPageLayout
-{
-    return NO;
-}
-
 - (BOOL)bounceVertical
 {
     return YES;

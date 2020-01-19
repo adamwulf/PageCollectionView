@@ -153,7 +153,7 @@
 /// Change the scale from actual-size to fit-width
 - (IBAction)swapScale:(id)sender
 {
-    if ([[[self collectionView] currentLayout] isPageLayout]) {
+    if ([self isPageLayout]) {
         CGPoint center = [[self collectionView] contentOffset];
         center.x += [[self collectionView] bounds].size.width / 2;
         center.y += [[self collectionView] bounds].size.height / 2;
@@ -173,7 +173,7 @@
 
 - (IBAction)toggleDirection:(id)sender
 {
-    if ([[[self collectionView] currentLayout] isPageLayout]) {
+    if ([self isPageLayout]) {
         CGPoint center = [[self collectionView] contentOffset];
         center.x += [[self collectionView] bounds].size.width / 2;
         center.y += [[self collectionView] bounds].size.height / 2;

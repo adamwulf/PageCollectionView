@@ -46,10 +46,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, readonly) id<MMPageCollectionViewDelegateShelfLayout> delegate;
 @property(nonatomic, readonly) id<MMPageCollectionViewDataSourceShelfLayout> datasource;
 
-@property(nonatomic, readonly) BOOL isShelfLayout;
-@property(nonatomic, readonly) BOOL isGridLayout;
-@property(nonatomic, readonly) BOOL isPageLayout;
-
 @property(nonatomic, readonly) BOOL bounceVertical;
 @property(nonatomic, readonly) BOOL bounceHorizontal;
 
