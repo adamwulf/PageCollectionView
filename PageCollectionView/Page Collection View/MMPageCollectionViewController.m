@@ -136,10 +136,10 @@ typedef enum : NSUInteger {
 {
     if ([self isDisplayingShelf]) {
         [self pinchFromShelf:pinchGesture];
-    } else if ([self isDisplayingPage]) {
-        [self pinchFromPage:pinchGesture];
     } else if ([self isDisplayingGrid]) {
         [self pinchFromGrid:pinchGesture];
+    } else if ([self isDisplayingPage]) {
+        [self pinchFromPage:pinchGesture];
     }
 }
 
@@ -257,6 +257,12 @@ typedef enum : NSUInteger {
         _targetIndexPath = [[self collectionView] closestIndexPathForPoint:gestureLocInContent];
         _zoomPercentOffset.x = gestureLocInContent.x / [[self collectionView] contentSize].width;
         _zoomPercentOffset.y = gestureLocInContent.y / [[self collectionView] contentSize].height;
+
+        if (!_targetIndexPath) {
+            // cancel if we can't find a target index
+            [pinchGesture setEnabled:NO];
+            [pinchGesture setEnabled:YES];
+        }
     } else if ([pinchGesture state] == UIGestureRecognizerStateChanged) {
         if (transitionLayout) {
             BOOL toPage = [[transitionLayout nextLayout] isKindOfClass:[MMPageLayout class]];
@@ -279,9 +285,6 @@ typedef enum : NSUInteger {
             transitionLayout.transitionProgress = progress;
             [transitionLayout invalidateLayout];
         } else {
-            NSIndexPath *targetPath = [[self collectionView] closestIndexPathForPoint:[pinchGesture locationInView:[self collectionView]]];
-            UICollectionViewLayout *nextLayout;
-
             if ((_isZoomingPage == MMScalingNone && pinchGesture.scaleDirection > 0) || _isZoomingPage == MMScalingPage || _pageScale > 1.0) {
                 // scale page up
                 _isZoomingPage = MMScalingPage;
@@ -313,11 +316,10 @@ typedef enum : NSUInteger {
             } else if (_isZoomingPage == MMScalingNone || _isZoomingPage == MMScalingToGrid) {
                 _isZoomingPage = MMScalingToGrid;
                 // transition into grid
-                MMGridLayout *gridLayout = [self newGridLayoutForSection:[targetPath section]];
-                [gridLayout setTargetIndexPath:targetPath];
-                nextLayout = gridLayout;
+                MMGridLayout *gridLayout = [self newGridLayoutForSection:[_targetIndexPath section]];
+                [gridLayout setTargetIndexPath:_targetIndexPath];
 
-                [[self collectionView] startInteractiveTransitionToCollectionViewLayout:nextLayout completion:^(BOOL completed, BOOL finished) {
+                [[self collectionView] startInteractiveTransitionToCollectionViewLayout:gridLayout completion:^(BOOL completed, BOOL finished) {
                     self->_targetIndexPath = nil;
                 }];
             }

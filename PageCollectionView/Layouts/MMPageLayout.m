@@ -34,6 +34,10 @@
     CGFloat _sectionOffset;
     CGFloat _sectionHeight;
     CGFloat _sectionWidth;
+    // track the header height so that we know when the bounds are within/out of the headers
+    CGFloat _headerHeight;
+    // track the orthogonal dimention from scroll, so that when it changes we can invalidate the header attributes
+    CGFloat _lastBoundsMinDim;
 }
 
 @dynamic delegate;
@@ -69,6 +73,40 @@
 }
 
 #pragma mark - UICollectionViewLayout
+
+- (BOOL)shouldInvalidateLayoutForBoundsChange:(CGRect)newBounds
+{
+    // Check if our bounds have changed enough so that we need to re-align our headers
+    // with the newly visible rect of the content
+    CGFloat currMinBoundsDim = _lastBoundsMinDim;
+    UIEdgeInsets insets = [[self collectionView] safeAreaInsets];
+
+    if (_direction == MMPageLayoutVertical && CGRectGetMinY(newBounds) < _headerHeight + insets.top) {
+        currMinBoundsDim = CGRectGetMinX(newBounds);
+    } else if (_direction == MMPageLayoutHorizontal && CGRectGetMinX(newBounds) < _headerHeight + insets.left) {
+        currMinBoundsDim = CGRectGetMinY(newBounds);
+    }
+
+    if (currMinBoundsDim != _lastBoundsMinDim) {
+        // if our header should move, then invalidate it
+        [self invalidateLayoutWithContext:[self invalidationContextForBoundsChange:newBounds]];
+    }
+
+    // the above handles conditionally invalidatin the layout from this bounds change,
+    // our [super] will handle invalidating the entire layout from the change
+    return [super shouldInvalidateLayoutForBoundsChange:newBounds];
+}
+
+- (UICollectionViewLayoutInvalidationContext *)invalidationContextForBoundsChange:(CGRect)newBounds
+{
+    // The only thing we need to conditionally invalidate because of a bounds change is our header
+    UICollectionViewLayoutInvalidationContext *context = [super invalidationContextForBoundsChange:newBounds];
+    NSIndexPath *headerPath = [NSIndexPath indexPathForRow:0 inSection:[self section]];
+
+    [context invalidateSupplementaryElementsOfKind:UICollectionElementKindSectionHeader atIndexPaths:@[headerPath]];
+
+    return context;
+}
 
 - (CGSize)collectionViewContentSize
 {
@@ -195,14 +233,15 @@
     _sectionWidth = 0;
     _sectionHeight = 0;
 
+    CGRect const collectionViewBounds = [[self collectionView] bounds];
     UIEdgeInsets insets = [[self collectionView] safeAreaInsets];
 
     CGFloat maxDim;
 
     if (_direction == MMPageLayoutVertical) {
-        maxDim = CGRectGetWidth([[self collectionView] bounds]) - insets.left - insets.right;
+        maxDim = CGRectGetWidth(collectionViewBounds) - insets.left - insets.right;
     } else {
-        maxDim = CGRectGetHeight([[self collectionView] bounds]) - insets.top - insets.bottom;
+        maxDim = CGRectGetHeight(collectionViewBounds) - insets.top - insets.bottom;
     }
 
     CGFloat const kMaxDim = maxDim;
@@ -216,6 +255,15 @@
         headerSize = [[self delegate] collectionView:[self collectionView] layout:self referenceSizeForHeaderInSection:[self section]];
     }
 
+    _headerHeight = headerSize.height;
+
+    // track the location of the bounds in the direction orthogonal to the scroll
+    if (_direction == MMPageLayoutVertical && CGRectGetMinY(collectionViewBounds) < _headerHeight + insets.top) {
+        _lastBoundsMinDim = CGRectGetMinX(collectionViewBounds);
+    } else if (_direction == MMPageLayoutHorizontal && CGRectGetMinX(collectionViewBounds) < _headerHeight + insets.left) {
+        _lastBoundsMinDim = CGRectGetMinY(collectionViewBounds);
+    }
+
     // Layout the header, if any
     if (!CGSizeEqualToSize(headerSize, CGSizeZero)) {
         UICollectionViewLayoutAttributes *headerAttrs = [UICollectionViewLayoutAttributes layoutAttributesForSupplementaryViewOfKind:UICollectionElementKindSectionHeader withIndexPath:[NSIndexPath indexPathForRow:0 inSection:[self section]]];
@@ -223,6 +271,12 @@
             [headerAttrs setFrame:CGRectMake(insets.left, offset, headerSize.width, headerSize.height)];
         } else {
             [headerAttrs setFrame:CGRectMake(offset, insets.top, headerSize.width, headerSize.height)];
+        }
+
+        if (_direction == MMPageLayoutVertical) {
+            [headerAttrs setCenter:CGPointMake(CGRectGetMidX(collectionViewBounds), headerSize.height / 2)];
+        } else {
+            [headerAttrs setCenter:CGPointMake(headerSize.width / 2, CGRectGetMidY(collectionViewBounds))];
         }
 
         [_pageCache addObject:headerAttrs];
@@ -328,7 +382,16 @@
     if ([indexPath section] == [self section]) {
         for (UICollectionViewLayoutAttributes *attrs in _pageCache) {
             if ([attrs representedElementCategory] == UICollectionElementCategorySupplementaryView && [[attrs indexPath] isEqual:indexPath]) {
-                return attrs;
+                // center the attributes in the scrollable direction
+                UICollectionViewLayoutAttributes *ret = [attrs copy];
+
+                if (_direction == MMPageLayoutVertical) {
+                    [ret setCenter:CGPointMake(CGRectGetMidX([[self collectionView] bounds]), [ret center].y)];
+                } else {
+                    [ret setCenter:CGPointMake([ret center].x, CGRectGetMidY([[self collectionView] bounds]))];
+                }
+
+                return ret;
             }
         }
     }

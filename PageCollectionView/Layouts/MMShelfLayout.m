@@ -93,12 +93,12 @@
 
 - (void)prepareLayout
 {
-    CGFloat yOffset = 0;
-
     if ([_shelfCache count]) {
         // don't relayout if we haven't been invalidated.
         return;
     }
+
+    CGFloat yOffset = 0;
 
     for (NSInteger section = 0; section < [[self collectionView] numberOfSections]; section++) {
         NSInteger rowCount = [[self collectionView] numberOfItemsInSection:section];
