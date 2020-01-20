@@ -48,6 +48,8 @@
         _pageCache = [NSMutableArray array];
         _fitWidth = YES;
         _direction = MMPageLayoutVertical;
+
+        [self setSectionInsets:UIEdgeInsetsMake(10, 10, 40, 40)];
     }
     return self;
 }
@@ -58,6 +60,8 @@
         _pageCache = [NSMutableArray array];
         _fitWidth = YES;
         _direction = MMPageLayoutVertical;
+
+        [self setSectionInsets:UIEdgeInsetsMake(10, 10, 40, 40)];
     }
     return self;
 }
@@ -248,14 +252,14 @@
     CGFloat offset = 0;
     NSInteger const kItemCount = [[self collectionView] numberOfItemsInSection:[self section]];
     CGFloat scaledMaxDim = kMaxDim;
-    CGSize headerSize = [self defaultHeaderSize];
+    CGFloat headerHeight = [self defaultHeaderHeight];
 
     // Calculate the header section size, if any
-    if ([[self delegate] respondsToSelector:@selector(collectionView:layout:referenceSizeForHeaderInSection:)]) {
-        headerSize = [[self delegate] collectionView:[self collectionView] layout:self referenceSizeForHeaderInSection:[self section]];
+    if ([[self delegate] respondsToSelector:@selector(collectionView:layout:heightForHeaderInSection:)]) {
+        headerHeight = [[self delegate] collectionView:[self collectionView] layout:self heightForHeaderInSection:[self section]];
     }
 
-    _headerHeight = headerSize.height;
+    _headerHeight = headerHeight;
 
     // track the location of the bounds in the direction orthogonal to the scroll
     if (_direction == MMPageLayoutVertical && CGRectGetMinY(collectionViewBounds) < _headerHeight + insets.top) {
@@ -265,27 +269,21 @@
     }
 
     // Layout the header, if any
-    if (!CGSizeEqualToSize(headerSize, CGSizeZero)) {
+    if (headerHeight > 0) {
         UICollectionViewLayoutAttributes *headerAttrs = [UICollectionViewLayoutAttributes layoutAttributesForSupplementaryViewOfKind:UICollectionElementKindSectionHeader withIndexPath:[NSIndexPath indexPathForRow:0 inSection:[self section]]];
-        if (_direction == MMPageLayoutVertical) {
-            [headerAttrs setFrame:CGRectMake(insets.left, offset, headerSize.width, headerSize.height)];
-        } else {
-            [headerAttrs setFrame:CGRectMake(offset, insets.top, headerSize.width, headerSize.height)];
-        }
 
         if (_direction == MMPageLayoutVertical) {
-            [headerAttrs setCenter:CGPointMake(CGRectGetMidX(collectionViewBounds), headerSize.height / 2)];
+            [headerAttrs setBounds:CGRectMake(0, 0, CGRectGetWidth(collectionViewBounds), headerHeight)];
+            [headerAttrs setCenter:CGPointMake(CGRectGetMidX(collectionViewBounds), headerHeight / 2)];
         } else {
-            [headerAttrs setCenter:CGPointMake(headerSize.width / 2, CGRectGetMidY(collectionViewBounds))];
+            [headerAttrs setBounds:CGRectMake(0, 0, CGRectGetHeight(collectionViewBounds) - insets.top, headerHeight)];
+            [headerAttrs setCenter:CGPointMake(headerHeight / 2, CGRectGetMidY(collectionViewBounds) + insets.top / 2)];
+            [headerAttrs setTransform:CGAffineTransformMakeRotation(-M_PI_2)];
         }
 
         [_pageCache addObject:headerAttrs];
 
-        if (_direction == MMPageLayoutVertical) {
-            offset += headerSize.height;
-        } else {
-            offset += headerSize.width;
-        }
+        offset += headerHeight;
     }
 
     if (_direction == MMPageLayoutVertical) {
@@ -363,7 +361,7 @@
         offset += [self sectionInsets].bottom;
         _sectionHeight = offset;
     } else {
-        offset += [self sectionInsets].left;
+        offset += [self sectionInsets].right;
         _sectionWidth = offset;
     }
 }
@@ -384,11 +382,12 @@
             if ([attrs representedElementCategory] == UICollectionElementCategorySupplementaryView && [[attrs indexPath] isEqual:indexPath]) {
                 // center the attributes in the scrollable direction
                 UICollectionViewLayoutAttributes *ret = [attrs copy];
+                UIEdgeInsets insets = [[self collectionView] safeAreaInsets];
 
                 if (_direction == MMPageLayoutVertical) {
                     [ret setCenter:CGPointMake(CGRectGetMidX([[self collectionView] bounds]), [ret center].y)];
                 } else {
-                    [ret setCenter:CGPointMake([ret center].x, CGRectGetMidY([[self collectionView] bounds]))];
+                    [ret setCenter:CGPointMake([ret center].x, CGRectGetMidY([[self collectionView] bounds]) + insets.top / 2)];
                 }
 
                 return ret;

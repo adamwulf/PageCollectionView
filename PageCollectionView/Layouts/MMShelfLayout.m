@@ -7,6 +7,7 @@
 //
 
 #import "MMShelfLayout.h"
+#import "Constants.h"
 
 
 @interface MMShelfLayout ()
@@ -26,7 +27,7 @@
         _sectionInsets = UIEdgeInsetsMake(10, 40, 40, 40);
         _shelfCache = [NSMutableArray array];
         _pageSpacing = 40;
-        _defaultHeaderSize = CGSizeMake(200, 50);
+        _defaultHeaderHeight = 50;
         _maxDim = 140;
     }
     return self;
@@ -38,7 +39,7 @@
         _sectionInsets = UIEdgeInsetsMake(10, 40, 40, 40);
         _shelfCache = [NSMutableArray array];
         _pageSpacing = 40;
-        _defaultHeaderSize = CGSizeMake(200, 50);
+        _defaultHeaderHeight = 50;
         _maxDim = 140;
     }
     return self;
@@ -103,19 +104,19 @@
     for (NSInteger section = 0; section < [[self collectionView] numberOfSections]; section++) {
         NSInteger rowCount = [[self collectionView] numberOfItemsInSection:section];
         CGFloat maxItemHeight = 0;
-        CGSize headerSize = _defaultHeaderSize;
+        CGFloat headerHeight = [self defaultHeaderHeight];
 
         // Calculate the header section size, if any
-        if ([[self delegate] respondsToSelector:@selector(collectionView:layout:referenceSizeForHeaderInSection:)]) {
-            headerSize = [[self delegate] collectionView:[self collectionView] layout:self referenceSizeForHeaderInSection:section];
+        if ([[self delegate] respondsToSelector:@selector(collectionView:layout:heightForHeaderInSection:)]) {
+            headerHeight = [[self delegate] collectionView:[self collectionView] layout:self heightForHeaderInSection:section];
         }
 
-        if (!CGSizeEqualToSize(headerSize, CGSizeZero)) {
+        if (headerHeight > 0) {
             UICollectionViewLayoutAttributes *headerAttrs = [UICollectionViewLayoutAttributes layoutAttributesForSupplementaryViewOfKind:UICollectionElementKindSectionHeader withIndexPath:[NSIndexPath indexPathForRow:0 inSection:section]];
-            [headerAttrs setFrame:CGRectMake(0, yOffset, headerSize.width, headerSize.height)];
+            [headerAttrs setFrame:CGRectMake(0, yOffset, CGRectGetWidth([[self collectionView] bounds]), headerHeight)];
             [_shelfCache addObject:headerAttrs];
 
-            yOffset += headerSize.height;
+            yOffset += headerHeight;
         }
 
         CGFloat xOffset = _sectionInsets.left;
@@ -139,12 +140,15 @@
                 itemSize.width = [self maxDim] / heightRatio;
             }
 
+            CGSize boundingSize = MMBoundingSizeFor(itemSize, rotation);
+
             if (!CGSizeEqualToSize(itemSize, CGSizeZero)) {
-                maxItemHeight = MAX(maxItemHeight, itemSize.height);
+                maxItemHeight = MAX(maxItemHeight, boundingSize.height);
 
                 UICollectionViewLayoutAttributes *itemAttrs = [UICollectionViewLayoutAttributes layoutAttributesForCellWithIndexPath:[NSIndexPath indexPathForRow:row inSection:section]];
-                [itemAttrs setFrame:CGRectMake(xOffset, yOffset, itemSize.width, itemSize.height)];
+                [itemAttrs setBounds:CGRectMake(0, 0, itemSize.width, itemSize.height)];
                 [itemAttrs setZIndex:rowCount - row];
+                [itemAttrs setCenter:CGPointMake(xOffset + itemSize.width / 2, yOffset + boundingSize.height / 2)];
 
                 if (rotation) {
                     [itemAttrs setTransform:CGAffineTransformMakeRotation(rotation)];

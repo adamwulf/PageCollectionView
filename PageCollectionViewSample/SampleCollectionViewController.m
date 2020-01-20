@@ -7,6 +7,7 @@
 //
 
 #import "SampleCollectionViewController.h"
+#import "MMPageCollectionView+Protected.h"
 #import "SampleObject.h"
 
 
@@ -153,7 +154,7 @@
 /// Change the scale from actual-size to fit-width
 - (IBAction)swapScale:(id)sender
 {
-    if ([self isPageLayout]) {
+    if ([[[self collectionView] currentLayout] isMemberOfClass:[MMPageLayout class]]) {
         CGPoint center = [[self collectionView] contentOffset];
         center.x += [[self collectionView] bounds].size.width / 2;
         center.y += [[self collectionView] bounds].size.height / 2;
@@ -165,7 +166,7 @@
         [layout setFitWidth:![[[self collectionView] currentLayout] fitWidth]];
         [layout setDirection:[[[self collectionView] currentLayout] direction]];
 
-        _scale = 1.0;
+        _pageScale = 1.0;
 
         [[self collectionView] setCollectionViewLayout:layout animated:YES];
     }
@@ -173,7 +174,7 @@
 
 - (IBAction)toggleDirection:(id)sender
 {
-    if ([self isPageLayout]) {
+    if ([[[self collectionView] currentLayout] isMemberOfClass:[MMPageLayout class]]) {
         CGPoint center = [[self collectionView] contentOffset];
         center.x += [[self collectionView] bounds].size.width / 2;
         center.y += [[self collectionView] bounds].size.height / 2;

@@ -29,14 +29,14 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol MMPageCollectionViewDelegateShelfLayout <MMPageCollectionViewDelegate>
 @optional
 
-- (CGSize)collectionView:(UICollectionView *)collectionView layout:(MMShelfLayout *)collectionViewLayout referenceSizeForHeaderInSection:(NSInteger)section;
+- (CGFloat)collectionView:(UICollectionView *)collectionView layout:(MMShelfLayout *)collectionViewLayout heightForHeaderInSection:(NSInteger)section;
 
 @end
 
 
 @interface MMShelfLayout : UICollectionViewLayout
 
-@property(nonatomic, assign) CGSize defaultHeaderSize;
+@property(nonatomic, assign) CGFloat defaultHeaderHeight;
 @property(nonatomic, assign) CGFloat maxDim;
 
 @property(nonatomic, assign) UIEdgeInsets sectionInsets;

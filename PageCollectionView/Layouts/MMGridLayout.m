@@ -95,19 +95,19 @@
     CGFloat yOffset = 0;
     NSInteger pageCount = [[self collectionView] numberOfItemsInSection:_section];
     CGFloat maxItemHeight = 0;
-    CGSize headerSize = [self defaultHeaderSize];
+    CGFloat headerHeight = [self defaultHeaderHeight];
 
     // Calculate the header section size, if any
-    if ([[self delegate] respondsToSelector:@selector(collectionView:layout:referenceSizeForHeaderInSection:)]) {
-        headerSize = [[self delegate] collectionView:[self collectionView] layout:self referenceSizeForHeaderInSection:_section];
+    if ([[self delegate] respondsToSelector:@selector(collectionView:layout:heightForHeaderInSection:)]) {
+        headerHeight = [[self delegate] collectionView:[self collectionView] layout:self heightForHeaderInSection:_section];
     }
 
-    if (!CGSizeEqualToSize(headerSize, CGSizeZero)) {
+    if (headerHeight > 0) {
         UICollectionViewLayoutAttributes *headerAttrs = [UICollectionViewLayoutAttributes layoutAttributesForSupplementaryViewOfKind:UICollectionElementKindSectionHeader withIndexPath:[NSIndexPath indexPathForRow:0 inSection:_section]];
-        [headerAttrs setFrame:CGRectMake(0, yOffset, headerSize.width, headerSize.height)];
+        [headerAttrs setFrame:CGRectMake(0, yOffset, CGRectGetWidth([[self collectionView] bounds]), headerHeight)];
         [_gridCache addObject:headerAttrs];
 
-        yOffset += headerSize.height;
+        yOffset += headerHeight;
     }
 
     CGFloat xOffset = [self sectionInsets].left;
