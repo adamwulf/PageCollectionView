@@ -11,9 +11,13 @@ Example:
 
 ![Page Collection Sample Gif](PageCollectionViewSample.gif)
 
-This is a UICollectionView based layout based on [Loose Leaf(https://getlooseleaf.com) app. Loose Leaf's navigation
+This is a UICollectionView based layout based on [Loose Leaf](https://getlooseleaf.com) app. Loose Leaf's navigation
 has a number of other feature's I'd like to eventually implement here as well. When I built Loose Leaf originally,
 UICollectionViews didn't exist yet (ack!), so it's been a lot of fun rebuilding some of the interactions with much
 simpler and cleaner code!
 
 ![Loose Leaf Sample Gif](LooseLeafSample.gif)
+
+# Dependencies
+
+This uses [MMToolbox](https://github.com/adamwulf/MMToolbox) for binary search of NSArray.
