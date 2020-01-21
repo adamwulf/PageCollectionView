@@ -130,46 +130,44 @@
 
         idealSize = MMFitSizeToWidth(idealSize, [self maxDim], NO);
 
-        if (!CGSizeEqualToSize(boundingSize, CGSizeZero)) {
-            // can it fit on this row?
-            if (xOffset + boundingSize.width + [self sectionInsets].right > [self collectionViewContentSize].width) {
-                // the row is done, remove the next item spacing. the item spacing do not sum with the sectionInsets,
-                // so the right+left spacing are added after every item to separate it from the following item. but there
-                // is no following item, so remove those trailing margins.
-                rowWidth -= _itemSpacing.right + _itemSpacing.left;
-                // now realign all the items into their row so that they stretch full width
-                [_gridCache addObjectsFromArray:[self alignItemsInRow:attributesPerRow maxItemHeight:maxItemHeight rowWidth:rowWidth yOffset:yOffset stretchWidth:YES]];
-                [attributesPerRow removeAllObjects];
+        // can it fit on this row?
+        if (xOffset + boundingSize.width + [self sectionInsets].right > [self collectionViewContentSize].width) {
+            // the row is done, remove the next item spacing. the item spacing do not sum with the sectionInsets,
+            // so the right+left spacing are added after every item to separate it from the following item. but there
+            // is no following item, so remove those trailing margins.
+            rowWidth -= _itemSpacing.right + _itemSpacing.left;
+            // now realign all the items into their row so that they stretch full width
+            [_gridCache addObjectsFromArray:[self alignItemsInRow:attributesPerRow maxItemHeight:maxItemHeight rowWidth:rowWidth yOffset:yOffset stretchWidth:YES]];
+            [attributesPerRow removeAllObjects];
 
-                yOffset += maxItemHeight + [self itemSpacing].bottom + [self itemSpacing].top;
-                xOffset = [self sectionInsets].left;
-                maxItemHeight = 0;
-                rowWidth = 0;
-            }
-
-            // track this row's tallest item, so we can vertically center them all when the row is done
-            maxItemHeight = MAX(maxItemHeight, boundingSize.height);
-
-            // set all the attributes
-            UICollectionViewLayoutAttributes *itemAttrs = [UICollectionViewLayoutAttributes layoutAttributesForCellWithIndexPath:indexPath];
-            [itemAttrs setBounds:CGRectMake(0, 0, idealSize.width, idealSize.height)];
-            [itemAttrs setCenter:CGPointMake(rowWidth + boundingSize.width / 2, 0)];
-            [itemAttrs setZIndex:pageCount - pageIndex];
-            [itemAttrs setAlpha:1];
-            [itemAttrs setHidden:NO];
-
-            lastItemWidth = boundingSize.width;
-            rowWidth += boundingSize.width + _itemSpacing.right + _itemSpacing.left;
-            xOffset += boundingSize.width + _itemSpacing.right + _itemSpacing.left;
-
-            if (rotation) {
-                [itemAttrs setTransform:CGAffineTransformMakeRotation(rotation)];
-            } else {
-                [itemAttrs setTransform:CGAffineTransformIdentity];
-            }
-
-            [attributesPerRow addObject:itemAttrs];
+            yOffset += maxItemHeight + [self itemSpacing].bottom + [self itemSpacing].top;
+            xOffset = [self sectionInsets].left;
+            maxItemHeight = 0;
+            rowWidth = 0;
         }
+
+        // track this row's tallest item, so we can vertically center them all when the row is done
+        maxItemHeight = MAX(maxItemHeight, boundingSize.height);
+
+        // set all the attributes
+        UICollectionViewLayoutAttributes *itemAttrs = [UICollectionViewLayoutAttributes layoutAttributesForCellWithIndexPath:indexPath];
+        [itemAttrs setBounds:CGRectMake(0, 0, idealSize.width, idealSize.height)];
+        [itemAttrs setCenter:CGPointMake(rowWidth + boundingSize.width / 2, 0)];
+        [itemAttrs setZIndex:pageCount - pageIndex];
+        [itemAttrs setAlpha:1];
+        [itemAttrs setHidden:NO];
+
+        lastItemWidth = boundingSize.width;
+        rowWidth += boundingSize.width + _itemSpacing.right + _itemSpacing.left;
+        xOffset += boundingSize.width + _itemSpacing.right + _itemSpacing.left;
+
+        if (rotation) {
+            [itemAttrs setTransform:CGAffineTransformMakeRotation(rotation)];
+        } else {
+            [itemAttrs setTransform:CGAffineTransformIdentity];
+        }
+
+        [attributesPerRow addObject:itemAttrs];
     }
 
     if ([attributesPerRow count]) {

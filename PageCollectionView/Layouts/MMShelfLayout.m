@@ -142,44 +142,42 @@
 
             CGSize boundingSize = MMBoundingSizeFor(itemSize, rotation);
 
-            if (!CGSizeEqualToSize(itemSize, CGSizeZero)) {
-                maxItemHeight = MAX(maxItemHeight, boundingSize.height);
+            maxItemHeight = MAX(maxItemHeight, boundingSize.height);
 
-                UICollectionViewLayoutAttributes *itemAttrs = [UICollectionViewLayoutAttributes layoutAttributesForCellWithIndexPath:[NSIndexPath indexPathForRow:row inSection:section]];
-                [itemAttrs setBounds:CGRectMake(0, 0, itemSize.width, itemSize.height)];
-                [itemAttrs setZIndex:rowCount - row];
-                [itemAttrs setCenter:CGPointMake(xOffset + itemSize.width / 2, yOffset + boundingSize.height / 2)];
+            UICollectionViewLayoutAttributes *itemAttrs = [UICollectionViewLayoutAttributes layoutAttributesForCellWithIndexPath:[NSIndexPath indexPathForRow:row inSection:section]];
+            [itemAttrs setBounds:CGRectMake(0, 0, itemSize.width, itemSize.height)];
+            [itemAttrs setZIndex:rowCount - row];
+            [itemAttrs setCenter:CGPointMake(xOffset + itemSize.width / 2, yOffset + boundingSize.height / 2)];
 
-                if (rotation) {
-                    [itemAttrs setTransform:CGAffineTransformMakeRotation(rotation)];
-                } else {
-                    [itemAttrs setTransform:CGAffineTransformIdentity];
-                }
-
-                // we've finished our row if the item would step into our section inset area.
-                // we need to || because our xOffset is going to be randomly distributed after
-                // this item, and our inequality won't always be true after the first hidden item
-                didFinish = didFinish || xOffset + itemSize.width >= [self collectionViewContentSize].width - [self sectionInsets].right;
-
-                if (didFinish) {
-                    didFinish = YES;
-                    [itemAttrs setAlpha:0];
-                    [itemAttrs setHidden:YES];
-
-                    // These pages are invisible, so place them randomly throughout the line
-                    // of visible pages so that they animate interestingly to/from grid layout
-                    CGFloat allowedWidth = [self collectionViewContentSize].width - [self sectionInsets].left - [self sectionInsets].right;
-                    xOffset = rand() % (int)(allowedWidth - itemSize.width);
-                } else {
-                    [itemAttrs setAlpha:1];
-                    [itemAttrs setHidden:NO];
-
-                    // this page is visible, so adjust spacing to align the next page in the list
-                    xOffset += _pageSpacing;
-                }
-
-                [_shelfCache addObject:itemAttrs];
+            if (rotation) {
+                [itemAttrs setTransform:CGAffineTransformMakeRotation(rotation)];
+            } else {
+                [itemAttrs setTransform:CGAffineTransformIdentity];
             }
+
+            // we've finished our row if the item would step into our section inset area.
+            // we need to || because our xOffset is going to be randomly distributed after
+            // this item, and our inequality won't always be true after the first hidden item
+            didFinish = didFinish || xOffset + itemSize.width >= [self collectionViewContentSize].width - [self sectionInsets].right;
+
+            if (didFinish) {
+                didFinish = YES;
+                [itemAttrs setAlpha:0];
+                [itemAttrs setHidden:YES];
+
+                // These pages are invisible, so place them randomly throughout the line
+                // of visible pages so that they animate interestingly to/from grid layout
+                CGFloat allowedWidth = [self collectionViewContentSize].width - [self sectionInsets].left - [self sectionInsets].right;
+                xOffset = rand() % (int)(allowedWidth - itemSize.width);
+            } else {
+                [itemAttrs setAlpha:1];
+                [itemAttrs setHidden:NO];
+
+                // this page is visible, so adjust spacing to align the next page in the list
+                xOffset += _pageSpacing;
+            }
+
+            [_shelfCache addObject:itemAttrs];
         }
 
         yOffset += maxItemHeight + _sectionInsets.bottom;

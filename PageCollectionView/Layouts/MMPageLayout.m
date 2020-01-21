@@ -173,51 +173,49 @@
 
     MMPageLayoutAttributes *itemAttrs;
 
-    if (!CGSizeEqualToSize(itemSize, CGSizeZero)) {
-        // set all the attributes
-        CGFloat altDiff;
-        CGRect frame;
+    // set all the attributes
+    CGFloat altDiff;
+    CGRect frame;
 
-        if (_direction == MMPageLayoutVertical) {
-            altDiff = (itemSize.height - boundingSize.height) / 2.0 * scale;
-            itemAttrs = [MMPageLayoutAttributes layoutAttributesForCellWithIndexPath:indexPath];
-            frame = CGRectMake(diff, offset - altDiff, itemSize.width, itemSize.height);
-        } else {
-            altDiff = (itemSize.width - boundingSize.width) / 2.0 * scale;
-            itemAttrs = [MMPageLayoutAttributes layoutAttributesForCellWithIndexPath:indexPath];
-            frame = CGRectMake(offset - altDiff, diff, itemSize.width, itemSize.height);
-        }
+    if (_direction == MMPageLayoutVertical) {
+        altDiff = (itemSize.height - boundingSize.height) / 2.0 * scale;
+        itemAttrs = [MMPageLayoutAttributes layoutAttributesForCellWithIndexPath:indexPath];
+        frame = CGRectMake(diff, offset - altDiff, itemSize.width, itemSize.height);
+    } else {
+        altDiff = (itemSize.width - boundingSize.width) / 2.0 * scale;
+        itemAttrs = [MMPageLayoutAttributes layoutAttributesForCellWithIndexPath:indexPath];
+        frame = CGRectMake(offset - altDiff, diff, itemSize.width, itemSize.height);
+    }
 
-        // For forcing the UICollectionViewBug described below.
-        // this doesn't need to be included, as a 180 degree
-        // rotation will also do this, but forcing it will
-        // help make sure our fix described below will always work
-        frame.origin.x -= -0.00000000000011368683772161603;
+    // For forcing the UICollectionViewBug described below.
+    // this doesn't need to be included, as a 180 degree
+    // rotation will also do this, but forcing it will
+    // help make sure our fix described below will always work
+    frame.origin.x -= -0.00000000000011368683772161603;
 
-        [itemAttrs setFrame:frame];
+    [itemAttrs setFrame:frame];
 
-        CGAffineTransform transform = CGAffineTransformTranslate(CGAffineTransformScale(CGAffineTransformMakeTranslation(-itemSize.width / 2, -itemSize.height / 2), scale, scale), itemSize.width / 2, itemSize.height / 2);
+    CGAffineTransform transform = CGAffineTransformTranslate(CGAffineTransformScale(CGAffineTransformMakeTranslation(-itemSize.width / 2, -itemSize.height / 2), scale, scale), itemSize.width / 2, itemSize.height / 2);
 
-        if (rotation) {
-            transform = CGAffineTransformRotate(transform, rotation);
-        }
+    if (rotation) {
+        transform = CGAffineTransformRotate(transform, rotation);
+    }
 
-        [itemAttrs setBoundingSize:boundingSize];
-        [itemAttrs setScale:scale];
-        [itemAttrs setAlpha:1];
-        [itemAttrs setHidden:NO];
-        [itemAttrs setTransform:transform];
+    [itemAttrs setBoundingSize:boundingSize];
+    [itemAttrs setScale:scale];
+    [itemAttrs setAlpha:1];
+    [itemAttrs setHidden:NO];
+    [itemAttrs setTransform:transform];
 
-        {
-            // This block is for the UICollectionViewBug, where if a frame of an item
-            // has a tiny offset from a round pixel, then it might disappear from the
-            // collection view altogether.
-            // Filed at FB7415012
-            CGFloat bumpX = [itemAttrs frame].origin.x - floor([itemAttrs frame].origin.x);
-            CGFloat bumpY = [itemAttrs frame].origin.y - floor([itemAttrs frame].origin.y);
+    {
+        // This block is for the UICollectionViewBug, where if a frame of an item
+        // has a tiny offset from a round pixel, then it might disappear from the
+        // collection view altogether.
+        // Filed at FB7415012
+        CGFloat bumpX = [itemAttrs frame].origin.x - floor([itemAttrs frame].origin.x);
+        CGFloat bumpY = [itemAttrs frame].origin.y - floor([itemAttrs frame].origin.y);
 
-            [itemAttrs setCenter:CGPointMake([itemAttrs center].x - bumpX, [itemAttrs center].y - bumpY)];
-        }
+        [itemAttrs setCenter:CGPointMake([itemAttrs center].x - bumpX, [itemAttrs center].y - bumpY)];
     }
 
     return itemAttrs;
