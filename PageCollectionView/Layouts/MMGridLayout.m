@@ -46,7 +46,7 @@
 - (NSArray<UICollectionViewLayoutAttributes *> *)alignItemsInRow:(NSArray<UICollectionViewLayoutAttributes *> *)items maxItemHeight:(CGFloat)maxItemHeight rowWidth:(CGFloat)rowWidth yOffset:(CGFloat)yOffset stretchWidth:(BOOL)shouldStretch
 {
     CGFloat widthDiff = [self collectionViewContentSize].width - rowWidth - [self sectionInsets].left - [self sectionInsets].right;
-    CGFloat spacing = widthDiff / ([items count] - 1);
+    CGFloat spacing = [items count] > 1 ? widthDiff / ([items count] - 1) : 0;
     yOffset += maxItemHeight / 2.0; // so that the yoffset is based on the center instead of the top
 
     [items enumerateObjectsUsingBlock:^(UICollectionViewLayoutAttributes *_Nonnull obj, NSUInteger index, BOOL *_Nonnull stop) {
