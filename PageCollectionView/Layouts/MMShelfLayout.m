@@ -206,7 +206,7 @@
 - (NSArray<__kindof UICollectionViewLayoutAttributes *> *)layoutAttributesForElementsInRect:(CGRect)rect
 {
     // use binary search to find the sections that are visible within the input rect
-    NSInteger firstIndex = [_shelfCache indexPassingTest:^NSComparisonResult(MMLayoutAttributeCache *obj, NSInteger index) {
+    NSInteger firstIndex = [_shelfCache sortedIndexPassingTest:^NSComparisonResult(MMLayoutAttributeCache *obj, NSInteger index) {
         if (CGRectIntersectsRect([obj frame], rect)) {
             return NSOrderedSame;
         } else if (CGRectGetMaxY([obj frame]) < CGRectGetMinY(rect)) {
@@ -218,7 +218,7 @@
 
     if (firstIndex != NSNotFound) {
         // if we find a first index, we're guaranteed to find a last index.
-        NSInteger lastIndex = [_shelfCache indexPassingTest:^NSComparisonResult(MMLayoutAttributeCache *obj, NSInteger index) {
+        NSInteger lastIndex = [_shelfCache sortedIndexPassingTest:^NSComparisonResult(MMLayoutAttributeCache *obj, NSInteger index) {
             if (CGRectIntersectsRect([obj frame], rect)) {
                 return NSOrderedSame;
             } else if (CGRectGetMaxY([obj frame]) < CGRectGetMinY(rect)) {
@@ -241,7 +241,7 @@
 
 - (UICollectionViewLayoutAttributes *)layoutAttributesForSupplementaryViewOfKind:(NSString *)elementKind atIndexPath:(NSIndexPath *)indexPath
 {
-    NSInteger index = [_headerCache indexPassingTest:^NSComparisonResult(UICollectionViewLayoutAttributes *obj, NSInteger index) {
+    NSInteger index = [_headerCache sortedIndexPassingTest:^NSComparisonResult(UICollectionViewLayoutAttributes *obj, NSInteger index) {
         return [indexPath compare:[obj indexPath]];
     } options:NSBinarySearchingFirstEqual];
 
@@ -254,7 +254,7 @@
 
 - (UICollectionViewLayoutAttributes *)layoutAttributesForItemAtIndexPath:(NSIndexPath *)indexPath
 {
-    NSInteger index = [_itemCache indexPassingTest:^NSComparisonResult(UICollectionViewLayoutAttributes *obj, NSInteger index) {
+    NSInteger index = [_itemCache sortedIndexPassingTest:^NSComparisonResult(UICollectionViewLayoutAttributes *obj, NSInteger index) {
         return [indexPath compare:[obj indexPath]];
     } options:NSBinarySearchingFirstEqual];
 
