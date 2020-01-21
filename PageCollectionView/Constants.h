@@ -12,6 +12,7 @@
 #define MMBoundingSizeFor(itemSize, rotation) _MMBoundingSizeFor(itemSize, rotation)
 #define MMFitSizeToWidth(itemSize, targetWidth, scaleUpToFit) _MMFitSizeToWidth(itemSize, targetWidth, scaleUpToFit)
 #define MMFitSizeToHeight(itemSize, targetHeight, scaleUpToFit) _MMFitSizeToHeight(itemSize, targetHeight, scaleUpToFit)
+#define MMFitSizeToDim(itemSize, targetDim, scaleUpToFit) _MMFitSizeToDim(itemSize, targetDim, scaleUpToFit)
 #define CGSizeForInscribedWidth(ratio, width, rotation) _CGSizeForInscribedWidth(ratio, width, rotation)
 #define CGSizeForInscribedHeight(ratio, height, rotation) _CGSizeForInscribedHeight(ratio, height, rotation)
 
@@ -43,6 +44,15 @@ static inline CGSize _MMFitSizeToHeight(CGSize itemSize, CGFloat targetHeight, B
     } else {
         return itemSize;
     }
+}
+
+static inline CGSize _MMFitSizeToDim(CGSize itemSize, CGFloat targetDim, BOOL scaleUp)
+{
+    if (itemSize.height > itemSize.width) {
+        return MMFitSizeToHeight(itemSize, targetDim, scaleUp);
+    }
+
+    return MMFitSizeToWidth(itemSize, targetDim, scaleUp);
 }
 
 /**

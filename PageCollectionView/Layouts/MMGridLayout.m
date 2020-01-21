@@ -125,10 +125,8 @@
         NSIndexPath *indexPath = [NSIndexPath indexPathForRow:pageIndex inSection:[self section]];
         id<MMShelfLayoutObject> object = [[self datasource] collectionView:[self collectionView] layout:self objectAtIndexPath:indexPath];
         CGFloat rotation = [object rotation];
-        CGSize idealSize = MMFitSizeToWidth([object idealSize], [self maxDim], NO);
+        CGSize idealSize = MMFitSizeToDim([object idealSize], [self maxDim], NO);
         CGSize boundingSize = MMBoundingSizeFor(idealSize, rotation);
-
-        idealSize = MMFitSizeToWidth(idealSize, [self maxDim], NO);
 
         // can it fit on this row?
         if (xOffset + boundingSize.width + [self sectionInsets].right > [self collectionViewContentSize].width) {
