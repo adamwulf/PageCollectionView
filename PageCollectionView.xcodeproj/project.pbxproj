@@ -43,6 +43,7 @@
 		C594FF8423D4436B00C6A6FF /* MMPageCollectionView+Protected.h in Headers */ = {isa = PBXBuildFile; fileRef = C594FF8323D4436B00C6A6FF /* MMPageCollectionView+Protected.h */; };
 		C5ABCC4223D6D11C00B96040 /* MMLayoutAttributeCache.h in Headers */ = {isa = PBXBuildFile; fileRef = C5ABCC4023D6D11C00B96040 /* MMLayoutAttributeCache.h */; };
 		C5ABCC4323D6D11C00B96040 /* MMLayoutAttributeCache.m in Sources */ = {isa = PBXBuildFile; fileRef = C5ABCC4123D6D11C00B96040 /* MMLayoutAttributeCache.m */; };
+		C5ABCC4823D6DF1D00B96040 /* MMToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C5ABCC4723D6DF1D00B96040 /* MMToolbox.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -111,6 +112,7 @@
 		C594FF8323D4436B00C6A6FF /* MMPageCollectionView+Protected.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "MMPageCollectionView+Protected.h"; sourceTree = "<group>"; };
 		C5ABCC4023D6D11C00B96040 /* MMLayoutAttributeCache.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MMLayoutAttributeCache.h; sourceTree = "<group>"; };
 		C5ABCC4123D6D11C00B96040 /* MMLayoutAttributeCache.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MMLayoutAttributeCache.m; sourceTree = "<group>"; };
+		C5ABCC4723D6DF1D00B96040 /* MMToolbox.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = MMToolbox.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C5E6EBCF2367FC7000B5BBE1 /* Constants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Constants.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -126,6 +128,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C5ABCC4823D6DF1D00B96040 /* MMToolbox.framework in Frameworks */,
 				C5722AF22352EDBD00C3E6D3 /* PageCollectionView.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -242,6 +245,7 @@
 		C5722AF12352EDBD00C3E6D3 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				C5ABCC4723D6DF1D00B96040 /* MMToolbox.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
