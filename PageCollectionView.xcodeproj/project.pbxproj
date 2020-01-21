@@ -41,6 +41,8 @@
 		C5722AF22352EDBD00C3E6D3 /* PageCollectionView.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C5722A9B2352ED1F00C3E6D3 /* PageCollectionView.framework */; };
 		C594FF8223D4172100C6A6FF /* MMPageCollectionViewController+Protected.h in Headers */ = {isa = PBXBuildFile; fileRef = C594FF8123D4172100C6A6FF /* MMPageCollectionViewController+Protected.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		C594FF8423D4436B00C6A6FF /* MMPageCollectionView+Protected.h in Headers */ = {isa = PBXBuildFile; fileRef = C594FF8323D4436B00C6A6FF /* MMPageCollectionView+Protected.h */; };
+		C5ABCC4223D6D11C00B96040 /* MMLayoutAttributeCache.h in Headers */ = {isa = PBXBuildFile; fileRef = C5ABCC4023D6D11C00B96040 /* MMLayoutAttributeCache.h */; };
+		C5ABCC4323D6D11C00B96040 /* MMLayoutAttributeCache.m in Sources */ = {isa = PBXBuildFile; fileRef = C5ABCC4123D6D11C00B96040 /* MMLayoutAttributeCache.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -107,6 +109,8 @@
 		C5722ADA2352ED5D00C3E6D3 /* MMPageIconView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MMPageIconView.m; sourceTree = "<group>"; };
 		C594FF8123D4172100C6A6FF /* MMPageCollectionViewController+Protected.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "MMPageCollectionViewController+Protected.h"; sourceTree = "<group>"; };
 		C594FF8323D4436B00C6A6FF /* MMPageCollectionView+Protected.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "MMPageCollectionView+Protected.h"; sourceTree = "<group>"; };
+		C5ABCC4023D6D11C00B96040 /* MMLayoutAttributeCache.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MMLayoutAttributeCache.h; sourceTree = "<group>"; };
+		C5ABCC4123D6D11C00B96040 /* MMLayoutAttributeCache.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MMLayoutAttributeCache.m; sourceTree = "<group>"; };
 		C5E6EBCF2367FC7000B5BBE1 /* Constants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Constants.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -203,6 +207,8 @@
 			isa = PBXGroup;
 			children = (
 				C554F8F62355961C000BBC01 /* MMShelfLayoutObject.h */,
+				C5ABCC4023D6D11C00B96040 /* MMLayoutAttributeCache.h */,
+				C5ABCC4123D6D11C00B96040 /* MMLayoutAttributeCache.m */,
 				C5722ACD2352ED5D00C3E6D3 /* MMShelfLayout.h */,
 				C5722AD12352ED5D00C3E6D3 /* MMShelfLayout.m */,
 				C5722ACE2352ED5D00C3E6D3 /* MMGridLayout.h */,
@@ -251,6 +257,7 @@
 				C5722AEB2352ED5D00C3E6D3 /* MMPageIconView.h in Headers */,
 				C5722AE52352ED5D00C3E6D3 /* MMPageLayout.h in Headers */,
 				C5722ADB2352ED5D00C3E6D3 /* MMPageCollectionView.h in Headers */,
+				C5ABCC4223D6D11C00B96040 /* MMLayoutAttributeCache.h in Headers */,
 				C554F8F72355961C000BBC01 /* MMShelfLayoutObject.h in Headers */,
 				C5722ADE2352ED5D00C3E6D3 /* MMPageCollectionHeader.h in Headers */,
 				C5722AEC2352ED5D00C3E6D3 /* MMGridIconView.h in Headers */,
@@ -365,6 +372,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C5ABCC4323D6D11C00B96040 /* MMLayoutAttributeCache.m in Sources */,
 				C5722AE02352ED5D00C3E6D3 /* MMPageCollectionCell.m in Sources */,
 				C5722AE62352ED5D00C3E6D3 /* MMGridLayout.m in Sources */,
 				C5722AE72352ED5D00C3E6D3 /* MMShelfLayout.m in Sources */,

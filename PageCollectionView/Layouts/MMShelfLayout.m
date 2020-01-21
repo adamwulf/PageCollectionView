@@ -7,12 +7,16 @@
 //
 
 #import "MMShelfLayout.h"
+#import "MMLayoutAttributeCache.h"
 #import "Constants.h"
+#import <MMToolbox/MMToolbox.h>
 
 
 @interface MMShelfLayout ()
 
-@property(nonatomic, strong) NSMutableArray<UICollectionViewLayoutAttributes *> *shelfCache;
+@property(nonatomic, strong) NSMutableArray<UICollectionViewLayoutAttributes *> *headerCache;
+@property(nonatomic, strong) NSMutableArray<UICollectionViewLayoutAttributes *> *itemCache;
+@property(nonatomic, strong) NSMutableArray<MMLayoutAttributeCache *> *shelfCache;
 @property(nonatomic, assign) CGFloat contentHeight;
 @property(nonatomic, readonly) CGFloat contentWidth;
 
@@ -26,6 +30,8 @@
     if (self = [super initWithCoder:coder]) {
         _sectionInsets = UIEdgeInsetsMake(10, 40, 40, 40);
         _shelfCache = [NSMutableArray array];
+        _headerCache = [NSMutableArray array];
+        _itemCache = [NSMutableArray array];
         _pageSpacing = 40;
         _defaultHeaderHeight = 50;
         _maxDim = 140;
@@ -38,6 +44,8 @@
     if (self = [super init]) {
         _sectionInsets = UIEdgeInsetsMake(10, 40, 40, 40);
         _shelfCache = [NSMutableArray array];
+        _headerCache = [NSMutableArray array];
+        _itemCache = [NSMutableArray array];
         _pageSpacing = 40;
         _defaultHeaderHeight = 50;
         _maxDim = 140;
@@ -85,6 +93,8 @@
     [super invalidateLayout];
 
     [_shelfCache removeAllObjects];
+    [_headerCache removeAllObjects];
+    [_itemCache removeAllObjects];
 }
 
 - (CGSize)collectionViewContentSize
@@ -102,7 +112,7 @@
     CGFloat yOffset = 0;
 
     for (NSInteger section = 0; section < [[self collectionView] numberOfSections]; section++) {
-        NSInteger rowCount = [[self collectionView] numberOfItemsInSection:section];
+        NSInteger pageCount = [[self collectionView] numberOfItemsInSection:section];
         CGFloat maxItemHeight = 0;
         CGFloat headerHeight = [self defaultHeaderHeight];
 
@@ -114,7 +124,8 @@
         if (headerHeight > 0) {
             UICollectionViewLayoutAttributes *headerAttrs = [UICollectionViewLayoutAttributes layoutAttributesForSupplementaryViewOfKind:UICollectionElementKindSectionHeader withIndexPath:[NSIndexPath indexPathForRow:0 inSection:section]];
             [headerAttrs setFrame:CGRectMake(0, yOffset, CGRectGetWidth([[self collectionView] bounds]), headerHeight)];
-            [_shelfCache addObject:headerAttrs];
+            [_shelfCache addObject:[MMLayoutAttributeCache cacheWithAttributes:headerAttrs]];
+            [_headerCache addObject:headerAttrs];
 
             yOffset += headerHeight;
         }
@@ -123,10 +134,11 @@
         yOffset += _sectionInsets.top;
 
         BOOL didFinish = NO;
+        MMLayoutAttributeCache *sectionCache = [[MMLayoutAttributeCache alloc] init];
 
         // Calculate the size of each row
-        for (NSInteger row = 0; row < rowCount; row++) {
-            id<MMShelfLayoutObject> object = [[self datasource] collectionView:[self collectionView] layout:self objectAtIndexPath:[NSIndexPath indexPathForRow:row inSection:section]];
+        for (NSInteger pageIndex = 0; pageIndex < pageCount; pageIndex++) {
+            id<MMShelfLayoutObject> object = [[self datasource] collectionView:[self collectionView] layout:self objectAtIndexPath:[NSIndexPath indexPathForRow:pageIndex inSection:section]];
             CGSize itemSize = [object idealSize];
             CGFloat rotation = [object rotation];
             CGFloat heightRatio = itemSize.height / itemSize.width;
@@ -144,9 +156,9 @@
 
             maxItemHeight = MAX(maxItemHeight, boundingSize.height);
 
-            UICollectionViewLayoutAttributes *itemAttrs = [UICollectionViewLayoutAttributes layoutAttributesForCellWithIndexPath:[NSIndexPath indexPathForRow:row inSection:section]];
+            UICollectionViewLayoutAttributes *itemAttrs = [UICollectionViewLayoutAttributes layoutAttributesForCellWithIndexPath:[NSIndexPath indexPathForRow:pageIndex inSection:section]];
             [itemAttrs setBounds:CGRectMake(0, 0, itemSize.width, itemSize.height)];
-            [itemAttrs setZIndex:rowCount - row];
+            [itemAttrs setZIndex:pageCount - pageIndex];
             [itemAttrs setCenter:CGPointMake(xOffset + itemSize.width / 2, yOffset + boundingSize.height / 2)];
 
             if (rotation) {
@@ -177,8 +189,11 @@
                 xOffset += _pageSpacing;
             }
 
-            [_shelfCache addObject:itemAttrs];
+            [sectionCache appendLayoutAttributes:itemAttrs];
+            [_itemCache addObject:itemAttrs];
         }
+
+        [_shelfCache addObject:sectionCache];
 
         yOffset += maxItemHeight + _sectionInsets.bottom;
     }
@@ -190,28 +205,61 @@
 
 - (NSArray<__kindof UICollectionViewLayoutAttributes *> *)layoutAttributesForElementsInRect:(CGRect)rect
 {
-    // TODO: the cache could be sorted by center.y value, and we can use this to binary search for the items in the rect
-    return [_shelfCache filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id _Nullable obj, NSDictionary<NSString *, id> *_Nullable bindings) {
-        return CGRectIntersectsRect([obj frame], rect) && ![obj isHidden];
-    }]];
+    // use binary search to find the sections that are visible within the input rect
+    NSInteger firstIndex = [_shelfCache indexPassingTest:^NSComparisonResult(MMLayoutAttributeCache *obj, NSInteger index) {
+        if (CGRectIntersectsRect([obj frame], rect)) {
+            return NSOrderedSame;
+        } else if (CGRectGetMaxY([obj frame]) < CGRectGetMinY(rect)) {
+            return NSOrderedDescending;
+        } else {
+            return NSOrderedAscending;
+        }
+    } options:NSBinarySearchingFirstEqual];
+
+    if (firstIndex != NSNotFound) {
+        // if we find a first index, we're guaranteed to find a last index.
+        NSInteger lastIndex = [_shelfCache indexPassingTest:^NSComparisonResult(MMLayoutAttributeCache *obj, NSInteger index) {
+            if (CGRectIntersectsRect([obj frame], rect)) {
+                return NSOrderedSame;
+            } else if (CGRectGetMaxY([obj frame]) < CGRectGetMinY(rect)) {
+                return NSOrderedDescending;
+            } else {
+                return NSOrderedAscending;
+            }
+        } options:NSBinarySearchingLastEqual];
+
+        // get the subarray of our first -> last index and return the visibleItems in those rows
+        NSArray<MMLayoutAttributeCache *> *items = [_shelfCache subarrayWithRange:NSMakeRange(firstIndex, lastIndex - firstIndex + 1)];
+
+        return [items reduce:^id(MMLayoutAttributeCache *obj, NSUInteger index, id accum) {
+            return [accum arrayByAddingObjectsFromArray:[obj visibleItems]];
+        } initially:@[]];
+    }
+
+    return @[];
 }
 
 - (UICollectionViewLayoutAttributes *)layoutAttributesForSupplementaryViewOfKind:(NSString *)elementKind atIndexPath:(NSIndexPath *)indexPath
 {
-    for (UICollectionViewLayoutAttributes *attrs in _shelfCache) {
-        if ([attrs representedElementCategory] == UICollectionElementCategorySupplementaryView && [[attrs indexPath] isEqual:indexPath]) {
-            return attrs;
-        }
+    NSInteger index = [_headerCache indexPassingTest:^NSComparisonResult(UICollectionViewLayoutAttributes *obj, NSInteger index) {
+        return [indexPath compare:[obj indexPath]];
+    } options:NSBinarySearchingFirstEqual];
+
+    if (index != NSNotFound) {
+        return [_headerCache objectAtIndex:index];
     }
+
     return nil;
 }
 
 - (UICollectionViewLayoutAttributes *)layoutAttributesForItemAtIndexPath:(NSIndexPath *)indexPath
 {
-    for (UICollectionViewLayoutAttributes *attrs in _shelfCache) {
-        if ([attrs representedElementCategory] == UICollectionElementCategoryCell && [[attrs indexPath] isEqual:indexPath]) {
-            return attrs;
-        }
+    NSInteger index = [_itemCache indexPassingTest:^NSComparisonResult(UICollectionViewLayoutAttributes *obj, NSInteger index) {
+        return [indexPath compare:[obj indexPath]];
+    } options:NSBinarySearchingFirstEqual];
+
+    if (index != NSNotFound) {
+        return [_itemCache objectAtIndex:index];
     }
 
     return nil;
