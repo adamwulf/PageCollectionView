@@ -241,28 +241,16 @@
 
 - (UICollectionViewLayoutAttributes *)layoutAttributesForSupplementaryViewOfKind:(NSString *)elementKind atIndexPath:(NSIndexPath *)indexPath
 {
-    NSInteger index = [_headerCache sortedIndexPassingTest:^NSComparisonResult(UICollectionViewLayoutAttributes *obj, NSInteger index) {
+    return [_headerCache sortedObjectPassingTest:^NSComparisonResult(UICollectionViewLayoutAttributes *obj, NSInteger index) {
         return [indexPath compare:[obj indexPath]];
-    } options:NSBinarySearchingFirstEqual];
-
-    if (index != NSNotFound) {
-        return [_headerCache objectAtIndex:index];
-    }
-
-    return nil;
+    }];
 }
 
 - (UICollectionViewLayoutAttributes *)layoutAttributesForItemAtIndexPath:(NSIndexPath *)indexPath
 {
-    NSInteger index = [_itemCache sortedIndexPassingTest:^NSComparisonResult(UICollectionViewLayoutAttributes *obj, NSInteger index) {
+    return [_itemCache sortedObjectPassingTest:^NSComparisonResult(UICollectionViewLayoutAttributes *obj, NSInteger index) {
         return [indexPath compare:[obj indexPath]];
-    } options:NSBinarySearchingFirstEqual];
-
-    if (index != NSNotFound) {
-        return [_itemCache objectAtIndex:index];
-    }
-
-    return nil;
+    }];
 }
 
 #pragma mark - Content Offset
