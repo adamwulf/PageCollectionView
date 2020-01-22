@@ -18,7 +18,6 @@
 #import "MMShelfLayout.h"
 #import "MMGridLayout.h"
 #import "MMPageLayout.h"
-#import "MMTransitionToShelfLayout.h"
 
 #define CLAMPF(v, minFr, maxFr, minTo, maxTo) (((v - minFr) / (maxFr - minFr)) * (maxTo - minTo) + minTo)
 
@@ -386,15 +385,6 @@ typedef enum : NSUInteger {
     }
 
     return nil;
-}
-
-- (UICollectionViewTransitionLayout *)collectionView:(UICollectionView *)collectionView transitionLayoutForOldLayout:(UICollectionViewLayout *)fromLayout newLayout:(UICollectionViewLayout *)toLayout
-{
-    if ([toLayout isMemberOfClass:[MMShelfLayout class]]) {
-        return [[MMTransitionToShelfLayout alloc] initWithCurrentLayout:fromLayout nextLayout:toLayout];
-    } else {
-        return [[UICollectionViewTransitionLayout alloc] initWithCurrentLayout:fromLayout nextLayout:toLayout];
-    }
 }
 
 #pragma mark - UIScrollViewDelegate
