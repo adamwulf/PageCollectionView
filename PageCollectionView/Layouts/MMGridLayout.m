@@ -75,16 +75,6 @@
     return CGSizeMake(contentSize.width, _sectionHeight);
 }
 
-- (BOOL)shouldInvalidateLayoutForBoundsChange:(CGRect)newBounds
-{
-    // invalidate all of the sections after our current section
-    [self invalidateLayoutWithContext:[self invalidationContextForBoundsChange:newBounds]];
-
-    // the above handles conditionally invalidatin the layout from this bounds change,
-    // our [super] will handle invalidating the entire layout from the change
-    return [super shouldInvalidateLayoutForBoundsChange:newBounds];
-}
-
 - (UICollectionViewLayoutInvalidationContext *)invalidationContextForBoundsChange:(CGRect)newBounds
 {
     // The only thing we need to conditionally invalidate because of a bounds change is our header
@@ -207,6 +197,24 @@
     yOffset += maxItemHeight + [self sectionInsets].bottom;
 
     _sectionHeight = yOffset;
+}
+
+#pragma mark - Transitions
+
+- (void)prepareForTransitionToLayout:(UICollectionViewLayout *)newLayout
+{
+    [super prepareForTransitionToLayout:newLayout];
+
+    // invalidate all of the sections after our current section
+    [self invalidateLayoutWithContext:[self invalidationContextForBoundsChange:[[self collectionView] bounds]]];
+}
+
+- (void)prepareForTransitionFromLayout:(UICollectionViewLayout *)oldLayout
+{
+    [super prepareForTransitionFromLayout:oldLayout];
+
+    // invalidate all of the sections after our current section
+    [self invalidateLayoutWithContext:[self invalidationContextForBoundsChange:[[self collectionView] bounds]]];
 }
 
 #pragma mark - Fetch Attributes
