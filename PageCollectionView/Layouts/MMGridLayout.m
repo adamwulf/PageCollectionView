@@ -236,6 +236,10 @@
         }
     }
 
+    // The following attributes should only be requested when transitioning to/from
+    // this layout. The [prepareForTransitionTo/FromLayout:] methods invalidate these
+    // elements, which will cause their attributes to be updated just in time for
+    // the transition. Otherwise all of these elements are offscreen and invisible
     UICollectionViewLayoutAttributes *attrs = [[super layoutAttributesForSupplementaryViewOfKind:elementKind atIndexPath:indexPath] copy];
     CGPoint center = [attrs center];
 
