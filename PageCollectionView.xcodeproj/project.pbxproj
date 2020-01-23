@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C5034D3223D9759500E62A19 /* MMToolbox.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = C5ABCC4723D6DF1D00B96040 /* MMToolbox.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C554F8F72355961C000BBC01 /* MMShelfLayoutObject.h in Headers */ = {isa = PBXBuildFile; fileRef = C554F8F62355961C000BBC01 /* MMShelfLayoutObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		C554F8FA235599A4000BBC01 /* SampleCollectionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C554F8F9235599A4000BBC01 /* SampleCollectionViewController.m */; };
 		C554F8FD23559ABA000BBC01 /* SampleObject.m in Sources */ = {isa = PBXBuildFile; fileRef = C554F8FC23559ABA000BBC01 /* SampleObject.m */; };
@@ -57,6 +58,16 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		C5034D3123D9758800E62A19 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				C5034D3223D9759500E62A19 /* MMToolbox.framework in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		C557318523C17F6000D4BB57 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -304,6 +315,7 @@
 				C5722AA72352ED4C00C3E6D3 /* Frameworks */,
 				C5722AA82352ED4C00C3E6D3 /* Resources */,
 				C557318523C17F6000D4BB57 /* CopyFiles */,
+				C5034D3123D9758800E62A19 /* CopyFiles */,
 			);
 			buildRules = (
 			);

@@ -102,6 +102,17 @@ typedef enum : NSUInteger {
     [[self collectionView] setAlwaysBounceHorizontal:[[[self collectionView] currentLayout] bounceHorizontal]];
 }
 
+#pragma mark - UIViewController
+
+- (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator
+{
+    [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> _Nonnull context) {
+        [[[self collectionView] collectionViewLayout] invalidateLayout];
+    } completion:^(id<UIViewControllerTransitionCoordinatorContext> _Nonnull context){
+
+    }];
+}
+
 #pragma mark - Layout Helpers
 
 - (BOOL)isDisplayingShelf
