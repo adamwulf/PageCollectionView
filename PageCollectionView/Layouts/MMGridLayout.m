@@ -84,11 +84,18 @@
     UICollectionViewLayoutInvalidationContext *context = [[UICollectionViewLayoutInvalidationContext alloc] init];
     NSInteger sectionCount = [[self collectionView] numberOfSections];
     NSMutableArray<NSIndexPath *> *headers = [NSMutableArray array];
+    NSMutableArray<NSIndexPath *> *items = [NSMutableArray array];
     for (NSInteger section = 0; section < sectionCount; section++) {
+        MMLayoutAttributeCache *sectionCache = [self shelfAttributesForSection:section];
+
         [headers addObject:[NSIndexPath indexPathForRow:0 inSection:section]];
+        [[sectionCache visibleItems] enumerateObjectsUsingBlock:^(UICollectionViewLayoutAttributes *_Nonnull obj, NSUInteger idx, BOOL *_Nonnull stop) {
+            [items addObject:[obj indexPath]];
+        }];
     }
 
     [context invalidateSupplementaryElementsOfKind:UICollectionElementKindSectionHeader atIndexPaths:headers];
+    [context invalidateItemsAtIndexPaths:items];
 
     return context;
 }
@@ -260,19 +267,9 @@
 
     // always [copy] from our [super] so that we don't accidentally modify our superclass's cached attributes
     UICollectionViewLayoutAttributes *attrs = [[super layoutAttributesForItemAtIndexPath:indexPath] copy];
-    MMLayoutAttributeCache *sectionAttributes = [self shelfAttributesForSection:[self section]];
 
-    CGPoint center = [attrs center];
+    [self adjustLayoutAttributesForTransition:attrs];
 
-    // adjust any non-visible sections to be further above or below our section
-    // so that they animate nicely offscreen as we transition from shelf->grid
-    center.y -= CGRectGetMinY([sectionAttributes frame]);
-
-    if ([indexPath section] > [self section]) {
-        center.y += [self collectionViewContentSize].height;
-    }
-
-    [attrs setCenter:center];
     [attrs setAlpha:0];
 
     return attrs;
