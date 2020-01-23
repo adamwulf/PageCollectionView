@@ -10,6 +10,8 @@
 #import "MMLayoutAttributeCache.h"
 #import "Constants.h"
 
+NSInteger const kAnimationBufferSpace = 200;
+
 
 @interface MMGridLayout ()
 
@@ -304,7 +306,7 @@
         // for all sections that are before our grid, we can align those sections
         // as if they've shifted straight up from the top of our grid
         center.y -= CGRectGetMinY([sectionAttributes frame]);
-        center.y += MAX(0, _yOffsetForTransition - CGRectGetHeight([sectionAttributes frame]));
+        center.y += MAX(0, _yOffsetForTransition - CGRectGetHeight([sectionAttributes frame]) - kAnimationBufferSpace);
     } else if ([[attrs indexPath] section] > [self section]) {
         // for all sections after our grid, the goal is to have them pinch to/from
         // immediatley after the screen, regardless of our scroll position. To do
