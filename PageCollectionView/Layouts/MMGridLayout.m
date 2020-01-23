@@ -78,10 +78,10 @@
     return CGSizeMake(contentSize.width, _sectionHeight);
 }
 
-- (UICollectionViewLayoutInvalidationContext *)invalidationContextForBoundsChange:(CGRect)newBounds
+- (UICollectionViewLayoutInvalidationContext *)invalidationContextForTransition
 {
     // The only thing we need to conditionally invalidate because of a bounds change is our header
-    UICollectionViewLayoutInvalidationContext *context = [super invalidationContextForBoundsChange:newBounds];
+    UICollectionViewLayoutInvalidationContext *context = [[UICollectionViewLayoutInvalidationContext alloc] init];
     NSInteger sectionCount = [[self collectionView] numberOfSections];
     NSMutableArray<NSIndexPath *> *headers = [NSMutableArray array];
     for (NSInteger section = 0; section < sectionCount; section++) {
@@ -106,22 +106,18 @@
 
     // Call [super] to get the attributes of our header in shelf mode. This will give us our section offset
     // in shelf mode, which we'll use to adjust all other items so that our grid section will appear at 0,0
-    UICollectionViewLayoutAttributes *header = [super layoutAttributesForSupplementaryViewOfKind:UICollectionElementKindSectionHeader atIndexPath:[NSIndexPath indexPathForRow:0 inSection:_section]];
-    _sectionOffset = CGRectGetMinY([header frame]);
+    UICollectionViewLayoutAttributes *headerAttrs = [[super layoutAttributesForSupplementaryViewOfKind:UICollectionElementKindSectionHeader atIndexPath:[NSIndexPath indexPathForRow:0 inSection:_section]] copy];
+    CGRect headerFrame = [headerAttrs frame];
+    _sectionOffset = CGRectGetMinY(headerFrame);
 
     CGFloat yOffset = 0;
     NSInteger pageCount = [[self collectionView] numberOfItemsInSection:_section];
     CGFloat maxItemHeight = 0;
-    CGFloat headerHeight = [self defaultHeaderHeight];
-
-    // Calculate the header section size, if any
-    if ([[self delegate] respondsToSelector:@selector(collectionView:layout:heightForHeaderInSection:)]) {
-        headerHeight = [[self delegate] collectionView:[self collectionView] layout:self heightForHeaderInSection:_section];
-    }
+    CGFloat headerHeight = CGRectGetHeight(headerFrame);
 
     if (headerHeight > 0) {
-        UICollectionViewLayoutAttributes *headerAttrs = [UICollectionViewLayoutAttributes layoutAttributesForSupplementaryViewOfKind:UICollectionElementKindSectionHeader withIndexPath:[NSIndexPath indexPathForRow:0 inSection:_section]];
-        [headerAttrs setFrame:CGRectMake(0, yOffset, CGRectGetWidth([[self collectionView] bounds]), headerHeight)];
+        headerFrame.origin.y = yOffset;
+        [headerAttrs setFrame:headerFrame];
 
         [_gridCache addObject:headerAttrs];
         _sectionHeaderAttributes = headerAttrs;
@@ -213,7 +209,7 @@
     _yOffsetForTransition = [[self collectionView] contentOffset].y;
 
     // invalidate all of the sections after our current section
-    [self invalidateLayoutWithContext:[self invalidationContextForBoundsChange:[[self collectionView] bounds]]];
+    [self invalidateLayoutWithContext:[self invalidationContextForTransition]];
 }
 
 - (void)prepareForTransitionFromLayout:(UICollectionViewLayout *)oldLayout
@@ -227,7 +223,7 @@
     _yOffsetForTransition = 0;
 
     // invalidate all of the sections after our current section
-    [self invalidateLayoutWithContext:[self invalidationContextForBoundsChange:[[self collectionView] bounds]]];
+    [self invalidateLayoutWithContext:[self invalidationContextForTransition]];
 }
 
 #pragma mark - Fetch Attributes
@@ -241,13 +237,7 @@
 
 - (UICollectionViewLayoutAttributes *)layoutAttributesForSupplementaryViewOfKind:(NSString *)elementKind atIndexPath:(NSIndexPath *)indexPath
 {
-    UICollectionViewLayoutAttributes *attrs;
-
-    if ([indexPath section] == [self section]) {
-        attrs = [_sectionHeaderAttributes copy];
-    } else {
-        attrs = [[super layoutAttributesForSupplementaryViewOfKind:elementKind atIndexPath:indexPath] copy];
-    }
+    UICollectionViewLayoutAttributes *attrs = [[super layoutAttributesForSupplementaryViewOfKind:elementKind atIndexPath:indexPath] copy];
 
     // The following attributes should only be requested when transitioning to/from
     // this layout. The [prepareForTransitionTo/FromLayout:] methods invalidate these
@@ -255,12 +245,10 @@
     // the transition. Otherwise all of these elements are offscreen and invisible
     CGPoint center = [attrs center];
 
-    if ([indexPath section] < [self section]) {
+    if ([indexPath section] <= [self section]) {
         // for all sections that are before our grid, we can align those sections
         // as if they've shifted straight up from the top of our grid
         center.y -= _sectionOffset;
-        center.y += MAX(0, _yOffsetForTransition - CGRectGetHeight([_sectionHeaderAttributes bounds]));
-    } else if ([indexPath section] == [self section]) {
         center.y += MAX(0, _yOffsetForTransition - CGRectGetHeight([_sectionHeaderAttributes bounds]));
     } else if ([indexPath section] > [self section]) {
         // for all sections after our grid, the goal is to have them pinch to/from
