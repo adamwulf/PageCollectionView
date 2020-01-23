@@ -236,40 +236,8 @@
 - (UICollectionViewLayoutAttributes *)layoutAttributesForSupplementaryViewOfKind:(NSString *)elementKind atIndexPath:(NSIndexPath *)indexPath
 {
     UICollectionViewLayoutAttributes *attrs = [[super layoutAttributesForSupplementaryViewOfKind:elementKind atIndexPath:indexPath] copy];
-    MMLayoutAttributeCache *sectionAttributes = [self shelfAttributesForSection:[self section]];
 
-    // The following attributes should only be requested when transitioning to/from
-    // this layout. The [prepareForTransitionTo/FromLayout:] methods invalidate these
-    // elements, which will cause their attributes to be updated just in time for
-    // the transition. Otherwise all of these elements are offscreen and invisible
-    CGPoint center = [attrs center];
-
-    if ([indexPath section] <= [self section]) {
-        // for all sections that are before our grid, we can align those sections
-        // as if they've shifted straight up from the top of our grid
-        center.y -= CGRectGetMinY([sectionAttributes frame]);
-        center.y += MAX(0, _yOffsetForTransition - CGRectGetHeight([sectionAttributes frame]));
-    } else if ([indexPath section] > [self section]) {
-        // for all sections after our grid, the goal is to have them pinch to/from
-        // immediatley after the screen, regardless of our scroll position. To do
-        // that, we invalidate all headers/items as the view scrolls so that they're
-        // continually layout right after the end of the screen, and then in the same
-        // layout as the shelf. this way, the transition will have them slide up
-        // direction from the bottom edge of the screen
-        UICollectionViewLayoutAttributes *nextAttrs = [super layoutAttributesForSupplementaryViewOfKind:elementKind atIndexPath:[NSIndexPath indexPathForRow:0 inSection:[self section] + 1]];
-        CGFloat diff = CGRectGetMinY([attrs frame]) - CGRectGetMinY([nextAttrs frame]);
-
-        // start at the correct target offset for the grid view
-        center.y = _yOffsetForTransition;
-        // move to the bottom of the screen
-        center.y += CGRectGetHeight([[self collectionView] bounds]);
-        // adjust the header to be in its correct offset to its neighbors
-        center.y += diff;
-        // since we're moving the center, adjust by height/2
-        center.y += CGRectGetHeight([attrs frame]) / 2;
-    }
-
-    [attrs setCenter:center];
+    [self adjustLayoutAttributesForTransition:attrs];
 
     if ([indexPath section] == [self section]) {
         [attrs setAlpha:1];
@@ -309,6 +277,43 @@
 
     return attrs;
 }
+
+- (void)adjustLayoutAttributesForTransition:(UICollectionViewLayoutAttributes *)attrs
+{
+    // The following attributes should only be requested when transitioning to/from
+    // this layout. The [prepareForTransitionTo/FromLayout:] methods invalidate these
+    // elements, which will cause their attributes to be updated just in time for
+    // the transition. Otherwise all of these elements are offscreen and invisible
+    CGPoint center = [attrs center];
+    MMLayoutAttributeCache *sectionAttributes = [self shelfAttributesForSection:[self section]];
+
+    if ([[attrs indexPath] section] <= [self section]) {
+        // for all sections that are before our grid, we can align those sections
+        // as if they've shifted straight up from the top of our grid
+        center.y -= CGRectGetMinY([sectionAttributes frame]);
+        center.y += MAX(0, _yOffsetForTransition - CGRectGetHeight([sectionAttributes frame]));
+    } else if ([[attrs indexPath] section] > [self section]) {
+        // for all sections after our grid, the goal is to have them pinch to/from
+        // immediatley after the screen, regardless of our scroll position. To do
+        // that, we invalidate all headers/items as the view scrolls so that they're
+        // continually layout right after the end of the screen, and then in the same
+        // layout as the shelf. this way, the transition will have them slide up
+        // direction from the bottom edge of the screen
+        CGFloat diff = CGRectGetMinY([attrs frame]) - CGRectGetMinY([sectionAttributes frame]);
+
+        // start at the correct target offset for the grid view
+        center.y = _yOffsetForTransition;
+        // move to the bottom of the screen
+        center.y += CGRectGetHeight([[self collectionView] bounds]);
+        // adjust the header to be in its correct offset to its neighbors
+        center.y += diff;
+        // since we're moving the center, adjust by height/2
+        center.y += CGRectGetHeight([attrs frame]) / 2;
+    }
+
+    [attrs setCenter:center];
+}
+
 
 #pragma mark - Content Offset
 
