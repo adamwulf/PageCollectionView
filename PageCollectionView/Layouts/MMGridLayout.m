@@ -263,6 +263,9 @@
         for (UICollectionViewLayoutAttributes *attrs in _gridCache) {
             if ([attrs representedElementCategory] == UICollectionElementCategoryCell && [[attrs indexPath] isEqual:indexPath]) {
                 if (_yOffsetForTransition > CGRectGetHeight([sectionAttributes frame]) && CGRectGetMaxY([attrs frame]) < _yOffsetForTransition) {
+                    // if we're in a transition from grid view, our content offset is larger than 0.
+                    // and if the page's frames are offscreen above our starting offset, then don't
+                    // load our grid layout, instead, load and adjust the shelf layout below
                     break;
                 }
 
@@ -285,6 +288,9 @@
     return attrs;
 }
 
+// Accepts shelf-relative attributs and adjusts them for the current transition
+// offset target _yOffsetForTransition so that the attributes will animate
+// into the new layout from just outside the visible screen area.
 - (void)adjustLayoutAttributesForTransition:(UICollectionViewLayoutAttributes *)attrs
 {
     // The following attributes should only be requested when transitioning to/from
