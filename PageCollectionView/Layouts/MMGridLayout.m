@@ -258,8 +258,14 @@
 - (UICollectionViewLayoutAttributes *)layoutAttributesForItemAtIndexPath:(NSIndexPath *)indexPath
 {
     if ([indexPath section] == [self section]) {
+        MMLayoutAttributeCache *sectionAttributes = [self shelfAttributesForSection:[self section]];
+
         for (UICollectionViewLayoutAttributes *attrs in _gridCache) {
             if ([attrs representedElementCategory] == UICollectionElementCategoryCell && [[attrs indexPath] isEqual:indexPath]) {
+                if (_yOffsetForTransition > CGRectGetHeight([sectionAttributes frame]) && CGRectGetMaxY([attrs frame]) < _yOffsetForTransition) {
+                    break;
+                }
+
                 return attrs;
             }
         }
@@ -270,7 +276,11 @@
 
     [self adjustLayoutAttributesForTransition:attrs];
 
-    [attrs setAlpha:0];
+    if ([indexPath section] == [self section]) {
+        [attrs setAlpha:1];
+    } else {
+        [attrs setAlpha:0];
+    }
 
     return attrs;
 }
