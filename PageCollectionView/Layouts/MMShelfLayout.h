@@ -12,7 +12,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class MMShelfLayout;
+@class MMShelfLayout, MMLayoutAttributeCache;
 
 /// Similar  to UICollectionViewDelegateFlowLayout, these delegate method will be used by the layout
 /// for item specific properties. If they are not implemented, then defaultHeaderSize or defaultItemSize
@@ -49,6 +49,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, readonly) BOOL bounceVertical;
 @property(nonatomic, readonly) BOOL bounceHorizontal;
 
+- (MMLayoutAttributeCache *)shelfAttributesForSection:(NSInteger)section;
 
 @end
 

@@ -81,6 +81,14 @@
     return CGRectGetWidth([[self collectionView] bounds]) - insets.left - insets.right;
 }
 
+- (MMLayoutAttributeCache *)shelfAttributesForSection:(NSInteger)section
+{
+    if (section < [_shelfCache count]) {
+        return [_shelfCache objectAtIndex:section];
+    }
+    return nil;
+}
+
 #pragma mark - UICollectionViewLayout
 
 - (BOOL)shouldInvalidateLayoutForBoundsChange:(CGRect)newBounds
@@ -115,6 +123,7 @@
         NSInteger pageCount = [[self collectionView] numberOfItemsInSection:section];
         CGFloat maxItemHeight = 0;
         CGFloat headerHeight = [self defaultHeaderHeight];
+        MMLayoutAttributeCache *sectionCache = [[MMLayoutAttributeCache alloc] init];
 
         // Calculate the header section size, if any
         if ([[self delegate] respondsToSelector:@selector(collectionView:layout:heightForHeaderInSection:)]) {
@@ -124,7 +133,7 @@
         if (headerHeight > 0) {
             UICollectionViewLayoutAttributes *headerAttrs = [UICollectionViewLayoutAttributes layoutAttributesForSupplementaryViewOfKind:UICollectionElementKindSectionHeader withIndexPath:[NSIndexPath indexPathForRow:0 inSection:section]];
             [headerAttrs setFrame:CGRectMake(0, yOffset, CGRectGetWidth([[self collectionView] bounds]), headerHeight)];
-            [_shelfCache addObject:[MMLayoutAttributeCache cacheWithAttributes:headerAttrs]];
+            [sectionCache appendLayoutAttributes:headerAttrs];
             [_headerCache addObject:headerAttrs];
 
             yOffset += headerHeight;
@@ -134,7 +143,6 @@
         yOffset += _sectionInsets.top;
 
         BOOL didFinish = NO;
-        MMLayoutAttributeCache *sectionCache = [[MMLayoutAttributeCache alloc] init];
 
         // Calculate the size of each row
         for (NSInteger pageIndex = 0; pageIndex < pageCount; pageIndex++) {
