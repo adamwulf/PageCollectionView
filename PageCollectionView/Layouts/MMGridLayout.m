@@ -18,6 +18,9 @@
 
 
 @implementation MMGridLayout {
+    UICollectionViewLayoutAttributes *_sectionHeaderAttributes;
+    CGFloat _yOffsetForTransition;
+
     CGFloat _sectionOffset;
     CGFloat _sectionHeight;
 }
@@ -106,7 +109,6 @@
     UICollectionViewLayoutAttributes *header = [super layoutAttributesForSupplementaryViewOfKind:UICollectionElementKindSectionHeader atIndexPath:[NSIndexPath indexPathForRow:0 inSection:_section]];
     _sectionOffset = CGRectGetMinY([header frame]);
 
-
     CGFloat yOffset = 0;
     NSInteger pageCount = [[self collectionView] numberOfItemsInSection:_section];
     CGFloat maxItemHeight = 0;
@@ -120,7 +122,9 @@
     if (headerHeight > 0) {
         UICollectionViewLayoutAttributes *headerAttrs = [UICollectionViewLayoutAttributes layoutAttributesForSupplementaryViewOfKind:UICollectionElementKindSectionHeader withIndexPath:[NSIndexPath indexPathForRow:0 inSection:_section]];
         [headerAttrs setFrame:CGRectMake(0, yOffset, CGRectGetWidth([[self collectionView] bounds]), headerHeight)];
+
         [_gridCache addObject:headerAttrs];
+        _sectionHeaderAttributes = headerAttrs;
 
         yOffset += headerHeight;
     }
@@ -205,6 +209,9 @@
 {
     [super prepareForTransitionToLayout:newLayout];
 
+    // transition from grid view /to/ another layout, or scrolling within grid view
+    _yOffsetForTransition = [[self collectionView] contentOffset].y;
+
     // invalidate all of the sections after our current section
     [self invalidateLayoutWithContext:[self invalidationContextForBoundsChange:[[self collectionView] bounds]]];
 }
@@ -212,6 +219,12 @@
 - (void)prepareForTransitionFromLayout:(UICollectionViewLayout *)oldLayout
 {
     [super prepareForTransitionFromLayout:oldLayout];
+
+    // transition from shelf view to grid view. When moving into the grid view,
+    // the grid is always displayed at the very top of our content. if we ever
+    // change to open to mid-grid from the shelf, then this will need to
+    // compensate for that.
+    _yOffsetForTransition = 0;
 
     // invalidate all of the sections after our current section
     [self invalidateLayoutWithContext:[self invalidationContextForBoundsChange:[[self collectionView] bounds]]];
@@ -228,25 +241,27 @@
 
 - (UICollectionViewLayoutAttributes *)layoutAttributesForSupplementaryViewOfKind:(NSString *)elementKind atIndexPath:(NSIndexPath *)indexPath
 {
+    UICollectionViewLayoutAttributes *attrs;
+
     if ([indexPath section] == [self section]) {
-        for (UICollectionViewLayoutAttributes *attrs in _gridCache) {
-            if ([attrs representedElementCategory] == UICollectionElementCategorySupplementaryView && [[attrs indexPath] isEqual:indexPath]) {
-                return attrs;
-            }
-        }
+        attrs = [_sectionHeaderAttributes copy];
+    } else {
+        attrs = [[super layoutAttributesForSupplementaryViewOfKind:elementKind atIndexPath:indexPath] copy];
     }
 
     // The following attributes should only be requested when transitioning to/from
     // this layout. The [prepareForTransitionTo/FromLayout:] methods invalidate these
     // elements, which will cause their attributes to be updated just in time for
     // the transition. Otherwise all of these elements are offscreen and invisible
-    UICollectionViewLayoutAttributes *attrs = [[super layoutAttributesForSupplementaryViewOfKind:elementKind atIndexPath:indexPath] copy];
     CGPoint center = [attrs center];
 
-    if ([indexPath section] <= [self section]) {
+    if ([indexPath section] < [self section]) {
         // for all sections that are before our grid, we can align those sections
         // as if they've shifted straight up from the top of our grid
         center.y -= _sectionOffset;
+        center.y += MAX(0, _yOffsetForTransition - CGRectGetHeight([_sectionHeaderAttributes bounds]));
+    } else if ([indexPath section] == [self section]) {
+        center.y += MAX(0, _yOffsetForTransition - CGRectGetHeight([_sectionHeaderAttributes bounds]));
     } else if ([indexPath section] > [self section]) {
         // for all sections after our grid, the goal is to have them pinch to/from
         // immediatley after the screen, regardless of our scroll position. To do
@@ -257,17 +272,8 @@
         UICollectionViewLayoutAttributes *nextAttrs = [super layoutAttributesForSupplementaryViewOfKind:elementKind atIndexPath:[NSIndexPath indexPathForRow:0 inSection:[self section] + 1]];
         CGFloat diff = CGRectGetMinY([attrs frame]) - CGRectGetMinY([nextAttrs frame]);
 
-        if ([[self collectionView] collectionViewLayout] == self) {
-            // transition from grid view /to/ another layout, or scrolling within grid view
-            center.y = [[self collectionView] contentOffset].y;
-        } else {
-            // transition from shelf view to grid view. When moving into the grid view,
-            // the grid is always displayed at the very top of our content. if we ever
-            // change to open to mid-grid from the shelf, then this will need to
-            // compensate for that.
-            center.y = 0;
-        }
-
+        // start at the correct target offset for the grid view
+        center.y = _yOffsetForTransition;
         // move to the bottom of the screen
         center.y += CGRectGetHeight([[self collectionView] bounds]);
         // adjust the header to be in its correct offset to its neighbors
@@ -277,7 +283,12 @@
     }
 
     [attrs setCenter:center];
-    [attrs setAlpha:0];
+
+    if ([indexPath section] == [self section]) {
+        [attrs setAlpha:1];
+    } else {
+        [attrs setAlpha:0];
+    }
 
     return attrs;
 }
