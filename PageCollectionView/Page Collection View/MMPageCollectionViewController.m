@@ -47,6 +47,7 @@ typedef enum : NSUInteger {
     NSIndexPath *_targetIndexPath;
     MMGridIconView *_collapseGridIcon;
     MMVerticalPageIconView *_collapseVerticalPageIcon;
+    MMVerticalPageIconView *_collapseHorizontalPageIcon;
     CGPoint _zoomPercentOffset;
     MMScalingDirection _isZoomingPage;
     MMPinchVelocityGestureRecognizer *_pinchGesture;
@@ -92,8 +93,18 @@ typedef enum : NSUInteger {
     [[[_collapseVerticalPageIcon heightAnchor] constraintEqualToConstant:60] setActive:YES];
     [[[_collapseVerticalPageIcon bottomAnchor] constraintEqualToAnchor:[[self collectionView] topAnchor] constant:-25] setActive:YES];
 
+    _collapseHorizontalPageIcon = [[MMVerticalPageIconView alloc] initWithFrame:CGRectZero];
+    [_collapseHorizontalPageIcon setTranslatesAutoresizingMaskIntoConstraints:NO];
+    [[self collectionView] addSubview:_collapseHorizontalPageIcon];
+
+    [[[_collapseHorizontalPageIcon centerYAnchor] constraintEqualToAnchor:[[self collectionView] centerYAnchor]] setActive:YES];
+    [[[_collapseHorizontalPageIcon widthAnchor] constraintEqualToConstant:100] setActive:YES];
+    [[[_collapseHorizontalPageIcon heightAnchor] constraintEqualToConstant:60] setActive:YES];
+    [[[_collapseHorizontalPageIcon rightAnchor] constraintEqualToAnchor:[[self collectionView] leftAnchor] constant:-25] setActive:YES];
+
     [_collapseGridIcon setAlpha:0];
     [_collapseVerticalPageIcon setAlpha:0];
+    [_collapseHorizontalPageIcon setAlpha:0];
 
     _pageScale = 1.0;
 
@@ -404,26 +415,38 @@ typedef enum : NSUInteger {
 {
     CGFloat const min = 70;
     CGFloat const dist = 40;
-    CGFloat progress = MIN(-min, MAX(-(min + dist), scrollView.contentOffset.y));
-    progress = ABS(min + progress) / dist;
+    CGFloat vProgress = MIN(-min, MAX(-(min + dist), scrollView.contentOffset.y));
+    vProgress = ABS(min + vProgress) / dist;
+    CGFloat hProgress = MIN(-min, MAX(-(min + dist), scrollView.contentOffset.x));
+    hProgress = ABS(min + hProgress) / dist;
 
     if ([self isDisplayingGrid]) {
-        [_collapseGridIcon setProgress:progress];
+        [_collapseGridIcon setProgress:vProgress];
         [_collapseVerticalPageIcon setProgress:0];
+        [_collapseHorizontalPageIcon setProgress:0];
     } else if ([self isDisplayingPage] && [[[self collectionView] currentLayout] direction] == MMPageLayoutVertical) {
         [_collapseGridIcon setProgress:0];
-        [_collapseVerticalPageIcon setProgress:progress];
+        [_collapseVerticalPageIcon setProgress:vProgress];
+        [_collapseHorizontalPageIcon setProgress:0];
+    } else if ([self isDisplayingPage] && [[[self collectionView] currentLayout] direction] == MMPageLayoutHorizontal) {
+        [_collapseGridIcon setProgress:0];
+        [_collapseVerticalPageIcon setProgress:0];
+        [_collapseHorizontalPageIcon setProgress:hProgress];
     } else {
         [_collapseGridIcon setProgress:0];
         [_collapseVerticalPageIcon setProgress:0];
+        [_collapseHorizontalPageIcon setProgress:0];
     }
 }
 
 - (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
 {
     BOOL isVerticalPage = [self isDisplayingPage] && [[[self collectionView] currentLayout] direction] == MMPageLayoutVertical;
+    BOOL isHorizontalPage = [self isDisplayingPage] && [[[self collectionView] currentLayout] direction] == MMPageLayoutHorizontal;
+    BOOL verticalSuccess = scrollView.contentOffset.y < -100;
+    BOOL horizontalSuccess = scrollView.contentOffset.x < -100;
 
-    if (scrollView.contentOffset.y < -100 && ([self isDisplayingGrid] || isVerticalPage)) {
+    if ((verticalSuccess && ([self isDisplayingGrid] || isVerticalPage)) || (horizontalSuccess && isHorizontalPage)) {
         // turn off bounce during this animation, as the bounce from the scrollview
         // being overscrolled conflicts with the layout animation
         MMShelfLayout *nextLayout;
@@ -477,12 +500,19 @@ typedef enum : NSUInteger {
     if ([newLayout isMemberOfClass:[MMGridLayout class]]) {
         [_collapseGridIcon setAlpha:1];
         [_collapseVerticalPageIcon setAlpha:0];
+        [_collapseHorizontalPageIcon setAlpha:0];
     } else if ([newLayout isMemberOfClass:[MMPageLayout class]] && [(MMPageLayout *)newLayout direction] == MMPageLayoutVertical) {
         [_collapseGridIcon setAlpha:0];
         [_collapseVerticalPageIcon setAlpha:1];
+        [_collapseHorizontalPageIcon setAlpha:0];
+    } else if ([newLayout isMemberOfClass:[MMPageLayout class]] && [(MMPageLayout *)newLayout direction] == MMPageLayoutHorizontal) {
+        [_collapseGridIcon setAlpha:0];
+        [_collapseVerticalPageIcon setAlpha:0];
+        [_collapseHorizontalPageIcon setAlpha:1];
     } else {
         [_collapseGridIcon setAlpha:0];
         [_collapseVerticalPageIcon setAlpha:0];
+        [_collapseHorizontalPageIcon setAlpha:0];
     }
 }
 
