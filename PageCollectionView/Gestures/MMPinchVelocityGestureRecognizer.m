@@ -50,6 +50,16 @@ CGFloat const kLowPass = .8;
 
 - (CGPoint)firstLocationInView:(UIView *)view
 {
+    CGPoint loc = [self locationInView:view];
+
+    loc.x += _scaledAdjustment.x * [self scale];
+    loc.y += _scaledAdjustment.y * [self scale];
+
+    return loc;
+}
+
+- (CGPoint)locationInView:(UIView *)view
+{
     CGPoint loc = CGPointZero;
 
     for (UITouch *touch in _touches) {
@@ -64,21 +74,8 @@ CGFloat const kLowPass = .8;
         loc.y /= [_touches count];
     }
 
-    loc.x += _adjustment.x * [self scale];
-    loc.y += _adjustment.y * [self scale];
-
     loc.x += _adjustWait.x;
     loc.y += _adjustWait.y;
-
-    return loc;
-}
-
-- (CGPoint)locationInView:(UIView *)view
-{
-    CGPoint loc = [self firstLocationInView:view];
-
-    loc.x -= _adjustment.x * [self scale];
-    loc.y -= _adjustment.y * [self scale];
 
     return loc;
 }
@@ -93,10 +90,10 @@ CGFloat const kLowPass = .8;
     CGPoint after = [self locationInView:[self view]];
 
     if ([_touches count] > 1 && stateBefore == UIGestureRecognizerStateChanged) {
-        _adjustment.x += _adjustWait.x / [self scale];
-        _adjustment.y += _adjustWait.y / [self scale];
-        _adjustment.x += (before.x - after.x) / [self scale];
-        _adjustment.y += (before.y - after.y) / [self scale];
+        _scaledAdjustment.x += _adjustWait.x / [self scale];
+        _scaledAdjustment.y += _adjustWait.y / [self scale];
+        _scaledAdjustment.x += (before.x - after.x) / [self scale];
+        _scaledAdjustment.y += (before.y - after.y) / [self scale];
 
         _adjustWait = CGPointZero;
     }
@@ -129,7 +126,7 @@ CGFloat const kLowPass = .8;
     _adjustWait.y += (before.y - after.y);
 
     if ([_touches count] <= 0) {
-        _adjustment = CGPointZero;
+        _scaledAdjustment = CGPointZero;
         _adjustWait = CGPointZero;
     }
 }
@@ -142,7 +139,7 @@ CGFloat const kLowPass = .8;
     [super touchesCancelled:touches withEvent:event];
 
     if ([_touches count] == 0) {
-        _adjustment = CGPointZero;
+        _scaledAdjustment = CGPointZero;
         _adjustWait = CGPointZero;
     }
 }
@@ -161,7 +158,7 @@ CGFloat const kLowPass = .8;
     _adjustWait.y -= (before.y - after.y);
 
     if ([_touches count] == 0) {
-        _adjustment = CGPointZero;
+        _scaledAdjustment = CGPointZero;
         _adjustWait = CGPointZero;
     }
 }

@@ -424,44 +424,37 @@
         // This method is called during zoom because the collection view is constantly
         // resetting its layout to a new page layout, so it transitions from page layout
         // to page layout, and uses this method to keep the offset where it needs to be
-        CGPoint gestureLocation = [[self gestureRecognizer] locationInView:[[self collectionView] superview]];
-        CGPoint targetPercentOffset = [[self gestureRecognizer] locationInView:[self collectionView]];
-        targetPercentOffset.x = targetPercentOffset.x / [self collectionViewContentSize].width;
-        targetPercentOffset.y = targetPercentOffset.y / [self collectionViewContentSize].height;
-
-        gestureLocation.x -= [[self collectionView] frame].origin.x;
-        gestureLocation.y -= [[self collectionView] frame].origin.y;
-
+        CGPoint outerOffset = [[self gestureRecognizer] locationInView:[[self collectionView] superview]];
         CGPoint startLocInContent;
-        // _targetPercentOffset is the % of our contentSize that should align to our gesture
+        // _startingPercentOffset is the % of our contentSize that should align to our gesture
+        // startLocInContent is the point in the content that is exactly under the gesture
+        // when the gesture begins.
         startLocInContent.x = [self collectionViewContentSize].width * _startingPercentOffset.x;
         startLocInContent.y = [self collectionViewContentSize].height * _startingPercentOffset.y;
 
-        CGPoint targetLocInContent;
-        // _targetPercentOffset is the % of our contentSize that should align to our gesture
-        targetLocInContent.x = [self collectionViewContentSize].width * targetPercentOffset.x;
-        targetLocInContent.y = [self collectionViewContentSize].height * targetPercentOffset.y;
+        CGPoint targetLocInContent = startLocInContent;
 
-        CGPoint travel = CGPointDiff(targetLocInContent, startLocInContent);
+        // so remove the gesture's offset from the corner of the super view to the gesture,
+        // as our contentOffset will need to be relative to that corner
+        targetLocInContent.x -= outerOffset.x;
+        targetLocInContent.y -= outerOffset.y;
 
-        // so remove the gesture's offset to adjust that % of content size to our top/left of the screen
-        targetLocInContent.x -= gestureLocation.x;
-        targetLocInContent.y -= gestureLocation.y;
+        // If the user starts a pinch with two fingers, but then lifts a finger
+        // the pinch gesture doesn't fail, but instead continues. By default,
+        // the location of the gesture is the average of all touches, so this
+        // makes the location jump around the screen as the user lifts and presses
+        // down fingers mid-gesture. The MMPinchVelocityGestureRecognizer instead
+        // handles this for us and returns a smooth locationInView: that accounts
+        // for touches starting and stopping mid gesture. The `scaledAdjustment` property
+        // is a CGPoint offset from teh gesture's location back to the initial
+        // locationInView when the gesture first began. We can use this to
+        // Adjust the content offset and keep the content under our fingers
+        // throughout the pinch, even if the user 'walks' their fingers
+        // down the screen resulting in a large scaledAdjustment.
+        CGPoint scaledAdjustment = [[self gestureRecognizer] scaledAdjustment];
 
-        targetLocInContent.x -= travel.x / MAX(1, [[self gestureRecognizer] scale]);
-        targetLocInContent.y -= travel.y / MAX(1, [[self gestureRecognizer] scale]);
-
-        CGPoint adjustment = [[self gestureRecognizer] adjustment];
-        //
-        //        adjustment.x = adjustment.x / [[self gestureRecognizer] scale];
-        //        adjustment.y = adjustment.y / [[self gestureRecognizer] scale];
-        //        adjustment.x = adjustment.x / [self collectionViewContentSize].width;
-        //        adjustment.y = adjustment.y / [self collectionViewContentSize].height;
-        //        adjustment.x = adjustment.x * CGRectGetWidth([[self collectionView] bounds]);
-        //        adjustment.y = adjustment.y * CGRectGetHeight([[self collectionView] bounds]);
-        //
-        targetLocInContent.x -= adjustment.x;
-        targetLocInContent.y -= adjustment.y;
+        targetLocInContent.x -= scaledAdjustment.x * MAX(1, [[self gestureRecognizer] scale]);
+        targetLocInContent.y -= scaledAdjustment.y * MAX(1, [[self gestureRecognizer] scale]);
 
         // now that our content is aligned with our gesture,
         // clamp it to the edges of our content

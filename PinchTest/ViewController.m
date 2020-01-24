@@ -60,9 +60,6 @@
     [_orangeDot setCenter:[pinchGesture firstLocationInView:[self view]]];
     [_greenDot setCenter:[pinchGesture locationInView:[self view]]];
 
-    NSLog(@"=====");
-    NSLog(@"adjustment: %@", NSStringFromCGPoint([pinchGesture adjustment]));
-
     if ([pinchGesture state] == UIGestureRecognizerStateEnded || [pinchGesture state] == UIGestureRecognizerStateFailed || [pinchGesture state] == UIGestureRecognizerStateCancelled) {
         [_redDot setHidden:YES];
         [_greenDot setHidden:YES];

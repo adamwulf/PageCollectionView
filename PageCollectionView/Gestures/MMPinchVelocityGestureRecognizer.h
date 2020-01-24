@@ -14,7 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MMPinchVelocityGestureRecognizer : UIPinchGestureRecognizer
 
 @property(nonatomic, readonly) CGFloat scaleDirection;
-@property(nonatomic, readonly) CGPoint adjustment;
+@property(nonatomic, readonly) CGPoint scaledAdjustment;
 
 - (CGPoint)firstLocationInView:(UIView *)view;
 - (CGPoint)oldLocationInView:(UIView *)view;
