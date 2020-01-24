@@ -15,7 +15,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property(nonatomic, readonly) CGFloat scaleDirection;
 @property(nonatomic, readonly) CGPoint scaledAdjustment;
+@property(nonatomic, readonly) CGPoint adjustment;
 
+- (CGPoint)scaledFirstLocationInView:(UIView *)view;
 - (CGPoint)firstLocationInView:(UIView *)view;
 - (CGPoint)oldLocationInView:(UIView *)view;
 
