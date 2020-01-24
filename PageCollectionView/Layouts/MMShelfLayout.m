@@ -270,6 +270,7 @@
         // in the middle of the shelf. this will calculate its offset within our content size
         // and then clamp it to our min/max allowed content offset
         UICollectionViewLayoutAttributes *attrs = [self layoutAttributesForSupplementaryViewOfKind:UICollectionElementKindSectionHeader atIndexPath:[self targetIndexPath]];
+        MMLayoutAttributeCache *shelfAttrs = [self shelfAttributesForSection:[[self targetIndexPath] section]];
 
         attrs = attrs ?: [self layoutAttributesForItemAtIndexPath:[self targetIndexPath]];
 
@@ -277,6 +278,9 @@
         CGFloat const screenHeight = CGRectGetHeight([[self collectionView] bounds]);
         CGSize const size = [self collectionViewContentSize];
         CGFloat targetY = attrs.frame.origin.y + inset;
+
+        // align to roughly middle of screen
+        targetY -= (screenHeight - CGRectGetHeight([shelfAttrs frame])) / 5.0;
 
         // clamp the target Y to our content size
         targetY = targetY < size.height - screenHeight ? targetY : size.height - screenHeight;
