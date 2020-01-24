@@ -94,6 +94,8 @@
 
     if (currMinBoundsDim != _lastBoundsMinDim) {
         // if our header should move, then invalidate it
+        _lastBoundsMinDim = currMinBoundsDim;
+
         [self invalidateLayoutWithContext:[self invalidationContextForBoundsChange:newBounds]];
     }
 
@@ -369,9 +371,21 @@
 
 - (NSArray<__kindof UICollectionViewLayoutAttributes *> *)layoutAttributesForElementsInRect:(CGRect)rect
 {
-    return [_pageCache filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id _Nullable obj, NSDictionary<NSString *, id> *_Nullable bindings) {
+    NSArray<__kindof UICollectionViewLayoutAttributes *> *ret = [_pageCache filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id _Nullable obj, NSDictionary<NSString *, id> *_Nullable bindings) {
         return CGRectIntersectsRect([obj frame], rect);
     }]];
+
+    UICollectionViewLayoutAttributes *maybeHeaderAttrs = [ret firstObject];
+
+    // For our floating header, we need to return the adjusted header attributes, not our static cached ones
+    // so swap them out if needed. Luckily, the header will always be the first in our array if at all
+    if ([[maybeHeaderAttrs representedElementKind] isEqualToString:UICollectionElementKindSectionHeader]) {
+        UICollectionViewLayoutAttributes *headerAttributes = [self layoutAttributesForSupplementaryViewOfKind:[maybeHeaderAttrs representedElementKind] atIndexPath:[maybeHeaderAttrs indexPath]];
+
+        return [@[headerAttributes] arrayByAddingObjectsFromArray:[ret arrayByRemovingFirstObject]];
+    }
+
+    return ret;
 }
 
 - (UICollectionViewLayoutAttributes *)layoutAttributesForSupplementaryViewOfKind:(NSString *)elementKind atIndexPath:(NSIndexPath *)indexPath
@@ -384,9 +398,11 @@
                 UIEdgeInsets insets = [[self collectionView] safeAreaInsets];
 
                 if (_direction == MMPageLayoutVertical) {
-                    [ret setCenter:CGPointMake(CGRectGetMidX([[self collectionView] bounds]), [ret center].y)];
+                    CGFloat midDim = _lastBoundsMinDim + CGRectGetWidth([[self collectionView] bounds]) / 2;
+                    [ret setCenter:CGPointMake(midDim, [ret center].y)];
                 } else {
-                    [ret setCenter:CGPointMake([ret center].x, CGRectGetMidY([[self collectionView] bounds]) + insets.top / 2)];
+                    CGFloat midDim = _lastBoundsMinDim + CGRectGetHeight([[self collectionView] bounds]) / 2;
+                    [ret setCenter:CGPointMake([ret center].x, midDim + insets.top / 2)];
                 }
 
                 return ret;
