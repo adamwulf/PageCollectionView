@@ -14,7 +14,7 @@
 #import "MMPageCollectionCell.h"
 #import "MMPageCollectionHeader.h"
 #import "MMGridIconView.h"
-#import "MMPageIconView.h"
+#import "MMVerticalPageIconView.h"
 #import "MMShelfLayout.h"
 #import "MMGridLayout.h"
 #import "MMPageLayout.h"
@@ -46,7 +46,7 @@ typedef enum : NSUInteger {
 @implementation MMPageCollectionViewController {
     NSIndexPath *_targetIndexPath;
     MMGridIconView *_collapseGridIcon;
-    MMPageIconView *_collapsePageIcon;
+    MMVerticalPageIconView *_collapseVerticalPageIcon;
     CGPoint _zoomPercentOffset;
     MMScalingDirection _isZoomingPage;
     MMPinchVelocityGestureRecognizer *_pinchGesture;
@@ -83,17 +83,17 @@ typedef enum : NSUInteger {
     [[[_collapseGridIcon heightAnchor] constraintEqualToConstant:60] setActive:YES];
     [[[_collapseGridIcon bottomAnchor] constraintEqualToAnchor:[[self collectionView] topAnchor] constant:-25] setActive:YES];
 
-    _collapsePageIcon = [[MMPageIconView alloc] initWithFrame:CGRectZero];
-    [_collapsePageIcon setTranslatesAutoresizingMaskIntoConstraints:NO];
-    [[self collectionView] addSubview:_collapsePageIcon];
+    _collapseVerticalPageIcon = [[MMVerticalPageIconView alloc] initWithFrame:CGRectZero];
+    [_collapseVerticalPageIcon setTranslatesAutoresizingMaskIntoConstraints:NO];
+    [[self collectionView] addSubview:_collapseVerticalPageIcon];
 
-    [[[_collapsePageIcon centerXAnchor] constraintEqualToAnchor:[[self collectionView] centerXAnchor]] setActive:YES];
-    [[[_collapsePageIcon widthAnchor] constraintEqualToConstant:100] setActive:YES];
-    [[[_collapsePageIcon heightAnchor] constraintEqualToConstant:60] setActive:YES];
-    [[[_collapsePageIcon bottomAnchor] constraintEqualToAnchor:[[self collectionView] topAnchor] constant:-25] setActive:YES];
+    [[[_collapseVerticalPageIcon centerXAnchor] constraintEqualToAnchor:[[self collectionView] centerXAnchor]] setActive:YES];
+    [[[_collapseVerticalPageIcon widthAnchor] constraintEqualToConstant:100] setActive:YES];
+    [[[_collapseVerticalPageIcon heightAnchor] constraintEqualToConstant:60] setActive:YES];
+    [[[_collapseVerticalPageIcon bottomAnchor] constraintEqualToAnchor:[[self collectionView] topAnchor] constant:-25] setActive:YES];
 
     [_collapseGridIcon setAlpha:0];
-    [_collapsePageIcon setAlpha:0];
+    [_collapseVerticalPageIcon setAlpha:0];
 
     _pageScale = 1.0;
 
@@ -409,13 +409,13 @@ typedef enum : NSUInteger {
 
     if ([self isDisplayingGrid]) {
         [_collapseGridIcon setProgress:progress];
-        [_collapsePageIcon setProgress:0];
+        [_collapseVerticalPageIcon setProgress:0];
     } else if ([self isDisplayingPage]) {
         [_collapseGridIcon setProgress:0];
-        [_collapsePageIcon setProgress:progress];
+        [_collapseVerticalPageIcon setProgress:progress];
     } else {
         [_collapseGridIcon setProgress:0];
-        [_collapsePageIcon setProgress:0];
+        [_collapseVerticalPageIcon setProgress:0];
     }
 }
 
@@ -474,13 +474,13 @@ typedef enum : NSUInteger {
 {
     if ([newLayout isMemberOfClass:[MMGridLayout class]]) {
         [_collapseGridIcon setAlpha:1];
-        [_collapsePageIcon setAlpha:0];
+        [_collapseVerticalPageIcon setAlpha:0];
     } else if ([newLayout isMemberOfClass:[MMPageLayout class]]) {
         [_collapseGridIcon setAlpha:0];
-        [_collapsePageIcon setAlpha:1];
+        [_collapseVerticalPageIcon setAlpha:1];
     } else {
         [_collapseGridIcon setAlpha:0];
-        [_collapsePageIcon setAlpha:0];
+        [_collapseVerticalPageIcon setAlpha:0];
     }
 }
 

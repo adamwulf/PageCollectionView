@@ -17,7 +17,6 @@ FOUNDATION_EXPORT const unsigned char PageCollectionViewVersionString[];
 // In this header, you should import all the public headers of your framework using statements like #import <PageCollectionView/PublicHeader.h>
 
 
-
 #import <PageCollectionView/MMPageCollectionViewController.h>
 #import <PageCollectionView/MMPageCollectionView.h>
 #import <PageCollectionView/MMPageCollectionCell.h>
@@ -28,5 +27,5 @@ FOUNDATION_EXPORT const unsigned char PageCollectionViewVersionString[];
 #import <PageCollectionView/MMPageLayout.h>
 
 #import <PageCollectionView/MMGridIconView.h>
-#import <PageCollectionView/MMPageIconView.h>
+#import <PageCollectionView/MMVerticalPageIconView.h>
 #import <PageCollectionView/MMPinchVelocityGestureRecognizer.h>

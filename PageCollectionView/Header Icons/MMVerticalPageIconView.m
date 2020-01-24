@@ -1,17 +1,17 @@
 //
-//  MMPageIconView.m
+//  MMVerticalPageIconView.m
 //  infinite-draw
 //
 //  Created by Adam Wulf on 10/7/19.
 //  Copyright © 2019 Milestone Made. All rights reserved.
 //
 
-#import "MMPageIconView.h"
+#import "MMVerticalPageIconView.h"
 
 #define interpolate(s, e, p) (s * p + e * (1 - p))
 
 
-@implementation MMPageIconView
+@implementation MMVerticalPageIconView
 
 - (instancetype)init
 {

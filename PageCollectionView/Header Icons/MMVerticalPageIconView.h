@@ -1,5 +1,5 @@
 //
-//  MMPageIconView.h
+//  MMVerticalPageIconView.h
 //  infinite-draw
 //
 //  Created by Adam Wulf on 10/7/19.
@@ -11,7 +11,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 
-@interface MMPageIconView : UIView
+@interface MMVerticalPageIconView : UIView
 
 /// between 0 and 1. 0 will show page view, 1 will show grid row
 @property(nonatomic, assign) CGFloat progress;
