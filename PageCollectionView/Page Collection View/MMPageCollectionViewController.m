@@ -410,7 +410,7 @@ typedef enum : NSUInteger {
     if ([self isDisplayingGrid]) {
         [_collapseGridIcon setProgress:progress];
         [_collapseVerticalPageIcon setProgress:0];
-    } else if ([self isDisplayingPage]) {
+    } else if ([self isDisplayingPage] && [[[self collectionView] currentLayout] direction] == MMPageLayoutVertical) {
         [_collapseGridIcon setProgress:0];
         [_collapseVerticalPageIcon setProgress:progress];
     } else {
@@ -421,7 +421,9 @@ typedef enum : NSUInteger {
 
 - (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
 {
-    if (scrollView.contentOffset.y < -100 && ([self isDisplayingGrid] || [self isDisplayingPage])) {
+    BOOL isVerticalPage = [self isDisplayingPage] && [[[self collectionView] currentLayout] direction] == MMPageLayoutVertical;
+
+    if (scrollView.contentOffset.y < -100 && ([self isDisplayingGrid] || isVerticalPage)) {
         // turn off bounce during this animation, as the bounce from the scrollview
         // being overscrolled conflicts with the layout animation
         MMShelfLayout *nextLayout;
@@ -475,7 +477,7 @@ typedef enum : NSUInteger {
     if ([newLayout isMemberOfClass:[MMGridLayout class]]) {
         [_collapseGridIcon setAlpha:1];
         [_collapseVerticalPageIcon setAlpha:0];
-    } else if ([newLayout isMemberOfClass:[MMPageLayout class]]) {
+    } else if ([newLayout isMemberOfClass:[MMPageLayout class]] && [(MMPageLayout *)newLayout direction] == MMPageLayoutVertical) {
         [_collapseGridIcon setAlpha:0];
         [_collapseVerticalPageIcon setAlpha:1];
     } else {
