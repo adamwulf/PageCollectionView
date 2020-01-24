@@ -7,6 +7,7 @@
 //
 
 #import "MMGridLayout.h"
+#import "MMPinchVelocityGestureRecognizer.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -35,8 +36,8 @@ typedef enum : NSUInteger {
 @property(nonatomic, assign) MMPageLayoutDirection direction;
 /// The percent (from 0 to 1) of the target offset for the layout. This is used for the pinch gesture to keep
 /// the same location in the page centered under the gesture.
-@property(nonatomic, assign) CGPoint targetPercentOffset;
-@property(nonatomic, assign, nullable) UIGestureRecognizer *gestureRecognizer;
+@property(nonatomic, assign) CGPoint startingPercentOffset;
+@property(nonatomic, assign, nullable) MMPinchVelocityGestureRecognizer *gestureRecognizer;
 
 @end
 

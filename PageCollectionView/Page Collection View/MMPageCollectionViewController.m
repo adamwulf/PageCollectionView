@@ -309,14 +309,14 @@ typedef enum : NSUInteger {
                 // which page is being held
                 [layout setTargetIndexPath:_targetIndexPath];
                 // what % in both direction its held
-                [layout setTargetPercentOffset:_zoomPercentOffset];
+                [layout setStartingPercentOffset:_zoomPercentOffset];
                 // where the gesture is in collection view coordiates
                 [layout setGestureRecognizer:_pinchGesture];
                 [layout setFitWidth:[[[self collectionView] currentLayout] fitWidth]];
                 [layout setDirection:[[[self collectionView] currentLayout] direction]];
 
                 [[[self collectionView] currentLayout] setTargetIndexPath:_targetIndexPath];
-                [[[self collectionView] currentLayout] setTargetPercentOffset:_zoomPercentOffset];
+                [[[self collectionView] currentLayout] setStartingPercentOffset:_zoomPercentOffset];
                 [[[self collectionView] currentLayout] setGestureRecognizer:_pinchGesture];
 
                 // Can't call [invalidateLayout] here, as this won't cause the collectionView to
@@ -348,7 +348,7 @@ typedef enum : NSUInteger {
             _pageScale = MIN(MAX(1.0, _pageScale * [_pinchGesture scale]), [self maxPageScale]);
         }
         _isZoomingPage = MMScalingNone;
-        [[[self collectionView] currentLayout] setTargetPercentOffset:CGPointZero];
+        [[[self collectionView] currentLayout] setStartingPercentOffset:CGPointZero];
         [[[self collectionView] currentLayout] setGestureRecognizer:nil];
     } else {
         if (transitionLayout) {
@@ -358,7 +358,7 @@ typedef enum : NSUInteger {
         }
 
         _isZoomingPage = MMScalingNone;
-        [[[self collectionView] currentLayout] setTargetPercentOffset:CGPointZero];
+        [[[self collectionView] currentLayout] setStartingPercentOffset:CGPointZero];
         [[[self collectionView] currentLayout] setGestureRecognizer:nil];
     }
 }

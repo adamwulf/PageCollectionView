@@ -8,6 +8,7 @@
 
 #import "MMPageLayout.h"
 #import "Constants.h"
+#import <MMToolbox/MMToolbox.h>
 
 
 @interface MMPageLayoutAttributes : UICollectionViewLayoutAttributes
@@ -424,24 +425,50 @@
         // resetting its layout to a new page layout, so it transitions from page layout
         // to page layout, and uses this method to keep the offset where it needs to be
         CGPoint gestureLocation = [[self gestureRecognizer] locationInView:[[self collectionView] superview]];
+        CGPoint targetPercentOffset = [[self gestureRecognizer] locationInView:[self collectionView]];
+        targetPercentOffset.x = targetPercentOffset.x / [self collectionViewContentSize].width;
+        targetPercentOffset.y = targetPercentOffset.y / [self collectionViewContentSize].height;
+
         gestureLocation.x -= [[self collectionView] frame].origin.x;
         gestureLocation.y -= [[self collectionView] frame].origin.y;
 
-        CGPoint locInContent;
+        CGPoint startLocInContent;
         // _targetPercentOffset is the % of our contentSize that should align to our gesture
-        locInContent.x = [self collectionViewContentSize].width * _targetPercentOffset.x;
-        locInContent.y = [self collectionViewContentSize].height * _targetPercentOffset.y;
+        startLocInContent.x = [self collectionViewContentSize].width * _startingPercentOffset.x;
+        startLocInContent.y = [self collectionViewContentSize].height * _startingPercentOffset.y;
+
+        CGPoint targetLocInContent;
+        // _targetPercentOffset is the % of our contentSize that should align to our gesture
+        targetLocInContent.x = [self collectionViewContentSize].width * targetPercentOffset.x;
+        targetLocInContent.y = [self collectionViewContentSize].height * targetPercentOffset.y;
+
+        CGPoint travel = CGPointDiff(targetLocInContent, startLocInContent);
 
         // so remove the gesture's offset to adjust that % of content size to our top/left of the screen
-        locInContent.x -= gestureLocation.x;
-        locInContent.y -= gestureLocation.y;
+        targetLocInContent.x -= gestureLocation.x;
+        targetLocInContent.y -= gestureLocation.y;
+
+        targetLocInContent.x -= travel.x / MAX(1, [[self gestureRecognizer] scale]);
+        targetLocInContent.y -= travel.y / MAX(1, [[self gestureRecognizer] scale]);
+
+        CGPoint adjustment = [[self gestureRecognizer] adjustment];
+        //
+        //        adjustment.x = adjustment.x / [[self gestureRecognizer] scale];
+        //        adjustment.y = adjustment.y / [[self gestureRecognizer] scale];
+        //        adjustment.x = adjustment.x / [self collectionViewContentSize].width;
+        //        adjustment.y = adjustment.y / [self collectionViewContentSize].height;
+        //        adjustment.x = adjustment.x * CGRectGetWidth([[self collectionView] bounds]);
+        //        adjustment.y = adjustment.y * CGRectGetHeight([[self collectionView] bounds]);
+        //
+        targetLocInContent.x -= adjustment.x;
+        targetLocInContent.y -= adjustment.y;
 
         // now that our content is aligned with our gesture,
         // clamp it to the edges of our content
-        locInContent.x = MAX(-insets.left, MIN(contentSize.width - viewSize.width, locInContent.x));
-        locInContent.y = MAX(-insets.top, MIN(contentSize.height - viewSize.height, locInContent.y));
+        targetLocInContent.x = MAX(-insets.left, MIN(contentSize.width - viewSize.width, targetLocInContent.x));
+        targetLocInContent.y = MAX(-insets.top, MIN(contentSize.height - viewSize.height, targetLocInContent.y));
 
-        return locInContent;
+        return targetLocInContent;
     } else if ([self direction] == MMPageLayoutHorizontal) {
         if ([self targetIndexPath]) {
             CGPoint locInContent;
