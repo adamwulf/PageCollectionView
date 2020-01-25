@@ -28,4 +28,5 @@ FOUNDATION_EXPORT const unsigned char PageCollectionViewVersionString[];
 
 #import <PageCollectionView/MMGridIconView.h>
 #import <PageCollectionView/MMVerticalPageIconView.h>
+#import <PageCollectionView/MMHorizontalPageIconView.h>
 #import <PageCollectionView/MMPinchVelocityGestureRecognizer.h>

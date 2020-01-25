@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		C5034D3223D9759500E62A19 /* MMToolbox.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = C5ABCC4723D6DF1D00B96040 /* MMToolbox.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C554F8F72355961C000BBC01 /* MMShelfLayoutObject.h in Headers */ = {isa = PBXBuildFile; fileRef = C554F8F62355961C000BBC01 /* MMShelfLayoutObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		C554F8FA235599A4000BBC01 /* SampleCollectionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C554F8F9235599A4000BBC01 /* SampleCollectionViewController.m */; };
 		C554F8FD23559ABA000BBC01 /* SampleObject.m in Sources */ = {isa = PBXBuildFile; fileRef = C554F8FC23559ABA000BBC01 /* SampleObject.m */; };
@@ -53,6 +52,9 @@
 		C582E52A23DACF080002E7E3 /* PageCollectionView.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = C5722A9B2352ED1F00C3E6D3 /* PageCollectionView.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C594FF8223D4172100C6A6FF /* MMPageCollectionViewController+Protected.h in Headers */ = {isa = PBXBuildFile; fileRef = C594FF8123D4172100C6A6FF /* MMPageCollectionViewController+Protected.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		C594FF8423D4436B00C6A6FF /* MMPageCollectionView+Protected.h in Headers */ = {isa = PBXBuildFile; fileRef = C594FF8323D4436B00C6A6FF /* MMPageCollectionView+Protected.h */; };
+		C5A07F1823DC03B80098FF61 /* MMHorizontalPageIconView.h in Headers */ = {isa = PBXBuildFile; fileRef = C5A07F1623DC03B80098FF61 /* MMHorizontalPageIconView.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		C5A07F1923DC03B80098FF61 /* MMHorizontalPageIconView.m in Sources */ = {isa = PBXBuildFile; fileRef = C5A07F1723DC03B80098FF61 /* MMHorizontalPageIconView.m */; };
+		C5A07F1C23DC0B8B0098FF61 /* MMToolbox.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = C5ABCC4723D6DF1D00B96040 /* MMToolbox.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C5ABCC4223D6D11C00B96040 /* MMLayoutAttributeCache.h in Headers */ = {isa = PBXBuildFile; fileRef = C5ABCC4023D6D11C00B96040 /* MMLayoutAttributeCache.h */; };
 		C5ABCC4323D6D11C00B96040 /* MMLayoutAttributeCache.m in Sources */ = {isa = PBXBuildFile; fileRef = C5ABCC4123D6D11C00B96040 /* MMLayoutAttributeCache.m */; };
 		C5ABCC4823D6DF1D00B96040 /* MMToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C5ABCC4723D6DF1D00B96040 /* MMToolbox.framework */; };
@@ -69,22 +71,13 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		C5034D3123D9758800E62A19 /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-				C5034D3223D9759500E62A19 /* MMToolbox.framework in CopyFiles */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		C557318523C17F6000D4BB57 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				C5A07F1C23DC0B8B0098FF61 /* MMToolbox.framework in CopyFiles */,
 				C557318623C17F6E00D4BB57 /* PageCollectionView.framework in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -155,6 +148,9 @@
 		C582E52123DACD7B0002E7E3 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		C594FF8123D4172100C6A6FF /* MMPageCollectionViewController+Protected.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "MMPageCollectionViewController+Protected.h"; sourceTree = "<group>"; };
 		C594FF8323D4436B00C6A6FF /* MMPageCollectionView+Protected.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "MMPageCollectionView+Protected.h"; sourceTree = "<group>"; };
+		C5A07F1623DC03B80098FF61 /* MMHorizontalPageIconView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MMHorizontalPageIconView.h; sourceTree = "<group>"; };
+		C5A07F1723DC03B80098FF61 /* MMHorizontalPageIconView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MMHorizontalPageIconView.m; sourceTree = "<group>"; };
+		C5A07F1D23DC0B980098FF61 /* MMToolbox.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = MMToolbox.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C5ABCC4023D6D11C00B96040 /* MMLayoutAttributeCache.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MMLayoutAttributeCache.h; sourceTree = "<group>"; };
 		C5ABCC4123D6D11C00B96040 /* MMLayoutAttributeCache.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MMLayoutAttributeCache.m; sourceTree = "<group>"; };
 		C5ABCC4723D6DF1D00B96040 /* MMToolbox.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = MMToolbox.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -292,6 +288,8 @@
 			children = (
 				C5722AD82352ED5D00C3E6D3 /* MMGridIconView.h */,
 				C5722AD92352ED5D00C3E6D3 /* MMGridIconView.m */,
+				C5A07F1623DC03B80098FF61 /* MMHorizontalPageIconView.h */,
+				C5A07F1723DC03B80098FF61 /* MMHorizontalPageIconView.m */,
 				C5722AD72352ED5D00C3E6D3 /* MMVerticalPageIconView.h */,
 				C5722ADA2352ED5D00C3E6D3 /* MMVerticalPageIconView.m */,
 			);
@@ -301,6 +299,7 @@
 		C5722AF12352EDBD00C3E6D3 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				C5A07F1D23DC0B980098FF61 /* MMToolbox.framework */,
 				C5ABCC4723D6DF1D00B96040 /* MMToolbox.framework */,
 			);
 			name = Frameworks;
@@ -336,6 +335,7 @@
 				C5722AE52352ED5D00C3E6D3 /* MMPageLayout.h in Headers */,
 				C5722ADB2352ED5D00C3E6D3 /* MMPageCollectionView.h in Headers */,
 				C5ABCC4223D6D11C00B96040 /* MMLayoutAttributeCache.h in Headers */,
+				C5A07F1823DC03B80098FF61 /* MMHorizontalPageIconView.h in Headers */,
 				C554F8F72355961C000BBC01 /* MMShelfLayoutObject.h in Headers */,
 				C5722ADE2352ED5D00C3E6D3 /* MMPageCollectionHeader.h in Headers */,
 				C5722AEC2352ED5D00C3E6D3 /* MMGridIconView.h in Headers */,
@@ -378,7 +378,6 @@
 				C5722AA72352ED4C00C3E6D3 /* Frameworks */,
 				C5722AA82352ED4C00C3E6D3 /* Resources */,
 				C557318523C17F6000D4BB57 /* CopyFiles */,
-				C5034D3123D9758800E62A19 /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -493,6 +492,7 @@
 				C5722AEE2352ED5D00C3E6D3 /* MMVerticalPageIconView.m in Sources */,
 				C5722ADF2352ED5D00C3E6D3 /* MMPageCollectionView.m in Sources */,
 				C5722AE12352ED5D00C3E6D3 /* MMPageCollectionViewController.m in Sources */,
+				C5A07F1923DC03B80098FF61 /* MMHorizontalPageIconView.m in Sources */,
 				C5722AE22352ED5D00C3E6D3 /* MMPageCollectionHeader.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

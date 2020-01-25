@@ -15,6 +15,7 @@
 #import "MMPageCollectionHeader.h"
 #import "MMGridIconView.h"
 #import "MMVerticalPageIconView.h"
+#import "MMHorizontalPageIconView.h"
 #import "MMShelfLayout.h"
 #import "MMGridLayout.h"
 #import "MMPageLayout.h"
@@ -47,7 +48,7 @@ typedef enum : NSUInteger {
     NSIndexPath *_targetIndexPath;
     MMGridIconView *_collapseGridIcon;
     MMVerticalPageIconView *_collapseVerticalPageIcon;
-    MMVerticalPageIconView *_collapseHorizontalPageIcon;
+    MMHorizontalPageIconView *_collapseHorizontalPageIcon;
     CGPoint _zoomPercentOffset;
     MMScalingDirection _isZoomingPage;
     MMPinchVelocityGestureRecognizer *_pinchGesture;
@@ -93,7 +94,7 @@ typedef enum : NSUInteger {
     [[[_collapseVerticalPageIcon heightAnchor] constraintEqualToConstant:60] setActive:YES];
     [[[_collapseVerticalPageIcon bottomAnchor] constraintEqualToAnchor:[[self collectionView] topAnchor] constant:-25] setActive:YES];
 
-    _collapseHorizontalPageIcon = [[MMVerticalPageIconView alloc] initWithFrame:CGRectZero];
+    _collapseHorizontalPageIcon = [[MMHorizontalPageIconView alloc] initWithFrame:CGRectZero];
     [_collapseHorizontalPageIcon setTranslatesAutoresizingMaskIntoConstraints:NO];
     [[self collectionView] addSubview:_collapseHorizontalPageIcon];
 
