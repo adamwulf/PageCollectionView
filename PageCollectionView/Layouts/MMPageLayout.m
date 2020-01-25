@@ -185,11 +185,11 @@
         UICollectionViewLayoutAttributes *vHeaderAttrs = [UICollectionViewLayoutAttributes layoutAttributesForSupplementaryViewOfKind:UICollectionElementKindSectionHeader withIndexPath:[NSIndexPath indexPathForRow:0 inSection:[self section]]];
         UICollectionViewLayoutAttributes *hHeaderAttrs = [UICollectionViewLayoutAttributes layoutAttributesForSupplementaryViewOfKind:UICollectionElementKindSectionHeader withIndexPath:[NSIndexPath indexPathForRow:1 inSection:[self section]]];
 
-        [vHeaderAttrs setBounds:CGRectMake(0, 0, CGRectGetWidth(collectionViewBounds), headerHeight)];
+        [vHeaderAttrs setBounds:CGRectMake(0, 0, CGRectGetWidth(collectionViewBounds) - insets.left - insets.right, headerHeight)];
         [vHeaderAttrs setCenter:CGPointMake(CGRectGetMidX(collectionViewBounds), headerHeight / 2)];
         [vHeaderAttrs setAlpha:_direction == MMPageLayoutVertical];
 
-        [hHeaderAttrs setBounds:CGRectMake(0, 0, CGRectGetHeight(collectionViewBounds) - insets.top, headerHeight)];
+        [hHeaderAttrs setBounds:CGRectMake(0, 0, CGRectGetHeight(collectionViewBounds) - insets.top - insets.bottom, headerHeight)];
         [hHeaderAttrs setCenter:CGPointMake(headerHeight / 2, CGRectGetMidY(collectionViewBounds) + insets.top / 2)];
         [hHeaderAttrs setTransform:CGAffineTransformMakeRotation(-M_PI_2)];
         [vHeaderAttrs setAlpha:_direction == MMPageLayoutHorizontal];
@@ -405,7 +405,7 @@
                     // asking for vertical header
                     if (_direction == MMPageLayoutVertical) {
                         CGFloat midDim = _lastBoundsMinDim + CGRectGetWidth([[self collectionView] bounds]) / 2;
-                        [ret setCenter:CGPointMake(midDim, _headerHeight / 2)];
+                        [ret setCenter:CGPointMake(midDim + insets.left / 2 - insets.right / 2, _headerHeight / 2)];
                         [ret setAlpha:1];
                     } else {
                         [ret setAlpha:0];
@@ -414,7 +414,7 @@
                     // asking for horizontal header
                     if (_direction == MMPageLayoutHorizontal) {
                         CGFloat midDim = _lastBoundsMinDim + CGRectGetHeight([[self collectionView] bounds]) / 2;
-                        [ret setCenter:CGPointMake(_headerHeight / 2, midDim + insets.top / 2)];
+                        [ret setCenter:CGPointMake(_headerHeight / 2, midDim + insets.top / 2 - insets.bottom / 2)];
                         [ret setAlpha:1];
                     } else {
                         [ret setAlpha:0];
