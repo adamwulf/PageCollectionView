@@ -501,9 +501,7 @@
 
             if ([[self targetIndexPath] row] == 0) {
                 // for the first page, align it to the left of the screen
-                UICollectionViewLayoutAttributes *attrs = [self layoutAttributesForItemAtIndexPath:[self targetIndexPath]];
-
-                locInContent = CGPointMake(CGRectGetMinX([attrs frame]), 0);
+                locInContent = CGPointMake(0, 0);
             } else {
                 // for all other pages, align them to the center of the screen
                 UICollectionViewLayoutAttributes *attrs = [self layoutAttributesForItemAtIndexPath:[self targetIndexPath]];
@@ -525,9 +523,7 @@
 
             if ([[self targetIndexPath] row] == 0) {
                 // align the first page to the top of the screen
-                UICollectionViewLayoutAttributes *attrs = [self layoutAttributesForItemAtIndexPath:[self targetIndexPath]];
-
-                locInContent = CGPointMake(0, CGRectGetMinY([attrs frame]));
+                locInContent = CGPointMake(0, 0);
             } else {
                 // and align all other pages to the center of the screen
                 UICollectionViewLayoutAttributes *attrs = [self layoutAttributesForItemAtIndexPath:[self targetIndexPath]];
