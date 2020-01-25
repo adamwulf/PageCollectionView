@@ -108,9 +108,10 @@
 {
     // The only thing we need to conditionally invalidate because of a bounds change is our header
     UICollectionViewLayoutInvalidationContext *context = [super invalidationContextForBoundsChange:newBounds];
-    NSIndexPath *headerPath = [NSIndexPath indexPathForRow:0 inSection:[self section]];
+    NSIndexPath *vHeaderPath = [NSIndexPath indexPathForRow:0 inSection:[self section]];
+    NSIndexPath *hHeaderPath = [NSIndexPath indexPathForRow:1 inSection:[self section]];
 
-    [context invalidateSupplementaryElementsOfKind:UICollectionElementKindSectionHeader atIndexPaths:@[headerPath]];
+    [context invalidateSupplementaryElementsOfKind:UICollectionElementKindSectionHeader atIndexPaths:@[vHeaderPath, hHeaderPath]];
 
     return context;
 }
@@ -173,26 +174,28 @@
     _headerHeight = headerHeight;
 
     // track the location of the bounds in the direction orthogonal to the scroll
-    if (_direction == MMPageLayoutVertical && CGRectGetMinY(collectionViewBounds) < _headerHeight + insets.top) {
+    if (_direction == MMPageLayoutVertical) {
         _lastBoundsMinDim = CGRectGetMinX(collectionViewBounds);
-    } else if (_direction == MMPageLayoutHorizontal && CGRectGetMinX(collectionViewBounds) < _headerHeight + insets.left) {
+    } else if (_direction == MMPageLayoutHorizontal) {
         _lastBoundsMinDim = CGRectGetMinY(collectionViewBounds);
     }
 
     // Layout the header, if any
     if (headerHeight > 0) {
-        UICollectionViewLayoutAttributes *headerAttrs = [UICollectionViewLayoutAttributes layoutAttributesForSupplementaryViewOfKind:UICollectionElementKindSectionHeader withIndexPath:[NSIndexPath indexPathForRow:0 inSection:[self section]]];
+        UICollectionViewLayoutAttributes *vHeaderAttrs = [UICollectionViewLayoutAttributes layoutAttributesForSupplementaryViewOfKind:UICollectionElementKindSectionHeader withIndexPath:[NSIndexPath indexPathForRow:0 inSection:[self section]]];
+        UICollectionViewLayoutAttributes *hHeaderAttrs = [UICollectionViewLayoutAttributes layoutAttributesForSupplementaryViewOfKind:UICollectionElementKindSectionHeader withIndexPath:[NSIndexPath indexPathForRow:1 inSection:[self section]]];
 
-        if (_direction == MMPageLayoutVertical) {
-            [headerAttrs setBounds:CGRectMake(0, 0, CGRectGetWidth(collectionViewBounds), headerHeight)];
-            [headerAttrs setCenter:CGPointMake(CGRectGetMidX(collectionViewBounds), headerHeight / 2)];
-        } else {
-            [headerAttrs setBounds:CGRectMake(0, 0, CGRectGetHeight(collectionViewBounds) - insets.top, headerHeight)];
-            [headerAttrs setCenter:CGPointMake(headerHeight / 2, CGRectGetMidY(collectionViewBounds) + insets.top / 2)];
-            [headerAttrs setTransform:CGAffineTransformMakeRotation(-M_PI_2)];
-        }
+        [vHeaderAttrs setBounds:CGRectMake(0, 0, CGRectGetWidth(collectionViewBounds), headerHeight)];
+        [vHeaderAttrs setCenter:CGPointMake(CGRectGetMidX(collectionViewBounds), headerHeight / 2)];
+        [vHeaderAttrs setAlpha:_direction == MMPageLayoutVertical];
 
-        [_pageCache addObject:headerAttrs];
+        [hHeaderAttrs setBounds:CGRectMake(0, 0, CGRectGetHeight(collectionViewBounds) - insets.top, headerHeight)];
+        [hHeaderAttrs setCenter:CGPointMake(headerHeight / 2, CGRectGetMidY(collectionViewBounds) + insets.top / 2)];
+        [hHeaderAttrs setTransform:CGAffineTransformMakeRotation(-M_PI_2)];
+        [vHeaderAttrs setAlpha:_direction == MMPageLayoutHorizontal];
+
+        [_pageCache addObject:vHeaderAttrs];
+        [_pageCache addObject:hHeaderAttrs];
 
         offset += headerHeight;
     }
@@ -371,18 +374,19 @@
 
 - (NSArray<__kindof UICollectionViewLayoutAttributes *> *)layoutAttributesForElementsInRect:(CGRect)rect
 {
-    NSArray<__kindof UICollectionViewLayoutAttributes *> *ret = [_pageCache filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id _Nullable obj, NSDictionary<NSString *, id> *_Nullable bindings) {
+    NSMutableArray<__kindof UICollectionViewLayoutAttributes *> *ret = [[_pageCache filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id _Nullable obj, NSDictionary<NSString *, id> *_Nullable bindings) {
         return CGRectIntersectsRect([obj frame], rect);
-    }]];
+    }]] mutableCopy];
+    ;
 
-    UICollectionViewLayoutAttributes *maybeHeaderAttrs = [ret firstObject];
+    for (NSInteger index = 0; index < 2 && index < [ret count]; index++) {
+        // update our headers
+        if ([[[ret objectAtIndex:index] representedElementKind] isEqualToString:UICollectionElementKindSectionHeader]) {
+            UICollectionViewLayoutAttributes *oldHeader = [ret objectAtIndex:index];
+            UICollectionViewLayoutAttributes *newHeader = [self layoutAttributesForSupplementaryViewOfKind:[oldHeader representedElementKind] atIndexPath:[oldHeader indexPath]];
 
-    // For our floating header, we need to return the adjusted header attributes, not our static cached ones
-    // so swap them out if needed. Luckily, the header will always be the first in our array if at all
-    if ([[maybeHeaderAttrs representedElementKind] isEqualToString:UICollectionElementKindSectionHeader]) {
-        UICollectionViewLayoutAttributes *headerAttributes = [self layoutAttributesForSupplementaryViewOfKind:[maybeHeaderAttrs representedElementKind] atIndexPath:[maybeHeaderAttrs indexPath]];
-
-        return [@[headerAttributes] arrayByAddingObjectsFromArray:[ret arrayByRemovingFirstObject]];
+            [ret replaceObjectAtIndex:index withObject:newHeader];
+        }
     }
 
     return ret;
@@ -397,12 +401,24 @@
                 UICollectionViewLayoutAttributes *ret = [attrs copy];
                 UIEdgeInsets insets = [[self collectionView] safeAreaInsets];
 
-                if (_direction == MMPageLayoutVertical) {
-                    CGFloat midDim = _lastBoundsMinDim + CGRectGetWidth([[self collectionView] bounds]) / 2;
-                    [ret setCenter:CGPointMake(midDim, [ret center].y)];
+                if ([indexPath row] == 0) {
+                    // asking for vertical header
+                    if (_direction == MMPageLayoutVertical) {
+                        CGFloat midDim = _lastBoundsMinDim + CGRectGetWidth([[self collectionView] bounds]) / 2;
+                        [ret setCenter:CGPointMake(midDim, _headerHeight / 2)];
+                        [ret setAlpha:1];
+                    } else {
+                        [ret setAlpha:0];
+                    }
                 } else {
-                    CGFloat midDim = _lastBoundsMinDim + CGRectGetHeight([[self collectionView] bounds]) / 2;
-                    [ret setCenter:CGPointMake([ret center].x, midDim + insets.top / 2)];
+                    // asking for horizontal header
+                    if (_direction == MMPageLayoutHorizontal) {
+                        CGFloat midDim = _lastBoundsMinDim + CGRectGetHeight([[self collectionView] bounds]) / 2;
+                        [ret setCenter:CGPointMake(_headerHeight / 2, midDim + insets.top / 2)];
+                        [ret setAlpha:1];
+                    } else {
+                        [ret setAlpha:0];
+                    }
                 }
 
                 return ret;
@@ -433,6 +449,7 @@
     CGSize contentSize = [self collectionViewContentSize];
     CGSize viewSize = [[self collectionView] bounds].size;
     UIEdgeInsets insets = [[self collectionView] safeAreaInsets];
+    CGPoint ret = CGPointMake(CGFLOAT_MAX, CGFLOAT_MAX);
 
     if ([self gestureRecognizer]) {
         // the user is pinching to zoom the page. calculate an offset for our content
@@ -477,7 +494,7 @@
         targetLocInContent.x = MAX(-insets.left, MIN(contentSize.width - viewSize.width, targetLocInContent.x));
         targetLocInContent.y = MAX(-insets.top, MIN(contentSize.height - viewSize.height, targetLocInContent.y));
 
-        return targetLocInContent;
+        ret = targetLocInContent;
     } else if ([self direction] == MMPageLayoutHorizontal) {
         if ([self targetIndexPath]) {
             CGPoint locInContent;
@@ -500,7 +517,7 @@
             // clamp the offset so that we're not over/under scrolling our content size
             locInContent.x = MAX(-insets.left, MIN(contentSize.width - viewSize.width, locInContent.x));
 
-            return locInContent;
+            ret = locInContent;
         }
     } else if ([self direction] == MMPageLayoutVertical) {
         if ([self targetIndexPath]) {
@@ -524,11 +541,21 @@
             // clamp the offset so that we're not over/under scrolling our content size
             locInContent.y = MAX(-insets.top, MIN(contentSize.height - viewSize.height, locInContent.y));
 
-            return locInContent;
+            ret = locInContent;
         }
     }
 
-    return [super targetContentOffsetForProposedContentOffset:proposedContentOffset];
+    if (ret.x == CGFLOAT_MAX) {
+        ret = [super targetContentOffsetForProposedContentOffset:proposedContentOffset];
+    }
+
+    CGRect bounds = [[self collectionView] bounds];
+    bounds.origin = ret;
+
+    // check if we need to invalidate headesr for this offset
+    [self shouldInvalidateLayoutForBoundsChange:bounds];
+
+    return ret;
 }
 
 @end
