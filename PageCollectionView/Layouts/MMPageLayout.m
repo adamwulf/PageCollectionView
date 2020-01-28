@@ -192,7 +192,7 @@
         [hHeaderAttrs setBounds:CGRectMake(0, 0, CGRectGetHeight(collectionViewBounds) - insets.top - insets.bottom, headerHeight)];
         [hHeaderAttrs setCenter:CGPointMake(headerHeight / 2, CGRectGetMidY(collectionViewBounds) + insets.top / 2)];
         [hHeaderAttrs setTransform:CGAffineTransformMakeRotation(-M_PI_2)];
-        [vHeaderAttrs setAlpha:_direction == MMPageLayoutHorizontal];
+        [hHeaderAttrs setAlpha:_direction == MMPageLayoutHorizontal];
 
         [_pageCache addObject:vHeaderAttrs];
         [_pageCache addObject:hHeaderAttrs];
