@@ -48,9 +48,18 @@ NSInteger const kAnimationBufferSpace = 200;
 
 #pragma mark - Helpers
 
-- (NSArray<UICollectionViewLayoutAttributes *> *)alignItemsInRow:(NSArray<UICollectionViewLayoutAttributes *> *)items maxItemHeight:(CGFloat)maxItemHeight rowWidth:(CGFloat)rowWidth yOffset:(CGFloat)yOffset stretchWidth:(BOOL)shouldStretch
+// Will align items according to the available width of the collection view, taking into account
+// the section insets. The amount that was leftover in the row's width will be returned via widthDiffInOut.
+// When shouldStretch=NO, the value of widthDiffInOut will also be used as the spacing adjustment for the
+// elements of that row. This way, the spacing adjustment of the last row can mimic the adjustment needed
+// on previous rows, which is useful for keeping things looking similar.
+- (NSArray<UICollectionViewLayoutAttributes *> *)alignItemsInRow:(NSArray<UICollectionViewLayoutAttributes *> *)items maxItemHeight:(CGFloat)maxItemHeight rowWidth:(CGFloat)rowWidth yOffset:(CGFloat)yOffset stretchWidth:(BOOL)shouldStretch widthDiff:(CGFloat *)widthDiffInOut
 {
-    CGFloat widthDiff = [self collectionViewContentSize].width - rowWidth - [self sectionInsets].left - [self sectionInsets].right;
+    CGFloat stretchWidthDiff = [self collectionViewContentSize].width - rowWidth - [self sectionInsets].left - [self sectionInsets].right;
+    CGFloat widthDiff = shouldStretch ? stretchWidthDiff : *widthDiffInOut;
+
+    widthDiff = MIN(stretchWidthDiff, widthDiff);
+
     CGFloat spacing = [items count] > 1 ? widthDiff / ([items count] - 1) : 0;
     yOffset += maxItemHeight / 2.0; // so that the yoffset is based on the center instead of the top
 
@@ -58,15 +67,13 @@ NSInteger const kAnimationBufferSpace = 200;
         CGPoint center = [obj center];
 
         center.x += [self sectionInsets].left;
-
-        if (shouldStretch) {
-            center.x += spacing * index;
-        }
-
+        center.x += spacing * index;
         center.y = yOffset;
 
         [obj setCenter:center];
     }];
+
+    *widthDiffInOut = widthDiff;
 
     return items;
 }
@@ -141,6 +148,7 @@ NSInteger const kAnimationBufferSpace = 200;
     CGFloat rowWidth = 0;
     // track the row's last item's width, so that on our very last row we can see if we're within ~ 1 item from the edge
     CGFloat lastItemWidth = 0;
+    CGFloat widthDiffPerItem = 0;
 
     // Calculate the size of each row
     for (NSInteger pageIndex = 0; pageIndex < pageCount; pageIndex++) {
@@ -159,7 +167,10 @@ NSInteger const kAnimationBufferSpace = 200;
             // is no following item, so remove those trailing margins.
             rowWidth -= _itemSpacing.right + _itemSpacing.left;
             // now realign all the items into their row so that they stretch full width
-            [_gridCache addObjectsFromArray:[self alignItemsInRow:attributesPerRow maxItemHeight:maxItemHeight rowWidth:rowWidth yOffset:yOffset stretchWidth:YES]];
+            [_gridCache addObjectsFromArray:[self alignItemsInRow:attributesPerRow maxItemHeight:maxItemHeight rowWidth:rowWidth yOffset:yOffset stretchWidth:YES widthDiff:&widthDiffPerItem]];
+
+            widthDiffPerItem /= ([attributesPerRow count] - 1);
+
             [attributesPerRow removeAllObjects];
 
             yOffset += maxItemHeight + [self itemSpacing].bottom + [self itemSpacing].top;
@@ -194,10 +205,11 @@ NSInteger const kAnimationBufferSpace = 200;
 
     if ([attributesPerRow count]) {
         // we should stretch the last row if we're close to the edge anyways
+        CGFloat widthDiff = widthDiffPerItem * ([attributesPerRow count] - 1);
         BOOL stretch = xOffset + lastItemWidth + [self sectionInsets].right > [self collectionViewContentSize].width;
         rowWidth -= _itemSpacing.right + _itemSpacing.left;
 
-        [_gridCache addObjectsFromArray:[self alignItemsInRow:attributesPerRow maxItemHeight:maxItemHeight rowWidth:rowWidth yOffset:yOffset stretchWidth:stretch]];
+        [_gridCache addObjectsFromArray:[self alignItemsInRow:attributesPerRow maxItemHeight:maxItemHeight rowWidth:rowWidth yOffset:yOffset stretchWidth:stretch widthDiff:&widthDiff]];
     } else {
         // remove the top margin for the next row, since there is no next row
         yOffset -= [self itemSpacing].top;
