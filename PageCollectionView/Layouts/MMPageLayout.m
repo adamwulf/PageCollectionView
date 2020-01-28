@@ -284,6 +284,7 @@
 {
     CGSize idealSize = [object idealSize];
     CGFloat rotation = [object rotation];
+    CGSize physicalSize = CGSizeScale(MMBoundingSizeFor(idealSize, rotation), [object physicalScale]);
     UIEdgeInsets insets = [[self collectionView] safeAreaInsets];
 
     // scale the page so that if fits in screen when its fully rotated.
@@ -292,7 +293,7 @@
     CGSize itemSize;
 
     if (_direction == MMPageLayoutVertical) {
-        boundingSize = MMFitSizeToWidth(MMBoundingSizeFor(idealSize, rotation), kMaxDim, [self fitWidth]);
+        boundingSize = MMFitSizeToWidth(physicalSize, kMaxDim, [self fitWidth]);
 
         // now we need to find the unrotated size of the page that
         // fits in the above box when its rotated.
@@ -302,7 +303,7 @@
         // are always barely touching the screen edges.
         itemSize = CGSizeForInscribedWidth(idealSize.height / idealSize.width, boundingSize.width, rotation);
     } else {
-        boundingSize = MMFitSizeToHeight(MMBoundingSizeFor(idealSize, rotation), kMaxDim, [self fitWidth]);
+        boundingSize = MMFitSizeToHeight(physicalSize, kMaxDim, [self fitWidth]);
         itemSize = CGSizeForInscribedHeight(idealSize.height / idealSize.width, boundingSize.height, rotation);
     }
 

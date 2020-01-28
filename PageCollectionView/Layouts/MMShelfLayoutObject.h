@@ -13,8 +13,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol MMShelfLayoutObject <NSObject>
 
--(CGSize)idealSize;
--(CGFloat)rotation;
+- (CGSize)idealSize;
+- (CGFloat)physicalScale;
+- (CGFloat)rotation;
 
 @end
 

@@ -44,8 +44,12 @@
         if (i % 7 == 0) {
             [obj setIdealSize:CGSizeMake(fullWidth / 2, 1.4 * fullWidth / 2)];
         } else {
-            [obj setIdealSize:CGSizeMake(fullWidth, 1.4 * fullWidth)];
+            // 8.5x11
+            [obj setIdealSize:CGSizeMake(612, 792)];
         }
+
+        // example scale to show PDF at physical size
+        [obj setPhysicalScale:1.4];
 
         [arr addObject:obj];
     }
