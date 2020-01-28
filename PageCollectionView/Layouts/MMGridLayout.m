@@ -147,7 +147,9 @@ NSInteger const kAnimationBufferSpace = 200;
         NSIndexPath *indexPath = [NSIndexPath indexPathForRow:pageIndex inSection:[self section]];
         id<MMShelfLayoutObject> object = [[self datasource] collectionView:[self collectionView] layout:self objectAtIndexPath:indexPath];
         CGFloat rotation = [object rotation];
-        CGSize idealSize = MMFitSizeToDim([object idealSize], [self maxDim], NO);
+
+        CGSize idealSize = MMFitSizeToWidth([object idealSize], [self maxDim], NO);
+        idealSize = MMFitSizeToHeight(idealSize, [self maxDim] * 1.5, NO);
         CGSize boundingSize = MMBoundingSizeFor(idealSize, rotation);
 
         // can it fit on this row?
