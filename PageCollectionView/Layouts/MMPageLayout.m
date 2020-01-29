@@ -212,6 +212,18 @@
 
         if ([[self delegate] respondsToSelector:@selector(collectionView:layout:shouldIgnoreItemAtIndexPath:)]) {
             if ([[self delegate] collectionView:[self collectionView] layout:self shouldIgnoreItemAtIndexPath:indexPath]) {
+                UICollectionViewLayoutAttributes *hiddenAttributes = [[super layoutAttributesForItemAtIndexPath:indexPath] copy];
+
+                if (_direction == MMPageLayoutVertical) {
+                    [hiddenAttributes setCenter:CGPointMake([hiddenAttributes center].x, offset)];
+                } else {
+                    [hiddenAttributes setCenter:CGPointMake(_sectionWidth, [hiddenAttributes center].y)];
+                }
+
+                [hiddenAttributes setAlpha:0];
+
+                [_pageCache addObject:hiddenAttributes];
+
                 continue;
             }
         }
