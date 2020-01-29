@@ -148,12 +148,6 @@
         for (NSInteger pageIndex = 0; pageIndex < pageCount; pageIndex++) {
             NSIndexPath *indexPath = [NSIndexPath indexPathForRow:pageIndex inSection:section];
 
-            if ([[self delegate] respondsToSelector:@selector(collectionView:layout:shouldIgnoreItemAtIndexPath:)]) {
-                if ([[self delegate] collectionView:[self collectionView] layout:self shouldIgnoreItemAtIndexPath:indexPath]) {
-                    continue;
-                }
-            }
-
             id<MMShelfLayoutObject> object = [[self datasource] collectionView:[self collectionView] layout:self objectAtIndexPath:indexPath];
             CGSize itemSize = [object idealSize];
             CGFloat rotation = [object rotation];
@@ -203,6 +197,12 @@
 
                 // this page is visible, so adjust spacing to align the next page in the list
                 xOffset += _pageSpacing;
+            }
+
+            if ([[self delegate] respondsToSelector:@selector(collectionView:layout:shouldIgnoreItemAtIndexPath:)]) {
+                if ([[self delegate] collectionView:[self collectionView] layout:self shouldIgnoreItemAtIndexPath:indexPath]) {
+                    [itemAttrs setAlpha:0];
+                }
             }
 
             [sectionCache appendLayoutAttributes:itemAttrs];

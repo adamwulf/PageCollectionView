@@ -154,17 +154,10 @@ NSInteger const kAnimationBufferSpace = 200;
     for (NSInteger pageIndex = 0; pageIndex < pageCount; pageIndex++) {
         NSIndexPath *indexPath = [NSIndexPath indexPathForRow:pageIndex inSection:[self section]];
 
-        if ([[self delegate] respondsToSelector:@selector(collectionView:layout:shouldIgnoreItemAtIndexPath:)]) {
-            if ([[self delegate] collectionView:[self collectionView] layout:self shouldIgnoreItemAtIndexPath:indexPath]) {
-                continue;
-            }
-        }
-
         id<MMShelfLayoutObject> object = [[self datasource] collectionView:[self collectionView] layout:self objectAtIndexPath:indexPath];
         CGFloat rotation = [object rotation];
 
-        CGSize idealSize = MMFitSizeToWidth([object idealSize], [self maxDim], NO);
-        idealSize = MMFitSizeToHeight(idealSize, [self maxDim] * 1.5, NO);
+        CGSize idealSize = MMFitSizeToDim([object idealSize], [self maxDim], NO);
         CGSize boundingSize = MMBoundingSizeFor(idealSize, rotation);
 
         // can it fit on this row?
@@ -205,6 +198,12 @@ NSInteger const kAnimationBufferSpace = 200;
             [itemAttrs setTransform:CGAffineTransformMakeRotation(rotation)];
         } else {
             [itemAttrs setTransform:CGAffineTransformIdentity];
+        }
+
+        if ([[self delegate] respondsToSelector:@selector(collectionView:layout:shouldIgnoreItemAtIndexPath:)]) {
+            if ([[self delegate] collectionView:[self collectionView] layout:self shouldIgnoreItemAtIndexPath:indexPath]) {
+                [itemAttrs setAlpha:0];
+            }
         }
 
         [attributesPerRow addObject:itemAttrs];
