@@ -146,7 +146,15 @@
 
         // Calculate the size of each row
         for (NSInteger pageIndex = 0; pageIndex < pageCount; pageIndex++) {
-            id<MMShelfLayoutObject> object = [[self datasource] collectionView:[self collectionView] layout:self objectAtIndexPath:[NSIndexPath indexPathForRow:pageIndex inSection:section]];
+            NSIndexPath *indexPath = [NSIndexPath indexPathForRow:pageIndex inSection:section];
+
+            if ([[self delegate] respondsToSelector:@selector(collectionView:layout:shouldIgnoreItemAtIndexPath:)]) {
+                if ([[self delegate] collectionView:[self collectionView] layout:self shouldIgnoreItemAtIndexPath:indexPath]) {
+                    continue;
+                }
+            }
+
+            id<MMShelfLayoutObject> object = [[self datasource] collectionView:[self collectionView] layout:self objectAtIndexPath:indexPath];
             CGSize itemSize = [object idealSize];
             CGFloat rotation = [object rotation];
             CGFloat heightRatio = itemSize.height / itemSize.width;

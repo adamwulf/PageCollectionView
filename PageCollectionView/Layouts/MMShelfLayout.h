@@ -31,6 +31,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (CGFloat)collectionView:(UICollectionView *)collectionView layout:(MMShelfLayout *)collectionViewLayout heightForHeaderInSection:(NSInteger)section;
 
+- (BOOL)collectionView:(UICollectionView *)collectionView layout:(MMShelfLayout *)collectionViewLayout shouldIgnoreItemAtIndexPath:(NSIndexPath *)indexPath;
+
 @end
 
 

@@ -153,6 +153,13 @@ NSInteger const kAnimationBufferSpace = 200;
     // Calculate the size of each row
     for (NSInteger pageIndex = 0; pageIndex < pageCount; pageIndex++) {
         NSIndexPath *indexPath = [NSIndexPath indexPathForRow:pageIndex inSection:[self section]];
+
+        if ([[self delegate] respondsToSelector:@selector(collectionView:layout:shouldIgnoreItemAtIndexPath:)]) {
+            if ([[self delegate] collectionView:[self collectionView] layout:self shouldIgnoreItemAtIndexPath:indexPath]) {
+                continue;
+            }
+        }
+
         id<MMShelfLayoutObject> object = [[self datasource] collectionView:[self collectionView] layout:self objectAtIndexPath:indexPath];
         CGFloat rotation = [object rotation];
 

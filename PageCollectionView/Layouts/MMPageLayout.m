@@ -209,6 +209,13 @@
     // Layout each page
     for (NSInteger pageIdx = 0; pageIdx < kItemCount; pageIdx++) {
         NSIndexPath *indexPath = [NSIndexPath indexPathForRow:pageIdx inSection:[self section]];
+
+        if ([[self delegate] respondsToSelector:@selector(collectionView:layout:shouldIgnoreItemAtIndexPath:)]) {
+            if ([[self delegate] collectionView:[self collectionView] layout:self shouldIgnoreItemAtIndexPath:indexPath]) {
+                continue;
+            }
+        }
+
         id<MMShelfLayoutObject> object = [[self datasource] collectionView:[self collectionView] layout:self objectAtIndexPath:indexPath];
         MMPageLayoutAttributes *itemAttrs = [self layoutPage:object atOffset:offset forIndexPath:indexPath kMaxDim:kMaxDim];
 
