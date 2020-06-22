@@ -50,6 +50,11 @@
     __weak id weakSelf = self;
     UICollectionViewLayout *previousLayout = [self collectionViewLayout];
 
+    if ([previousLayout isKindOfClass:[UICollectionViewTransitionLayout class]]) {
+        // Change change layout during transition
+        return;
+    }
+
     if ([[self delegate] respondsToSelector:@selector(collectionView:willChangeToLayout:fromLayout:)]) {
         [[self delegate] collectionView:self willChangeToLayout:layout fromLayout:previousLayout];
     }
@@ -69,6 +74,11 @@
 {
     __weak id weakSelf = self;
     UICollectionViewLayout *previousLayout = [self collectionViewLayout];
+
+    if ([previousLayout isKindOfClass:[UICollectionViewTransitionLayout class]]) {
+        // can't change layout during transition
+        return;
+    }
 
     if ([[self delegate] respondsToSelector:@selector(collectionView:willChangeToLayout:fromLayout:)]) {
         [[self delegate] collectionView:self willChangeToLayout:layout fromLayout:previousLayout];
