@@ -33,7 +33,7 @@ public class ShelfLayout: UICollectionViewLayout {
     public var pageSpacing: UInt = 40
 
     public var targetIndexPath: IndexPath?
-    public var delegate: UICollectionViewDelegateShelfLayout? {
+    public var shelfDelegate: UICollectionViewDelegateShelfLayout? {
         return collectionView?.delegate as? UICollectionViewDelegateShelfLayout
     }
     public var datasource: UICollectionViewDataSourceShelfLayout? {
@@ -43,8 +43,12 @@ public class ShelfLayout: UICollectionViewLayout {
         return datasource
     }
 
-    public let bounceVertical = true
-    public let bounceHorizontal = false
+    public var bounceVertical: Bool {
+        return true
+    }
+    public var bounceHorizontal: Bool {
+        return false
+    }
 
     // MARK: - Private Properties
 
@@ -107,7 +111,7 @@ public class ShelfLayout: UICollectionViewLayout {
             let pageCount = collectionView.numberOfItems(inSection: section)
             var maxItemHeight: CGFloat = 0
             let sectionCache = LayoutAttributeCache()
-            let headerHeight = delegate?.collectionView?(collectionView, layout: self, heightForHeaderInSection: section) ?? defaultHeaderHeight
+            let headerHeight = shelfDelegate?.collectionView?(collectionView, layout: self, heightForHeaderInSection: section) ?? defaultHeaderHeight
 
             if headerHeight > 0 {
                 let headerAttrs = UICollectionViewLayoutAttributes(forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
@@ -170,7 +174,7 @@ public class ShelfLayout: UICollectionViewLayout {
                     xOffset += CGFloat(pageSpacing)
                 }
 
-                if delegate?.collectionView?(collectionView, layout: self, shouldIgnoreItemAtIndexPath: indexPath) ?? false {
+                if shelfDelegate?.collectionView?(collectionView, layout: self, shouldIgnoreItemAtIndexPath: indexPath) ?? false {
                     itemAttrs.alpha = 0
                 }
 

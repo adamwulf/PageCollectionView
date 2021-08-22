@@ -177,7 +177,7 @@ public class GridLayout: ShelfLayout {
                 itemAttrs.transform = .identity
             }
 
-            if delegate?.collectionView?(collectionView, layout: self, shouldIgnoreItemAtIndexPath: indexPath) ?? false {
+            if shelfDelegate?.collectionView?(collectionView, layout: self, shouldIgnoreItemAtIndexPath: indexPath) ?? false {
                 itemAttrs.alpha = 0
                 itemAttrs.isHidden = true
             }
