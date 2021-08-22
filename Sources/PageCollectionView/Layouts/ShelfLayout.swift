@@ -168,4 +168,58 @@ class ShelfLayout: UICollectionViewLayout {
 
         contentHeight = yOffset
     }
+
+    // MARK: - Fetch Attributes
+
+    override func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
+        guard
+            let firstIndex = shelfCache.firstIndex(where: { obj in
+                rect.intersects(obj.frame)
+            }),
+            let lastIndex = shelfCache.lastIndex(where: { obj in
+                rect.intersects(obj.frame)
+            })
+        else {
+            return []
+        }
+
+        // get the subarray of our first -> last index and return the visibleItems in those rows
+        return shelfCache[firstIndex...lastIndex].flatMap({ $0.visibleItems })
+    }
+
+    override func layoutAttributesForSupplementaryView(ofKind elementKind: String, at indexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
+        return headerCache.first(where: { $0.indexPath == indexPath })
+    }
+
+    override func layoutAttributesForItem(at indexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
+        return itemCache.first(where: { $0.indexPath == indexPath })
+    }
+
+    // MARK: - Content Offset
+
+    override func targetContentOffset(forProposedContentOffset proposedContentOffset: CGPoint) -> CGPoint {
+        guard
+            let targetIndexPath = targetIndexPath,
+            let collectionView = collectionView,
+            let attrs = layoutAttributesForSupplementaryView(ofKind: UICollectionView.elementKindSectionHeader, at: targetIndexPath)
+                ?? layoutAttributesForItem(at: targetIndexPath),
+            let shelfAttrs = shelfAttributes(for: targetIndexPath.section)
+        else {
+            return proposedContentOffset
+        }
+
+        let inset = -collectionView.safeAreaInsets.top
+        let screenHeight = collectionView.bounds.height
+        let size = collectionViewContentSize
+        var targetY = attrs.frame.origin.y + inset
+
+        // align to roughly middle of screen
+        targetY -= (screenHeight - shelfAttrs.frame.height) / 5.0
+
+        // clamp the target Y to our content size
+        targetY = targetY < size.height - screenHeight ? targetY : size.height - screenHeight
+        targetY = targetY < inset ? inset : targetY
+
+        return CGPoint(x: 0, y: targetY)
+    }
 }
