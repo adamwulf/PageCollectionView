@@ -58,6 +58,16 @@ public class ShelfLayout: UICollectionViewLayout {
         return collectionView.bounds.width - insets.left - insets.right
     }
 
+    // MARK: - Init
+
+    public override init() {
+        super.init()
+    }
+
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+    }
+
     // MARK: - Helpers
 
     public func shelfAttributes(for section: Int) -> LayoutAttributeCache? {

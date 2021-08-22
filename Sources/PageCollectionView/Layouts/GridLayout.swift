@@ -9,20 +9,22 @@
 import UIKit
 
 public class GridLayout: ShelfLayout {
-    private let kAnimationBufferSpace: CGFloat = 200
-    let section: Int
-    var itemSpacing: UIEdgeInsets = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
+    static private let AnimationBufferSpace: CGFloat = 200
+    public let section: Int
+    public var itemSpacing: UIEdgeInsets = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
 
     private var gridCache: [UICollectionViewLayoutAttributes] = []
     private var sectionHeight: CGFloat = 0
     private var yOffsetForTransition: CGFloat = 0
 
-    init(section: Int) {
+    // MARK: - Init
+
+    public init(section: Int) {
         self.section = section
         super.init()
     }
 
-    required init?(coder: NSCoder) {
+    required public init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
@@ -296,7 +298,7 @@ public class GridLayout: ShelfLayout {
                 // for all sections that are before our grid, we can align those sections
                 // as if they've shifted straight up from the top of our grid
                 center.y -= sectionAttributes.frame.minY
-                center.y += max(0, yOffsetForTransition - sectionAttributes.frame.height - kAnimationBufferSpace)
+                center.y += max(0, yOffsetForTransition - sectionAttributes.frame.height - Self.AnimationBufferSpace)
             } else if attrs.indexPath.section > section {
                 // for all sections after our grid, the goal is to have them pinch to/from
                 // immediatley after the screen, regardless of our scroll position. To do
