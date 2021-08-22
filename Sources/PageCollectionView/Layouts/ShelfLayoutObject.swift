@@ -8,7 +8,7 @@
 
 import UIKit
 
-protocol ShelfLayoutObject {
+public protocol ShelfLayoutObject {
     var idealSize: CGSize { get }
     var physicalScale: CGFloat { get }
     var rotation: CGFloat { get }

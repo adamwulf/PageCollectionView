@@ -8,15 +8,15 @@
 
 import UIKit
 
-class LayoutAttributeCache {
-    var frame: CGRect = .null
-    private(set) var visibleItems: [UICollectionViewLayoutAttributes] = []
-    private(set) var hiddenItems: [UICollectionViewLayoutAttributes] = []
-    var allItems: [UICollectionViewLayoutAttributes] {
+public class LayoutAttributeCache {
+    public var frame: CGRect = .null
+    private(set) public var visibleItems: [UICollectionViewLayoutAttributes] = []
+    private(set) public var hiddenItems: [UICollectionViewLayoutAttributes] = []
+    public var allItems: [UICollectionViewLayoutAttributes] {
         return visibleItems + hiddenItems
     }
 
-    func append(attributes: UICollectionViewLayoutAttributes) {
+    public func append(attributes: UICollectionViewLayoutAttributes) {
         frame = frame.union(attributes.frame)
 
         if attributes.isHidden {

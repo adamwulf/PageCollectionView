@@ -11,37 +11,42 @@ import UIKit
 /// Similar  to UICollectionViewDelegateFlowLayout, these delegate method will be used by the layout
 /// for item specific properties. If they are not implemented, then defaultHeaderSize or defaultItemSize
 /// will be used instead.
-protocol UICollectionViewDataSourceShelfLayout: UICollectionViewDataSource {
+public protocol UICollectionViewDataSourceShelfLayout: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, layout: ShelfLayout, objectAtIndexPath: IndexPath) -> ShelfLayoutObject
 }
 
 /// Similar  to UICollectionViewDelegateFlowLayout, these delegate method will be used by the layout
 /// for item specific properties. If they are not implemented, then defaultHeaderSize or defaultItemSize
 /// will be used instead.
-@objc protocol UICollectionViewDelegateShelfLayout: UICollectionViewDelegate {
+@objc public protocol UICollectionViewDelegateShelfLayout: UICollectionViewDelegate {
     @objc optional func collectionView(_ collectionView: UICollectionView, layout: ShelfLayout, heightForHeaderInSection: Int) -> CGFloat
     @objc optional func collectionView(_ collectionView: UICollectionView, layout: ShelfLayout, shouldIgnoreItemAtIndexPath: IndexPath) -> Bool
 }
 
-class ShelfLayout: UICollectionViewLayout {
-    var defaultHeaderHeight: CGFloat = 50
-    var maxDim: CGFloat = 140
-    var sectionInsets: UIEdgeInsets = UIEdgeInsets(top: 10, left: 40, bottom: 40, right: 40)
-    var pageSpacing: UInt = 40
+public class ShelfLayout: UICollectionViewLayout {
 
-    var targetIndexPath: IndexPath?
-    var delegate: UICollectionViewDelegateShelfLayout? {
+    // MARK: - Properties
+
+    public var defaultHeaderHeight: CGFloat = 50
+    public var maxDim: CGFloat = 140
+    public var sectionInsets: UIEdgeInsets = UIEdgeInsets(top: 10, left: 40, bottom: 40, right: 40)
+    public var pageSpacing: UInt = 40
+
+    public var targetIndexPath: IndexPath?
+    public var delegate: UICollectionViewDelegateShelfLayout? {
         return collectionView?.delegate as? UICollectionViewDelegateShelfLayout
     }
-    var datasource: UICollectionViewDataSourceShelfLayout? {
+    public var datasource: UICollectionViewDataSourceShelfLayout? {
         guard let datasource = collectionView?.dataSource as? UICollectionViewDataSourceShelfLayout else {
             fatalError("CollectionView data source must conform to UICollectionViewDataSourceShelfLayout")
         }
         return datasource
     }
 
-    let bounceVertical = true
-    let bounceHorizontal = false
+    public let bounceVertical = true
+    public let bounceHorizontal = false
+
+    // MARK: - Private Properties
 
     private var headerCache: [UICollectionViewLayoutAttributes] = []
     private var itemCache: [UICollectionViewLayoutAttributes] = []
@@ -53,7 +58,9 @@ class ShelfLayout: UICollectionViewLayout {
         return collectionView.bounds.width - insets.left - insets.right
     }
 
-    func shelfAttributes(for section: Int) -> LayoutAttributeCache? {
+    // MARK: - Helpers
+
+    public func shelfAttributes(for section: Int) -> LayoutAttributeCache? {
         if section < shelfCache.count {
             return shelfCache[section]
         }
@@ -62,11 +69,11 @@ class ShelfLayout: UICollectionViewLayout {
 
     // MARK: - UICollectionViewLayout
 
-    override func shouldInvalidateLayout(forBoundsChange newBounds: CGRect) -> Bool {
+    override public func shouldInvalidateLayout(forBoundsChange newBounds: CGRect) -> Bool {
         return collectionView?.bounds.size != newBounds.size
     }
 
-    override func invalidateLayout() {
+    override public func invalidateLayout() {
         super.invalidateLayout()
 
         shelfCache.removeAll()
@@ -74,11 +81,11 @@ class ShelfLayout: UICollectionViewLayout {
         itemCache.removeAll()
     }
 
-    override var collectionViewContentSize: CGSize {
+    override public var collectionViewContentSize: CGSize {
         return CGSize(width: contentWidth, height: contentHeight)
     }
 
-    override func prepare() {
+    override public func prepare() {
         guard
             let collectionView = collectionView,
             let datasource = datasource,
@@ -171,7 +178,7 @@ class ShelfLayout: UICollectionViewLayout {
 
     // MARK: - Fetch Attributes
 
-    override func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
+    override public func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
         guard
             let firstIndex = shelfCache.firstIndex(where: { obj in
                 rect.intersects(obj.frame)
@@ -187,17 +194,17 @@ class ShelfLayout: UICollectionViewLayout {
         return shelfCache[firstIndex...lastIndex].flatMap({ $0.visibleItems })
     }
 
-    override func layoutAttributesForSupplementaryView(ofKind elementKind: String, at indexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
+    override public func layoutAttributesForSupplementaryView(ofKind elementKind: String, at indexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
         return headerCache.first(where: { $0.indexPath == indexPath })
     }
 
-    override func layoutAttributesForItem(at indexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
+    override public func layoutAttributesForItem(at indexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
         return itemCache.first(where: { $0.indexPath == indexPath })
     }
 
     // MARK: - Content Offset
 
-    override func targetContentOffset(forProposedContentOffset proposedContentOffset: CGPoint) -> CGPoint {
+    override public func targetContentOffset(forProposedContentOffset proposedContentOffset: CGPoint) -> CGPoint {
         guard
             let targetIndexPath = targetIndexPath,
             let collectionView = collectionView,
