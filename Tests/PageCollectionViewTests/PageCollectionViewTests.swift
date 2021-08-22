@@ -1,4 +1,4 @@
-    import XCTest
+import XCTest
     @testable import PageCollectionView
 
     final class PageCollectionViewTests: XCTestCase {

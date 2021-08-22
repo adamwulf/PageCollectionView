@@ -132,7 +132,6 @@ public class PinchVelocityGestureRecognizer: UIPinchGestureRecognizer {
         adjustWait.x -= (before.x - after.x)
         adjustment.y -= (before.y - after.y)
 
-
         if self.touches.isEmpty {
             adjustment = .zero
             scaledAdjustment = .zero
