@@ -9,6 +9,7 @@
 import UIKit
 
 public class GridLayout: ShelfLayout {
+    private let kAnimationBufferSpace: CGFloat = 200
     let section: Int
     var itemSpacing: UIEdgeInsets = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
 
@@ -197,5 +198,152 @@ public class GridLayout: ShelfLayout {
         yOffset += maxItemHeight + sectionInsets.bottom
 
         sectionHeight = yOffset
+    }
+
+    // MARK: - Transitions
+
+    public override func prepareForTransition(to newLayout: UICollectionViewLayout) {
+        super.prepareForTransition(to: newLayout)
+
+        // transition from grid view /to/ another layout, or scrolling within grid view
+        yOffsetForTransition = collectionView?.contentOffset.y ?? 0
+
+        // invalidate all of the sections after our current section
+        invalidateLayout(with: invalidationContextForTransition())
+    }
+
+    public override func prepareForTransition(from oldLayout: UICollectionViewLayout) {
+        super.prepareForTransition(from: oldLayout)
+
+        // transition from shelf view to grid view. When moving into the grid view,
+        // the grid is always displayed at the very top of our content. if we ever
+        // change to open to mid-grid from the shelf, then this will need to
+        // compensate for that.
+        yOffsetForTransition = 0
+
+        invalidateLayout(with: invalidationContextForTransition())
+    }
+
+    // MARK: - Fetch Attributes
+
+    public override func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
+        return gridCache.filter({ rect.intersects($0.frame) })
+    }
+
+    public override func layoutAttributesForSupplementaryView(ofKind elementKind: String, at indexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
+        let attrs = super.layoutAttributesForSupplementaryView(ofKind: elementKind, at: indexPath)
+
+        if let attrs = attrs {
+            adjustLayoutAttributesForTransition(attrs)
+        }
+
+        if indexPath.section == section {
+            attrs?.alpha = 1
+            attrs?.isHidden = false
+        } else {
+            attrs?.alpha = 0
+            attrs?.isHidden = true
+        }
+
+        return attrs
+    }
+
+    public override func layoutAttributesForItem(at indexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
+        if indexPath.section == section,
+           let sectionAttributes = shelfAttributes(for: section) {
+            for attrs in gridCache {
+                if attrs.representedElementCategory == .cell && attrs.indexPath == indexPath {
+                    if yOffsetForTransition > sectionAttributes.frame.height && attrs.frame.maxY < yOffsetForTransition {
+                        // if we're in a transition from grid view, our content offset is larger than 0.
+                        // and if the page's frames are offscreen above our starting offset, then don't
+                        // load our grid layout, instead, load and adjust the shelf layout below
+                        break
+                    }
+
+                    return attrs
+                }
+            }
+        }
+
+        // always [copy] from our [super] so that we don't accidentally modify our superclass's cached attributes
+        let attrs = super.layoutAttributesForItem(at: indexPath)?.copy() as? UICollectionViewLayoutAttributes
+
+        if let attrs = attrs {
+            adjustLayoutAttributesForTransition(attrs)
+        }
+
+        if indexPath.section == section {
+            attrs?.alpha = 1
+            attrs?.isHidden = false
+        } else {
+            attrs?.alpha = 0
+            attrs?.isHidden = true
+        }
+
+        return attrs
+    }
+
+    // MARK: - Helper
+
+    func adjustLayoutAttributesForTransition(_ attrs: UICollectionViewLayoutAttributes) {
+        // The following attributes should only be requested when transitioning to/from
+        // this layout. The [prepareForTransitionTo/FromLayout:] methods invalidate these
+        // elements, which will cause their attributes to be updated just in time for
+        // the transition. Otherwise all of these elements are offscreen and invisible
+        var center = attrs.center
+        if let sectionAttributes = shelfAttributes(for: section) {
+            if attrs.indexPath.section <= section {
+                // for all sections that are before our grid, we can align those sections
+                // as if they've shifted straight up from the top of our grid
+                center.y -= sectionAttributes.frame.minY
+                center.y += max(0, yOffsetForTransition - sectionAttributes.frame.height - kAnimationBufferSpace)
+            } else if attrs.indexPath.section > section {
+                // for all sections after our grid, the goal is to have them pinch to/from
+                // immediatley after the screen, regardless of our scroll position. To do
+                // that, we invalidate all headers/items as the view scrolls so that they're
+                // continually layout right after the end of the screen, and then in the same
+                // layout as the shelf. this way, the transition will have them slide up
+                // direction from the bottom edge of the screen
+                let diff = attrs.frame.minY - sectionAttributes.frame.minY
+
+                // start at the correct target offset for the grid view
+                center.y = yOffsetForTransition
+                // move to the bottom of the screen
+                center.y += collectionView?.bounds.height ?? 0
+                // adjust the header to be in its correct offset to its neighbors
+                center.y += diff
+                // since we're moving the center, adjust by height/2
+                center.y += attrs.frame.height / 2
+            }
+        }
+
+        attrs.center = center
+    }
+
+    // MARK: - Content Offset
+
+    public override func targetContentOffset(forProposedContentOffset proposedContentOffset: CGPoint) -> CGPoint {
+        guard
+            let collectionView = collectionView,
+            let targetIndexPath = targetIndexPath
+        else {
+            return proposedContentOffset
+        }
+
+        // when pinching from PageLayout, we'd like to focus the grid view so that
+        // the page is centered in the view. To do that, calculate that target page's
+        // offset within our content, and return a content offset that will align
+        // with the middle of the screen
+        var p = super.targetContentOffset(forProposedContentOffset: proposedContentOffset)
+        guard let attrs = layoutAttributesForItem(at: targetIndexPath) else { return proposedContentOffset }
+        let itemFrame = attrs.frame
+        let diff = max(0, (collectionView.bounds.height - itemFrame.height) / 2)
+        let inset = collectionView.safeAreaInsets.top
+        let contentSize = collectionViewContentSize
+        let viewSize = collectionView.bounds.size
+
+        p.y = max(-inset, min(contentSize.height - viewSize.height, itemFrame.minY - diff - inset))
+
+        return p
     }
 }
