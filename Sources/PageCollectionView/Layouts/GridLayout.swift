@@ -179,7 +179,6 @@ public class GridLayout: ShelfLayout {
 
             if shelfDelegate?.collectionView?(collectionView, layout: self, shouldIgnoreItemAtIndexPath: indexPath) ?? false {
                 itemAttrs.alpha = 0
-                itemAttrs.isHidden = true
             }
 
             attributesPerRow.append(itemAttrs)
@@ -241,10 +240,8 @@ public class GridLayout: ShelfLayout {
 
         if indexPath.section == section {
             attrs?.alpha = 1
-            attrs?.isHidden = false
         } else {
             attrs?.alpha = 0
-            attrs?.isHidden = true
         }
 
         return attrs
@@ -276,10 +273,8 @@ public class GridLayout: ShelfLayout {
 
         if indexPath.section == section {
             attrs?.alpha = 1
-            attrs?.isHidden = false
         } else {
             attrs?.alpha = 0
-            attrs?.isHidden = true
         }
 
         return attrs
