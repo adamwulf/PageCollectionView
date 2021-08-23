@@ -271,6 +271,270 @@ public class PageLayout: GridLayout {
     }
 
     func layoutPage(_ object: ShelfLayoutObject, at offset: CGFloat, for indexPath: IndexPath, kMaxDim: CGFloat) -> PageLayoutAttributes? {
-        return PageLayoutAttributes()
+        guard let collectionView = collectionView else { return nil }
+
+        let idealSize = object.idealSize
+        let rotation = object.rotation
+        let physicalSize = idealSize.boundingSize(for: rotation).scale(by: object.physicalScale)
+        let insets = collectionView.safeAreaInsets
+
+        // scale the page so that if fits in screen when its fully rotated.
+        // This is the screen-aligned box that contains our rotated page
+        let boundingSize: CGSize
+        let itemSize: CGSize
+
+        if direction == .vertical {
+            boundingSize = physicalSize.scaleWidth(to: kMaxDim, scaleUp: fitWidth)
+
+            // now we need to find the unrotated size of the page that
+            // fits in the above box when its rotated.
+            //
+            // If the page is the exact same size as the screen, we rotate it
+            // and then we have to shrink it so that the corners of the page
+            // are always barely touching the screen edges.
+            itemSize = CGSize(forInscribedWidth: boundingSize.width, ratio: idealSize.height / idealSize.width, rotation: rotation)
+        } else {
+            boundingSize = physicalSize.scaleHeight(to: kMaxDim, scaleUp: fitWidth)
+            itemSize = CGSize(forInscribedHeight: boundingSize.height, ratio: idealSize.height / idealSize.width, rotation: rotation)
+        }
+
+        // Next, scale the page to account for our delegate's pinch-to-zoom.
+        let scale: CGFloat = pageDelegate?.collectionView?(collectionView, layout: self, zoomScaleForIndexPath: indexPath) ?? 1
+        let diff: CGFloat
+
+        if direction == .vertical {
+            diff = (kMaxDim - itemSize.width) / 2.0 * scale + insets.left
+        } else {
+            diff = (kMaxDim - itemSize.height) / 2.0 * scale + insets.top
+        }
+
+        // set all the attributes
+        let itemAttrs = PageLayoutAttributes(forCellWith: indexPath)
+        let altDiff: CGFloat
+        var frame: CGRect
+
+        if direction == .vertical {
+            altDiff = (itemSize.height - boundingSize.height) / 2.0 * scale
+            frame = CGRect(x: diff, y: offset - altDiff, width: itemSize.width, height: itemSize.height)
+        } else {
+            altDiff = (itemSize.width - boundingSize.width) / 2.0 * scale
+            frame = CGRect(x: offset - altDiff, y: diff, width: itemSize.width, height: itemSize.height)
+        }
+
+        // For forcing the UICollectionViewBug described below.
+        // this doesn't need to be included, as a 180 degree
+        // rotation will also do this, but forcing it will
+        // help make sure our fix described below will always work
+        frame.origin.x -= -0.00000000000011368683772161603
+
+        itemAttrs.frame = frame
+
+        var transform: CGAffineTransform = .identity
+            .translatedBy(x: -itemSize.width / 2, y: -itemSize.height / 2)
+            .scaledBy(x: scale, y: scale)
+            .translatedBy(x: itemSize.width / 2, y: itemSize.height / 2)
+
+        if rotation != 0 {
+            transform = transform.rotated(by: rotation)
+        }
+
+        itemAttrs.boundingSize = boundingSize
+        itemAttrs.scale = scale
+        itemAttrs.alpha = 1
+        itemAttrs.isHidden = false
+        itemAttrs.transform = transform
+
+        // This block is for the UICollectionViewBug, where if a frame of an item
+        // has a tiny offset from a round pixel, then it might disappear from the
+        // collection view altogether.
+        // Filed at FB7415012
+        let bumpX = itemAttrs.frame.minX - floor(itemAttrs.frame.minX)
+        let bumpY = itemAttrs.frame.minY - floor(itemAttrs.frame.minY)
+        itemAttrs.center = CGPoint(x: itemAttrs.center.x - bumpX, y: itemAttrs.center.y - bumpY)
+        // end block
+
+        return itemAttrs
+    }
+
+    // MARK: - Fetch Attributes
+
+    public override func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
+        var ret = pageCache.filter({ rect.intersects($0.frame) })
+
+        for index in 0 ..< 2 where index < ret.count {
+            // update our headers
+            if ret[index].representedElementKind == UICollectionView.elementKindSectionHeader {
+                let oldHeader = ret[index]
+                guard
+                    let newHeader = layoutAttributesForSupplementaryView(ofKind: UICollectionView.elementKindSectionHeader,
+                                                                         at: oldHeader.indexPath)
+                else {
+                    continue
+                }
+                ret[index] = newHeader
+            }
+        }
+
+        return ret
+    }
+
+    public override func layoutAttributesForSupplementaryView(ofKind elementKind: String,
+                                                              at indexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
+        guard let collectionView = collectionView else { return nil }
+        if indexPath.section == section {
+            for attrs in pageCache {
+                if
+                    attrs.representedElementCategory == .supplementaryView && attrs.indexPath == indexPath,
+                    let ret = attrs.copy() as? UICollectionViewLayoutAttributes {
+                    // center the attributes in the scrollable direction
+                    let insets = collectionView.safeAreaInsets
+
+                    if indexPath.row == 0 {
+                        // asking for vertical header
+                        if direction == .vertical {
+                            let midDim = lastBoundsMinDim + collectionView.bounds.width / 2
+                            ret.center = CGPoint(x: midDim + insets.left / 2 - insets.right / 2, y: headerHeight / 2)
+                            ret.alpha = 1
+                        } else {
+                            ret.alpha = 0
+                        }
+                    } else {
+                        // asking for horizontal header
+                        if direction == .horizontal {
+                            let midDim = lastBoundsMinDim + collectionView.bounds.height / 2
+                            ret.center = CGPoint(x: headerHeight / 2, y: midDim + insets.top / 2 - insets.bottom / 2)
+                            ret.alpha = 1
+                        } else {
+                            ret.alpha = 0
+                        }
+                    }
+
+                    return ret
+                }
+            }
+        }
+
+        return super.layoutAttributesForSupplementaryView(ofKind: elementKind, at: indexPath)
+    }
+
+    public override func layoutAttributesForItem(at indexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
+        if indexPath.section == section {
+            for attrs in pageCache {
+                if attrs.representedElementCategory == .cell && attrs.indexPath == indexPath {
+                    return attrs
+                }
+            }
+        }
+
+        return super.layoutAttributesForItem(at: indexPath)
+    }
+
+    // MARK: - Content Offset
+
+    public override func targetContentOffset(forProposedContentOffset proposedContentOffset: CGPoint) -> CGPoint {
+        guard let collectionView = collectionView else { return proposedContentOffset }
+        let contentSize = collectionViewContentSize
+        let viewSize = collectionView.bounds.size
+        let insets = collectionView.safeAreaInsets
+        var ret = CGPoint(x: CGFloat.infinity, y: CGFloat.infinity)
+
+        if let gestureRecognizer = gestureRecognizer {
+            // the user is pinching to zoom the page. calculate an offset for our content
+            // that will keep the pinch gesture in the same location of the zoomed page.
+            // This method is called during zoom because the collection view is constantly
+            // resetting its layout to a new page layout, so it transitions from page layout
+            // to page layout, and uses this method to keep the offset where it needs to be
+            let outerOffset = gestureRecognizer.location(in: collectionView.superview)
+            // _startingPercentOffset is the % of our contentSize that should align to our gesture
+            // startLocInContent is the point in the content that is exactly under the gesture
+            // when the gesture begins.
+            let startLocInContent = CGPoint(x: collectionViewContentSize.width * startingPercentOffset.x,
+                                            y: collectionViewContentSize.height * startingPercentOffset.y)
+
+            var targetLocInContent = startLocInContent
+
+            // so remove the gesture's offset from the corner of the super view to the gesture,
+            // as our contentOffset will need to be relative to that corner
+            targetLocInContent.x -= outerOffset.x
+            targetLocInContent.y -= outerOffset.y
+
+            // If the user starts a pinch with two fingers, but then lifts a finger
+            // the pinch gesture doesn't fail, but instead continues. By default,
+            // the location of the gesture is the average of all touches, so this
+            // makes the location jump around the screen as the user lifts and presses
+            // down fingers mid-gesture. The MMPinchVelocityGestureRecognizer instead
+            // handles this for us and returns a smooth locationInView: that accounts
+            // for touches starting and stopping mid gesture. The `scaledAdjustment` property
+            // is a CGPoint offset from teh gesture's location back to the initial
+            // locationInView when the gesture first began. We can use this to
+            // Adjust the content offset and keep the content under our fingers
+            // throughout the pinch, even if the user 'walks' their fingers
+            // down the screen resulting in a large scaledAdjustment.
+            let scaledAdjustment = gestureRecognizer.scaledAdjustment
+
+            targetLocInContent.x -= scaledAdjustment.x * max(1, gestureRecognizer.scale)
+            targetLocInContent.y -= scaledAdjustment.y * max(1, gestureRecognizer.scale)
+
+            // now that our content is aligned with our gesture,
+            // clamp it to the edges of our content
+            targetLocInContent.x = max(-insets.left, min(contentSize.width - viewSize.width, targetLocInContent.x))
+            targetLocInContent.y = max(-insets.top, min(contentSize.height - viewSize.height, targetLocInContent.y))
+
+            ret = targetLocInContent
+        } else if direction == .horizontal,
+                  let targetIndexPath = targetIndexPath {
+            var locInContent: CGPoint
+
+            if targetIndexPath.row == 0 {
+                // for the first page, align it to the left of the screen
+                locInContent = .zero
+            } else {
+                // for all other pages, align them to the center of the screen
+                let attrs = layoutAttributesForItem(at: targetIndexPath)
+                assert(attrs != nil, "Unable to find attributes for target index")
+                let itemFrame = attrs?.frame ?? .zero
+                let diff = max(0, (collectionView.bounds.width - itemFrame.width) / 2.0)
+
+                locInContent = CGPoint(x: itemFrame.minX - diff, y: 0)
+            }
+
+            // clamp the offset so that we're not over/under scrolling our content size
+            locInContent.x = max(-insets.left, min(contentSize.width - viewSize.width, locInContent.x))
+
+            ret = locInContent
+        } else if direction == .vertical,
+                  let targetIndexPath = targetIndexPath {
+            var locInContent: CGPoint
+
+            if targetIndexPath.row == 0 {
+                // align the first page to the top of the screen
+                locInContent = .zero
+            } else {
+                // and align all other pages to the center of the screen
+                let attrs = layoutAttributesForItem(at: targetIndexPath)
+                assert(attrs != nil, "Unable to find attributes for target index")
+                let itemFrame = attrs?.frame ?? .zero
+                let diff = max(0, (collectionView.bounds.height - itemFrame.height) / 2.0)
+
+                locInContent = CGPoint(x: 0, y: itemFrame.minY - diff)
+            }
+
+            // clamp the offset so that we're not over/under scrolling our content size
+            locInContent.y = max(-insets.top, min(contentSize.height - viewSize.height, locInContent.y))
+
+            ret = locInContent
+        }
+
+        if ret.x == .infinity {
+            ret = super.targetContentOffset(forProposedContentOffset: proposedContentOffset)
+        }
+
+        var bounds = collectionView.bounds
+        bounds.origin = ret
+
+        // check if we need to invalidate headesr for this offset
+        _ = shouldInvalidateLayout(forBoundsChange: bounds)
+
+        return ret
     }
 }
