@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  PageCollectionView.swift
 //  PageCollectionView
 //
 //  Created by Adam Wulf on 8/23/21.
