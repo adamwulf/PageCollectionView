@@ -450,6 +450,23 @@ class PageCollectionViewController: UICollectionViewController, PageCollectionVi
         }
     }
 
+    // MARK: - CollectionView
+
+    override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        var updatedLayout: GridLayout?
+
+        if isDisplayingShelf {
+            updatedLayout = newGridLayout(for: indexPath.section)
+        } else if isDisplayingGrid && pageCollectionView.activeTransitionLayout == nil {
+            updatedLayout = newPageLayout(for: indexPath.section)
+            updatedLayout?.targetIndexPath = indexPath
+        }
+
+        if let updatedLayout = updatedLayout {
+            collectionView.setCollectionViewLayout(updatedLayout, animated: true)
+        }
+    }
+
     // MARK: - Subclasses
 
     func newShelfLayout() -> ShelfLayout {
