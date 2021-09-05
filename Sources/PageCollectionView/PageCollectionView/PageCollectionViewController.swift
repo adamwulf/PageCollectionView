@@ -60,6 +60,50 @@ class PageCollectionViewController: UICollectionViewController, PageCollectionVi
 
     override func viewDidLoad() {
         super.viewDidLoad()
+
+        collectionView.backgroundColor = .lightGray
+        collectionView.register(PageCollectionCell.self, forCellWithReuseIdentifier: String(describing: PageCollectionCell.self))
+        collectionView.register(PageCollectionHeader.self, forCellWithReuseIdentifier: String(describing: PageCollectionHeader.self))
+        collectionView.reloadData()
+
+        collectionView.addGestureRecognizer(pinchGesture)
+
+        collapseGridIcon = GridIconView(frame: .zero)
+        collapseGridIcon.translatesAutoresizingMaskIntoConstraints = false
+        collectionView.addSubview(collapseGridIcon)
+
+        collapseGridIcon.centerXAnchor.constraint(equalTo: collectionView.centerXAnchor).isActive = true
+        collapseGridIcon.widthAnchor.constraint(equalToConstant: 100).isActive = true
+        collapseGridIcon.heightAnchor.constraint(equalToConstant: 100).isActive = true
+        collapseGridIcon.bottomAnchor.constraint(equalTo: collectionView.topAnchor, constant: -25).isActive = true
+
+        collapseVerticalPageIcon = VerticalPageIconView(frame: .zero)
+        collapseVerticalPageIcon.translatesAutoresizingMaskIntoConstraints = false
+        collectionView.addSubview(collapseVerticalPageIcon)
+
+        collapseVerticalPageIcon.centerXAnchor.constraint(equalTo: collectionView.centerXAnchor).isActive = true
+        collapseVerticalPageIcon.widthAnchor.constraint(equalToConstant: 100).isActive = true
+        collapseVerticalPageIcon.heightAnchor.constraint(equalToConstant: 60).isActive = true
+        collapseVerticalPageIcon.bottomAnchor.constraint(equalTo: collectionView.topAnchor, constant: -25).isActive = true
+
+        collapseHorizontalPageIcon = HorizontalPageIconView(frame: .zero)
+        collapseHorizontalPageIcon.translatesAutoresizingMaskIntoConstraints = false
+        collectionView.addSubview(collapseHorizontalPageIcon)
+
+        collapseHorizontalPageIcon.centerYAnchor.constraint(equalTo: collectionView.centerYAnchor).isActive = true
+        collapseHorizontalPageIcon.widthAnchor.constraint(equalToConstant: 100).isActive = true
+        collapseHorizontalPageIcon.heightAnchor.constraint(equalToConstant: 60).isActive = true
+        collapseHorizontalPageIcon.rightAnchor.constraint(equalTo: collectionView.leftAnchor, constant: -25).isActive = true
+
+        collapseGridIcon.alpha = 0
+        collapseVerticalPageIcon.alpha = 0
+        collapseHorizontalPageIcon.alpha = 0
+
+        _pageScale = 1.0
+
+        collectionView.addObserver(self, forKeyPath: "collectionViewLayout", options: .old, context: nil)
+        collectionView.alwaysBounceVertical = pageCollectionView.currentLayout?.bounceVertical ?? false
+        collectionView.alwaysBounceHorizontal = pageCollectionView.currentLayout?.bounceHorizontal ?? false
     }
 
     // MARK: - Gestures
