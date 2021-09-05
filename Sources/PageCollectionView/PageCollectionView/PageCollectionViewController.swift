@@ -393,6 +393,63 @@ class PageCollectionViewController: UICollectionViewController, PageCollectionVi
         }
     }
 
+    // MARK: - UIScrollViewDelegate
+
+    override func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        let kmin: CGFloat = 70
+        let kdist: CGFloat = 40
+        var vProgress: CGFloat = min(-kmin, max(-(kmin + kdist), scrollView.contentOffset.y))
+        vProgress = abs(kmin + vProgress) / kdist
+
+        var hProgress = min(-kmin, max(-(kmin + kdist), scrollView.contentOffset.x))
+        hProgress = abs(kmin + hProgress) / kdist
+
+        if isDisplayingGrid {
+            collapseGridIcon.progress = vProgress
+            collapseVerticalPageIcon.progress = 0
+            collapseHorizontalPageIcon.progress = 0
+        } else if isDisplayingPage && (pageCollectionView.currentLayout as? PageLayout)?.direction == .vertical {
+            collapseGridIcon.progress = 0
+            collapseVerticalPageIcon.progress = vProgress
+            collapseHorizontalPageIcon.progress = 0
+        } else if isDisplayingPage && (pageCollectionView.currentLayout as? PageLayout)?.direction == .horizontal {
+            collapseGridIcon.progress = 0
+            collapseVerticalPageIcon.progress = 0
+            collapseHorizontalPageIcon.progress = hProgress
+        } else {
+            collapseGridIcon.progress = 0
+            collapseVerticalPageIcon.progress = 0
+            collapseHorizontalPageIcon.progress = 0
+        }
+    }
+
+    override func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        let isVerticalPage = isDisplayingPage && (pageCollectionView.currentLayout as? PageLayout)?.direction == .vertical
+        let isHorizontalPage = isDisplayingPage && (pageCollectionView.currentLayout as? PageLayout)?.direction == .horizontal
+        let verticalSuccess = scrollView.contentOffset.y < -100
+        let horizontalSuccess = scrollView.contentOffset.x < -100
+
+        if (verticalSuccess && isDisplayingGrid || isVerticalPage) || (horizontalSuccess && isHorizontalPage) {
+            // turn off bounce during this animation, as the bounce from the scrollview
+            // being overscrolled conflicts with the layout animation
+            let nextLayout: ShelfLayout
+
+            if isDisplayingGrid {
+                nextLayout = newShelfLayout()
+                nextLayout.targetIndexPath = IndexPath(row: 0, section: (pageCollectionView.currentLayout as? GridLayout)?.section ?? 0)
+            } else if isDisplayingPage {
+                nextLayout = newGridLayout(for: (pageCollectionView.currentLayout as? PageLayout)?.section ?? 0)
+            } else {
+                assertionFailure()
+                return
+            }
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(100)) {
+                self.collectionView.setCollectionViewLayout(nextLayout, animated: true)
+            }
+        }
+    }
+
     // MARK: - Subclasses
 
     func newShelfLayout() -> ShelfLayout {
