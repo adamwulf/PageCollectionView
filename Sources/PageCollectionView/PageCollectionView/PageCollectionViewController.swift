@@ -8,7 +8,7 @@
 
 import UIKit
 
-class PageCollectionViewController: UICollectionViewController, PageCollectionViewDelegate {
+class PageCollectionViewController: UICollectionViewController, PageCollectionViewDelegate, UICollectionViewDelegatePageLayout {
 
     static let MinGestureScale: CGFloat = 1.0
     static let MaxGestureScale: CGFloat = 4.0
@@ -464,6 +464,66 @@ class PageCollectionViewController: UICollectionViewController, PageCollectionVi
 
         if let updatedLayout = updatedLayout {
             collectionView.setCollectionViewLayout(updatedLayout, animated: true)
+        }
+    }
+
+    // MARK: - Shelf and Page Layout
+
+    func collectionView(_ collectionView: UICollectionView, layout: ShelfLayout, objectAtIndexPath: IndexPath) -> ShelfLayoutObject {
+        fatalError("AbstractMethodException")
+    }
+
+    func collectionView(_ collectionView: UICollectionView, layout: PageLayout, zoomScaleForIndexPath indexPath: IndexPath) -> CGFloat {
+        return pageScale
+    }
+
+    // MARK: - Layout Changes
+
+    func collectionView(_ collectionView: PageCollectionView,
+                        willChangeToLayout newLayout: UICollectionViewLayout,
+                        fromLayout oldLayout: UICollectionViewLayout) {
+        if newLayout.isMember(of: GridLayout.self) {
+            collapseGridIcon.alpha = 1
+            collapseVerticalPageIcon.alpha = 0
+            collapseHorizontalPageIcon.alpha = 0
+        } else if let pageLayout = newLayout as? PageLayout,
+                  pageLayout.direction == .vertical {
+            collapseGridIcon.alpha = 0
+            collapseVerticalPageIcon.alpha = 1
+            collapseHorizontalPageIcon.alpha = 0
+        } else if let pageLayout = newLayout as? PageLayout,
+                  pageLayout.direction == .horizontal {
+            collapseGridIcon.alpha = 0
+            collapseVerticalPageIcon.alpha = 0
+            collapseHorizontalPageIcon.alpha = 1
+        } else {
+            collapseGridIcon.alpha = 0
+            collapseVerticalPageIcon.alpha = 0
+            collapseHorizontalPageIcon.alpha = 0
+        }
+    }
+
+    func collectionView(_ collectionView: PageCollectionView, didChangeToLayout newLayout: UICollectionViewLayout, fromLayout oldLayout: UICollectionViewLayout) {
+        if let shelfLayout = newLayout as? ShelfLayout {
+            shelfLayout.targetIndexPath = nil
+            collectionView.alwaysBounceVertical = shelfLayout.bounceVertical
+            collectionView.alwaysBounceHorizontal = shelfLayout.bounceHorizontal
+        }
+    }
+
+    func collectionView(_ collectionView: PageCollectionView, didFinalizeTransitionLayout transitionLayout: UICollectionViewTransitionLayout) {
+        // Disable pinching during a transition animation. This delegate method is called for any
+        // finishInteractiveTransition or cancelInteractiveTransition. This lets us turn off the
+        // pinch gesture for a small time while the animation completes, then it will re-enable.
+        brieflyDisablePinchGesture()
+    }
+
+    override func observeValue(forKeyPath keyPath: String?,
+                                     of object: Any?,
+                                     change: [NSKeyValueChangeKey: Any]?,
+                                     context: UnsafeMutableRawPointer?) {
+        if let oldLayout = change?[.oldKey] as? UICollectionViewLayout {
+            collectionView(pageCollectionView, willChangeToLayout: collectionView.collectionViewLayout, fromLayout: oldLayout)
         }
     }
 
