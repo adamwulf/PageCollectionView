@@ -193,7 +193,63 @@ class PageCollectionViewController: UICollectionViewController, PageCollectionVi
     }
 
     private func pinchFromGrid(_ gesture: PinchVelocityGestureRecognizer) {
+        let transitionLayout = pageCollectionView.activeTransitionLayout
 
+        if gesture.state == .began {
+            targetIndexPath = pageCollectionView.closestIndexPath(for: gesture.location(in: collectionView))
+        } else if let targetIndexPath = targetIndexPath, gesture.state == .changed {
+            if let transitionLayout = transitionLayout {
+                let toPage = transitionLayout.nextLayout.isKind(of: PageLayout.self)
+                var progress: CGFloat = 0
+
+                if toPage {
+                    if gesture.scale > 1 {
+                        progress = gesture.scale.clamp(minFrom: Self.MinGestureScale, maxFrom: Self.MaxGestureScale, minTo: 0, maxTo: 1)
+                    } else {
+                        progress = 0
+                    }
+                } else {
+                    if gesture.scale < 1 {
+                        progress = max(0, min(1, 1 - abs(gesture.scale)))
+                    } else {
+                        progress = 0
+                    }
+                }
+
+                transitionLayout.transitionProgress = progress
+                transitionLayout.invalidateLayout()
+            } else {
+                guard let currentGridLayout = pageCollectionView.currentLayout as? GridLayout else { assertionFailure(); return }
+                let nextLayout: UICollectionViewLayout
+                if pinchGesture.scaleDirection > 0 {
+                    // transition into page view
+                    let pageLayout = newPageLayout(for: currentGridLayout.section)
+                    pageLayout.targetIndexPath = targetIndexPath
+                    nextLayout = pageLayout
+                } else {
+                    // transition into shelf
+                    let shelfLayout = newShelfLayout()
+                    shelfLayout.targetIndexPath = IndexPath(row: 0, section: currentGridLayout.section)
+                    nextLayout = shelfLayout
+                }
+
+                collectionView.startInteractiveTransition(to: nextLayout) { _, _ in
+                    self.targetIndexPath = nil
+                }
+            }
+        } else if let transitionLayout = transitionLayout, gesture.state == .ended {
+            let toPage = transitionLayout.nextLayout.isKind(of: PageLayout.self)
+
+            if toPage && pinchGesture.scaleDirection > 0 {
+                collectionView.finishInteractiveTransition()
+            } else if !toPage && pinchGesture.scaleDirection < 0 {
+                collectionView.finishInteractiveTransition()
+            } else {
+                collectionView.cancelInteractiveTransition()
+            }
+        } else if transitionLayout != nil {
+            collectionView.cancelInteractiveTransition()
+        }
     }
 
     private func pinchFromPage(_ gesture: PinchVelocityGestureRecognizer) {
