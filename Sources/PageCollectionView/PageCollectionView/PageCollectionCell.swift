@@ -8,5 +8,5 @@
 import UIKit
 
 class PageCollectionCell: UICollectionViewCell {
-
+    let textLabel: UILabel()
 }

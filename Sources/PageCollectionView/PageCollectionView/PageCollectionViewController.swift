@@ -253,7 +253,143 @@ class PageCollectionViewController: UICollectionViewController, PageCollectionVi
     }
 
     private func pinchFromPage(_ gesture: PinchVelocityGestureRecognizer) {
+        UICollectionViewTransitionLayout *transitionLayout = [[self collectionView] activeTransitionLayout];
+        CGPoint locInView = [pinchGesture locationInView:[[self collectionView] superview]];
+        locInView.x -= [[self collectionView] frame].origin.x;
+        locInView.y -= [[self collectionView] frame].origin.y;
 
+        if ([pinchGesture state] == UIGestureRecognizerStateBegan) {
+            CGPoint gestureLocInContent = [pinchGesture locationInView:[self collectionView]];
+            _targetIndexPath = [[self collectionView] closestIndexPathForPoint:gestureLocInContent];
+            _zoomPercentOffset.x = gestureLocInContent.x / [[self collectionView] contentSize].width;
+            _zoomPercentOffset.y = gestureLocInContent.y / [[self collectionView] contentSize].height;
+
+            if (!_targetIndexPath) {
+                // cancel if we can't find a target index
+                [pinchGesture setEnabled:NO];
+                [pinchGesture setEnabled:YES];
+            }
+        } else if ([pinchGesture state] == UIGestureRecognizerStateChanged) {
+            if (transitionLayout) {
+                BOOL toPage = [[transitionLayout nextLayout] isKindOfClass:[MMPageLayout class]];
+                CGFloat progress;
+
+                if (toPage) {
+                    if (pinchGesture.scale > 1) {
+                        progress = CLAMPF(pinchGesture.scale, kMinGestureScale, kMaxGestureScale, 0, 1);
+                    } else {
+                        progress = 0;
+                    }
+                } else {
+                    if (pinchGesture.scale < 1) {
+                        progress = MAX(0, MIN(1, 1 - ABS(pinchGesture.scale)));
+                    } else {
+                        progress = 0;
+                    }
+                }
+
+                transitionLayout.transitionProgress = progress;
+                [transitionLayout invalidateLayout];
+            } else {
+                if ((_isZoomingPage == MMScalingNone && pinchGesture.scaleDirection > 0) || _isZoomingPage == MMScalingPage || _pageScale > 1.0) {
+                    // scale page up
+                    _isZoomingPage = MMScalingPage;
+
+                    // when zooming, to get a clean zoom animation we need to
+                    // reset the entire layout, as this will trigger targetContentOffsetForProposedContentOffset:
+                    // so that our layout + offset change will happen at the exact same time.
+                    // this prevents the offset from jumping around during the gesture, and also
+                    // prevents us invalidating the layout when setting the offset manually.
+                    MMPageLayout *layout = [[MMPageLayout alloc] initWithSection:[_targetIndexPath section]];
+                    // which page is being held
+                    [layout setTargetIndexPath:_targetIndexPath];
+                    // what % in both direction its held
+                    [layout setStartingPercentOffset:_zoomPercentOffset];
+                    // where the gesture is in collection view coordiates
+                    [layout setGestureRecognizer:_pinchGesture];
+                    [layout setFitWidth:[[[self collectionView] currentLayout] fitWidth]];
+                    [layout setDirection:[[[self collectionView] currentLayout] direction]];
+
+                    [[[self collectionView] currentLayout] setTargetIndexPath:_targetIndexPath];
+                    [[[self collectionView] currentLayout] setStartingPercentOffset:_zoomPercentOffset];
+                    [[[self collectionView] currentLayout] setGestureRecognizer:_pinchGesture];
+
+                    // Can't call [invalidateLayout] here, as this won't cause the collectionView to
+                    // ask for targetContentOffsetForProposedContentOffset:. This means the contentOffset
+                    // will remain exactly in place as the content scales. Setting a layout will
+                    // ask for a targetContentOffset, so we can keep the page in view while we scale.
+                    [[self collectionView] setCollectionViewLayout:layout animated:NO];
+                } else if (_isZoomingPage == MMScalingNone || _isZoomingPage == MMScalingToGrid) {
+                    _isZoomingPage = MMScalingToGrid;
+                    // transition into grid
+                    MMGridLayout *gridLayout = [self newGridLayoutForSection:[_targetIndexPath section]];
+                    [gridLayout setTargetIndexPath:_targetIndexPath];
+
+                    [[self collectionView] startInteractiveTransitionToCollectionViewLayout:gridLayout completion:^(BOOL completed, BOOL finished) {
+                        self->_targetIndexPath = nil;
+                    }];
+                }
+            }
+        } else if ([pinchGesture state] == UIGestureRecognizerStateEnded) {
+            if (transitionLayout) {
+                if ([pinchGesture scaleDirection] < 0) {
+                    [[self collectionView] finishInteractiveTransition];
+                } else {
+                    [[self collectionView] cancelInteractiveTransition];
+                }
+            }
+            if (_isZoomingPage == MMScalingPage) {
+                // we've finished zoom into our page, save the final scale
+                _pageScale = MIN(MAX(1.0, _pageScale * [_pinchGesture scale]), [self maxPageScale]);
+            }
+            _isZoomingPage = MMScalingNone;
+            [[[self collectionView] currentLayout] setStartingPercentOffset:CGPointZero];
+            [[[self collectionView] currentLayout] setGestureRecognizer:nil];
+        } else {
+            if (transitionLayout) {
+                [[self collectionView] cancelInteractiveTransition];
+            } else {
+                [[[self collectionView] currentLayout] invalidateLayout];
+            }
+
+            _isZoomingPage = MMScalingNone;
+            [[[self collectionView] currentLayout] setStartingPercentOffset:CGPointZero];
+            [[[self collectionView] currentLayout] setGestureRecognizer:nil];
+        }
+    }
+
+    // MARK: - UICollectionViewDataSource
+
+    override func numberOfSections(in collectionView: UICollectionView) -> Int {
+        fatalError("AbstractMethodException")
+    }
+
+    override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        fatalError("AbstractMethodException")
+    }
+
+    override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: String(describing: PageCollectionCell.self),
+                                                      for: indexPath) as! PageCollectionCell
+
+        cell.textLabel.text = "\(indexPath.section),\(indexPath.row)"
+
+        return cell;
+    }
+
+    override func collectionView(_ collectionView: UICollectionView,
+                                 viewForSupplementaryElementOfKind kind: String,
+                                 at indexPath: IndexPath) -> UICollectionReusableView {
+        if kind == UICollectionView.elementKindSectionHeader {
+            let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind,
+                                                                         withReuseIdentifier: String(describing: PageCollectionHeader.self),
+                                                                         for: indexPath) as! PageCollectionHeader
+            header.indexPath = indexPath
+
+            return header
+        } else {
+            fatalError("Invalid supplementary view")
+        }
     }
 
     // MARK: - Subclasses
