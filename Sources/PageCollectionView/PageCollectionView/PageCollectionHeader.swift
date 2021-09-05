@@ -8,7 +8,7 @@
 import UIKit
 
 class PageCollectionHeader: UICollectionReusableView {
-    var indexPath: IndexPath {
+    var indexPath: IndexPath? {
         didSet {
 
         }
