@@ -106,10 +106,58 @@ class PageCollectionViewController: UICollectionViewController, PageCollectionVi
         collectionView.alwaysBounceHorizontal = pageCollectionView.currentLayout?.bounceHorizontal ?? false
     }
 
+    // MARK: - UIViewController
+
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        coordinator.animate(alongsideTransition: { _ in
+            self.collectionView.collectionViewLayout.invalidateLayout()
+        }, completion: nil)
+    }
+
+    // MARK: - Layout Helpers
+
+    var isDisplayingShelf: Bool {
+        return pageCollectionView.currentLayout?.isMember(of: ShelfLayout.self) ?? false
+    }
+
+    var isDisplayingGrid: Bool {
+        return pageCollectionView.currentLayout?.isMember(of: GridLayout.self) ?? false
+    }
+
+    var isDisplayingPage: Bool {
+        return pageCollectionView.currentLayout?.isMember(of: PageLayout.self) ?? false
+    }
+
     // MARK: - Gestures
 
+    @objc private func reenablePinchGesture() {
+        pinchGesture.isEnabled = true
+    }
+
+    private func brieflyDisablePinchGesture() {
+        pinchGesture.isEnabled = false
+        self.perform(#selector(reenablePinchGesture), with: nil, afterDelay: 0.5)
+    }
+
     @objc func didPinch(_ gesture: PinchVelocityGestureRecognizer) {
+        if isDisplayingShelf {
+            pinchFromShelf(gesture)
+        } else if isDisplayingGrid {
+            pinchFromGrid(gesture)
+        } else if isDisplayingPage {
+            pinchFromPage(gesture)
+        }
+    }
+
+    private func pinchFromShelf(_ gesture: PinchVelocityGestureRecognizer) {
 
     }
 
+    private func pinchFromGrid(_ gesture: PinchVelocityGestureRecognizer) {
+
+    }
+
+    private func pinchFromPage(_ gesture: PinchVelocityGestureRecognizer) {
+
+    }
 }
