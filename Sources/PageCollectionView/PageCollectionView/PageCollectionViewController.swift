@@ -10,6 +10,9 @@ import UIKit
 
 class PageCollectionViewController: UICollectionViewController, PageCollectionViewDelegate {
 
+    static let MinGestureScale: CGFloat = 1.0
+    static let MaxGestureScale: CGFloat = 4.0
+
     enum ScalingDirection {
         case none
         case toPage
@@ -150,7 +153,43 @@ class PageCollectionViewController: UICollectionViewController, PageCollectionVi
     }
 
     private func pinchFromShelf(_ gesture: PinchVelocityGestureRecognizer) {
+        let transitionLayout = pageCollectionView.activeTransitionLayout
 
+        if transitionLayout == nil && gesture.state == .began {
+            let targetIndexPath = pageCollectionView.closestIndexPath(for: gesture.location(in: collectionView))
+            let pageGridLayout = newGridLayout(for: targetIndexPath?.section ?? 0)
+            pageGridLayout.targetIndexPath = targetIndexPath
+
+            if targetIndexPath != nil {
+                collectionView.startInteractiveTransition(to: pageGridLayout) { _, _ in
+                    self.targetIndexPath = nil
+                }
+            }
+        } else if let transitionLayout = transitionLayout, gesture.state == .changed {
+            // 1 if we've completed the transition to the new layout, 0 if we are at the existing layout
+            var progress: CGFloat = 0
+
+            if pinchGesture.scale > 1 {
+                // when pinching to zoom into a document from the shelf, the gesture scale
+                // starts at 1 and increases with the zoom. Below, we clamp the pinch
+                //  from 1x -> 4x and divide that by 3.0 to get a smooth transition from
+                // 1x -> 3x maps to  0 -> 1
+                progress = pinchGesture.scale.clamp(minFrom: Self.MinGestureScale, maxFrom: Self.MaxGestureScale, minTo: 0, maxTo: 1)
+            } else {
+                progress = 0
+            }
+
+            transitionLayout.transitionProgress = progress
+            transitionLayout.invalidateLayout()
+        } else if transitionLayout != nil && gesture.state == .ended {
+            if pinchGesture.scaleDirection > 0 {
+                collectionView.finishInteractiveTransition()
+            } else {
+                collectionView.cancelInteractiveTransition()
+            }
+        } else if transitionLayout != nil {
+            collectionView.cancelInteractiveTransition()
+        }
     }
 
     private func pinchFromGrid(_ gesture: PinchVelocityGestureRecognizer) {
@@ -159,5 +198,19 @@ class PageCollectionViewController: UICollectionViewController, PageCollectionVi
 
     private func pinchFromPage(_ gesture: PinchVelocityGestureRecognizer) {
 
+    }
+
+    // MARK: - Subclasses
+
+    func newShelfLayout() -> ShelfLayout {
+        return ShelfLayout()
+    }
+
+    func newGridLayout(for section: Int) -> GridLayout {
+        return GridLayout(section: section)
+    }
+
+    func newPageLayout(for section: Int) -> PageLayout {
+        return PageLayout(section: section)
     }
 }
