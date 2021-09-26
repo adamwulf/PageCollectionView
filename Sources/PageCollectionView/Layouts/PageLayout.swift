@@ -148,7 +148,9 @@ public class PageLayout: GridLayout {
         var scaledMaxDim = kMaxDim
 
         // Calculate the header section size, if any
-        headerHeight = pageDelegate?.collectionView?(collectionView, layout: self, heightForHeaderInSection: section) ?? defaultHeaderHeight
+        var headerHeight = pageDelegate?.collectionView?(collectionView, layout: self, heightForHeaderInSection: section) ?? defaultHeaderHeight
+
+        self.headerHeight = headerHeight
 
         // track the location of the bounds in the direction orthogonal to the scroll
         if direction == .vertical {
@@ -202,7 +204,11 @@ public class PageLayout: GridLayout {
                 continue
             }
 
-            guard let object = datasource?.collectionView(collectionView, layout: self, objectAtIndexPath: indexPath) else { continue }
+            guard
+                let object = datasource?.collectionView(collectionView, layout: self, objectAtIndexPath: indexPath)
+            else {
+                continue
+            }
 
             if let itemAttrs = layoutPage(object, at: offset, for: indexPath, kMaxDim: kMaxDim) {
                 let boundingSize = itemAttrs.boundingSize

@@ -44,6 +44,14 @@ public class PageCollectionView: UICollectionView {
         }
         set {
             let previousLayout = collectionViewLayout
+
+            if previousLayout is UICollectionViewTransitionLayout,
+               newValue is UICollectionViewTransitionLayout {
+                // Don't change layout during transition
+                assertionFailure("Cannot change layout during collection view transition")
+                return
+            }
+
             pageDelegate?.collectionView?(self, willChangeToLayout: newValue, fromLayout: previousLayout)
             super.collectionViewLayout = newValue
             pageDelegate?.collectionView?(self, didChangeToLayout: newValue, fromLayout: previousLayout)

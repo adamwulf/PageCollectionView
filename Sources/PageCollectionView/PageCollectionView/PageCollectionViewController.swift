@@ -155,9 +155,10 @@ open class PageCollectionViewController: UICollectionViewController, PageCollect
     }
 
     private func pinchFromShelf(_ gesture: PinchVelocityGestureRecognizer) {
+        let isActiveTransition = pageCollectionView.collectionViewLayout is UICollectionViewTransitionLayout
         let transitionLayout = pageCollectionView.activeTransitionLayout
 
-        if transitionLayout == nil && gesture.state == .began {
+        if !isActiveTransition && transitionLayout == nil && gesture.state == .began {
             let targetIndexPath = pageCollectionView.closestIndexPath(for: gesture.location(in: collectionView))
             let pageGridLayout = newGridLayout(for: targetIndexPath?.section ?? 0)
             pageGridLayout.targetIndexPath = targetIndexPath
@@ -195,6 +196,7 @@ open class PageCollectionViewController: UICollectionViewController, PageCollect
     }
 
     private func pinchFromGrid(_ gesture: PinchVelocityGestureRecognizer) {
+        let isActiveTransition = pageCollectionView.collectionViewLayout is UICollectionViewTransitionLayout
         let transitionLayout = pageCollectionView.activeTransitionLayout
 
         if gesture.state == .began {
@@ -220,7 +222,7 @@ open class PageCollectionViewController: UICollectionViewController, PageCollect
 
                 transitionLayout.transitionProgress = progress
                 transitionLayout.invalidateLayout()
-            } else {
+            } else if !isActiveTransition {
                 guard let currentGridLayout = pageCollectionView.currentLayout as? GridLayout else { assertionFailure(); return }
                 let nextLayout: UICollectionViewLayout
                 if pinchGesture.scaleDirection > 0 {
@@ -255,6 +257,7 @@ open class PageCollectionViewController: UICollectionViewController, PageCollect
     }
 
     private func pinchFromPage(_ gesture: PinchVelocityGestureRecognizer) {
+        let isActiveTransition = pageCollectionView.collectionViewLayout is UICollectionViewTransitionLayout
         let transitionLayout = pageCollectionView.activeTransitionLayout
         var locInView = pinchGesture.location(in: collectionView.superview)
         locInView.x -= collectionView.frame.minX
@@ -323,7 +326,7 @@ open class PageCollectionViewController: UICollectionViewController, PageCollect
                     // will remain exactly in place as the content scales. Setting a layout will
                     // ask for a targetContentOffset, so we can keep the page in view while we scale.
                     collectionView.setCollectionViewLayout(layout, animated: false)
-                } else if isZoomingPage == .none || isZoomingPage == .toGrid {
+                } else if !isActiveTransition && (isZoomingPage == .none || isZoomingPage == .toGrid) {
                     isZoomingPage = .toGrid
                     // transition into grid
                     let gridLayout = newGridLayout(for: targetIndexPath?.section ?? 0)
@@ -469,7 +472,7 @@ open class PageCollectionViewController: UICollectionViewController, PageCollect
         }
 
         if let updatedLayout = updatedLayout {
-            collectionView.setCollectionViewLayout(updatedLayout, animated: true)
+            collectionView.setCollectionViewLayout(updatedLayout, animated: true, completion: nil)
         }
     }
 
