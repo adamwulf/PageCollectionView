@@ -29,10 +29,11 @@ public class PageLayout: GridLayout {
         return collectionView?.delegate as? UICollectionViewDelegatePageLayout
     }
 
-    var fitWidth: Bool = true
-    var direction: Direction = .vertical
-    var startingPercentOffset: CGPoint = .zero
-    var gestureRecognizer: PinchVelocityGestureRecognizer?
+    public var fitWidth: Bool = true
+    public var direction: Direction = .vertical
+
+    internal var startingPercentOffset: CGPoint = .zero
+    internal var gestureRecognizer: PinchVelocityGestureRecognizer?
 
     private var boundingSize: CGSize = .zero
     private var scale: CGFloat = 0
@@ -382,6 +383,9 @@ public class PageLayout: GridLayout {
     public override func layoutAttributesForSupplementaryView(ofKind elementKind: String,
                                                               at indexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
         guard let collectionView = collectionView else { return nil }
+        // TODO: Why is the indexPath empty for supplementary views?
+        guard !indexPath.isEmpty else { return nil }
+
         if indexPath.section == section {
             for attrs in pageCache {
                 if

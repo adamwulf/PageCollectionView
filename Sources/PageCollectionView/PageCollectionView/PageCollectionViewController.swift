@@ -8,7 +8,7 @@
 
 import UIKit
 
-class PageCollectionViewController: UICollectionViewController, PageCollectionViewDelegate, UICollectionViewDelegatePageLayout {
+open class PageCollectionViewController: UICollectionViewController, PageCollectionViewDelegate, UICollectionViewDelegatePageLayout {
 
     static let MinGestureScale: CGFloat = 1.0
     static let MaxGestureScale: CGFloat = 4.0
@@ -19,7 +19,7 @@ class PageCollectionViewController: UICollectionViewController, PageCollectionVi
         case toGrid
     }
 
-    private var _pageScale: CGFloat = 0
+    public var _pageScale: CGFloat = 0
     private var maxPageScale: CGFloat = 300
     private var targetIndexPath: IndexPath?
     private var collapseGridIcon = GridIconView()
@@ -29,7 +29,7 @@ class PageCollectionViewController: UICollectionViewController, PageCollectionVi
     private var isZoomingPage: ScalingDirection
     private var pinchGesture: PinchVelocityGestureRecognizer
 
-    var pageScale: CGFloat {
+    open var pageScale: CGFloat {
         var scale = _pageScale
         if isZoomingPage == .toPage {
             scale = min(max(1.0, scale * pinchGesture.scale), maxPageScale)
@@ -37,13 +37,13 @@ class PageCollectionViewController: UICollectionViewController, PageCollectionVi
         return scale
     }
 
-    var pageCollectionView: PageCollectionView {
+    open var pageCollectionView: PageCollectionView {
         return collectionView as! PageCollectionView
     }
 
     // MARK: - Init
 
-    init() {
+    public init() {
         zoomPercentOffset = .zero
         isZoomingPage = .none
         pinchGesture = PinchVelocityGestureRecognizer()
@@ -51,7 +51,7 @@ class PageCollectionViewController: UICollectionViewController, PageCollectionVi
         pinchGesture.addTarget(self, action: #selector(didPinch))
     }
 
-    required init?(coder: NSCoder) {
+    public required init?(coder: NSCoder) {
         zoomPercentOffset = .zero
         isZoomingPage = .none
         pinchGesture = PinchVelocityGestureRecognizer()
@@ -61,12 +61,14 @@ class PageCollectionViewController: UICollectionViewController, PageCollectionVi
 
     // MARK: - UIViewController
 
-    override func viewDidLoad() {
+    open override func viewDidLoad() {
         super.viewDidLoad()
 
         collectionView.backgroundColor = .lightGray
         collectionView.register(PageCollectionCell.self, forCellWithReuseIdentifier: String(describing: PageCollectionCell.self))
-        collectionView.register(PageCollectionHeader.self, forCellWithReuseIdentifier: String(describing: PageCollectionHeader.self))
+        collectionView.register(PageCollectionHeader.self,
+                                forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
+                                withReuseIdentifier: String(describing: PageCollectionHeader.self))
         collectionView.reloadData()
 
         collectionView.addGestureRecognizer(pinchGesture)
@@ -111,7 +113,7 @@ class PageCollectionViewController: UICollectionViewController, PageCollectionVi
 
     // MARK: - UIViewController
 
-    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+    open override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         coordinator.animate(alongsideTransition: { _ in
             self.collectionView.collectionViewLayout.invalidateLayout()
         }, completion: nil)
@@ -119,15 +121,15 @@ class PageCollectionViewController: UICollectionViewController, PageCollectionVi
 
     // MARK: - Layout Helpers
 
-    var isDisplayingShelf: Bool {
+    public var isDisplayingShelf: Bool {
         return pageCollectionView.currentLayout?.isMember(of: ShelfLayout.self) ?? false
     }
 
-    var isDisplayingGrid: Bool {
+    public var isDisplayingGrid: Bool {
         return pageCollectionView.currentLayout?.isMember(of: GridLayout.self) ?? false
     }
 
-    var isDisplayingPage: Bool {
+    public var isDisplayingPage: Bool {
         return pageCollectionView.currentLayout?.isMember(of: PageLayout.self) ?? false
     }
 
@@ -142,7 +144,7 @@ class PageCollectionViewController: UICollectionViewController, PageCollectionVi
         self.perform(#selector(reenablePinchGesture), with: nil, afterDelay: 0.5)
     }
 
-    @objc func didPinch(_ gesture: PinchVelocityGestureRecognizer) {
+    @objc private func didPinch(_ gesture: PinchVelocityGestureRecognizer) {
         if isDisplayingShelf {
             pinchFromShelf(gesture)
         } else if isDisplayingGrid {
@@ -361,26 +363,30 @@ class PageCollectionViewController: UICollectionViewController, PageCollectionVi
 
     // MARK: - UICollectionViewDataSource
 
-    override func numberOfSections(in collectionView: UICollectionView) -> Int {
+    open override func numberOfSections(in collectionView: UICollectionView) -> Int {
         fatalError("AbstractMethodException")
     }
 
-    override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    open override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         fatalError("AbstractMethodException")
     }
 
-    override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+    open override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: String(describing: PageCollectionCell.self),
                                                       for: indexPath) as! PageCollectionCell
 
+        cell.setup()
         cell.textLabel.text = "\(indexPath.section),\(indexPath.row)"
+        cell.backgroundColor = .white
+        cell.layer.borderColor = UIColor.black.cgColor
+        cell.layer.borderWidth = 1
 
         return cell
     }
 
-    override func collectionView(_ collectionView: UICollectionView,
-                                 viewForSupplementaryElementOfKind kind: String,
-                                 at indexPath: IndexPath) -> UICollectionReusableView {
+    open override func collectionView(_ collectionView: UICollectionView,
+                                      viewForSupplementaryElementOfKind kind: String,
+                                      at indexPath: IndexPath) -> UICollectionReusableView {
         if kind == UICollectionView.elementKindSectionHeader {
             let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind,
                                                                          withReuseIdentifier: String(describing: PageCollectionHeader.self),
@@ -395,7 +401,7 @@ class PageCollectionViewController: UICollectionViewController, PageCollectionVi
 
     // MARK: - UIScrollViewDelegate
 
-    override func scrollViewDidScroll(_ scrollView: UIScrollView) {
+    open override func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let kmin: CGFloat = 70
         let kdist: CGFloat = 40
         var vProgress: CGFloat = min(-kmin, max(-(kmin + kdist), scrollView.contentOffset.y))
@@ -423,7 +429,7 @@ class PageCollectionViewController: UICollectionViewController, PageCollectionVi
         }
     }
 
-    override func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+    open override func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
         let isVerticalPage = isDisplayingPage && (pageCollectionView.currentLayout as? PageLayout)?.direction == .vertical
         let isHorizontalPage = isDisplayingPage && (pageCollectionView.currentLayout as? PageLayout)?.direction == .horizontal
         let verticalSuccess = scrollView.contentOffset.y < -100
@@ -452,7 +458,7 @@ class PageCollectionViewController: UICollectionViewController, PageCollectionVi
 
     // MARK: - CollectionView
 
-    override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+    open override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         var updatedLayout: GridLayout?
 
         if isDisplayingShelf {
@@ -469,19 +475,19 @@ class PageCollectionViewController: UICollectionViewController, PageCollectionVi
 
     // MARK: - Shelf and Page Layout
 
-    func collectionView(_ collectionView: UICollectionView, layout: ShelfLayout, objectAtIndexPath: IndexPath) -> ShelfLayoutObject {
+    open func collectionView(_ collectionView: UICollectionView, layout: ShelfLayout, objectAtIndexPath: IndexPath) -> ShelfLayoutObject {
         fatalError("AbstractMethodException")
     }
 
-    func collectionView(_ collectionView: UICollectionView, layout: PageLayout, zoomScaleForIndexPath indexPath: IndexPath) -> CGFloat {
+    open func collectionView(_ collectionView: UICollectionView, layout: PageLayout, zoomScaleForIndexPath indexPath: IndexPath) -> CGFloat {
         return pageScale
     }
 
     // MARK: - Layout Changes
 
-    func collectionView(_ collectionView: PageCollectionView,
-                        willChangeToLayout newLayout: UICollectionViewLayout,
-                        fromLayout oldLayout: UICollectionViewLayout) {
+    open func collectionView(_ collectionView: PageCollectionView,
+                             willChangeToLayout newLayout: UICollectionViewLayout,
+                             fromLayout oldLayout: UICollectionViewLayout) {
         if newLayout.isMember(of: GridLayout.self) {
             collapseGridIcon.alpha = 1
             collapseVerticalPageIcon.alpha = 0
@@ -503,7 +509,7 @@ class PageCollectionViewController: UICollectionViewController, PageCollectionVi
         }
     }
 
-    func collectionView(_ collectionView: PageCollectionView, didChangeToLayout newLayout: UICollectionViewLayout, fromLayout oldLayout: UICollectionViewLayout) {
+    open func collectionView(_ collectionView: PageCollectionView, didChangeToLayout newLayout: UICollectionViewLayout, fromLayout oldLayout: UICollectionViewLayout) {
         if let shelfLayout = newLayout as? ShelfLayout {
             shelfLayout.targetIndexPath = nil
             collectionView.alwaysBounceVertical = shelfLayout.bounceVertical
@@ -511,17 +517,17 @@ class PageCollectionViewController: UICollectionViewController, PageCollectionVi
         }
     }
 
-    func collectionView(_ collectionView: PageCollectionView, didFinalizeTransitionLayout transitionLayout: UICollectionViewTransitionLayout) {
+    open func collectionView(_ collectionView: PageCollectionView, didFinalizeTransitionLayout transitionLayout: UICollectionViewTransitionLayout) {
         // Disable pinching during a transition animation. This delegate method is called for any
         // finishInteractiveTransition or cancelInteractiveTransition. This lets us turn off the
         // pinch gesture for a small time while the animation completes, then it will re-enable.
         brieflyDisablePinchGesture()
     }
 
-    override func observeValue(forKeyPath keyPath: String?,
-                                     of object: Any?,
-                                     change: [NSKeyValueChangeKey: Any]?,
-                                     context: UnsafeMutableRawPointer?) {
+    open override func observeValue(forKeyPath keyPath: String?,
+                                    of object: Any?,
+                                    change: [NSKeyValueChangeKey: Any]?,
+                                    context: UnsafeMutableRawPointer?) {
         if let oldLayout = change?[.oldKey] as? UICollectionViewLayout {
             collectionView(pageCollectionView, willChangeToLayout: collectionView.collectionViewLayout, fromLayout: oldLayout)
         }
@@ -529,15 +535,15 @@ class PageCollectionViewController: UICollectionViewController, PageCollectionVi
 
     // MARK: - Subclasses
 
-    func newShelfLayout() -> ShelfLayout {
+    open func newShelfLayout() -> ShelfLayout {
         return ShelfLayout()
     }
 
-    func newGridLayout(for section: Int) -> GridLayout {
+    open func newGridLayout(for section: Int) -> GridLayout {
         return GridLayout(section: section)
     }
 
-    func newPageLayout(for section: Int) -> PageLayout {
+    open func newPageLayout(for section: Int) -> PageLayout {
         return PageLayout(section: section)
     }
 }

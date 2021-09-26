@@ -6,7 +6,7 @@
 //  Copyright © 2021 Milestone Made. All rights reserved.
 //
 
-import UIKit
+import CoreGraphics
 
 extension CGPoint {
     func distance(to point: CGPoint) -> CGFloat {

@@ -5,7 +5,7 @@
 //  Created by Adam Wulf on 9/5/21.
 //
 
-import UIKit
+import CoreGraphics
 
 extension CGFloat {
     func clamp(minFrom: CGFloat, maxFrom: CGFloat, minTo: CGFloat, maxTo: CGFloat) -> CGFloat {
