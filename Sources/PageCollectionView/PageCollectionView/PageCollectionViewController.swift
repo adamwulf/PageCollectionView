@@ -472,7 +472,7 @@ open class PageCollectionViewController: UICollectionViewController, PageCollect
         }
 
         if let updatedLayout = updatedLayout {
-            collectionView.setCollectionViewLayout(updatedLayout, animated: true, completion: nil)
+            collectionView.setCollectionViewLayout(updatedLayout, animated: true)
         }
     }
 

@@ -289,7 +289,7 @@ public class PageLayout: GridLayout {
         // scale the page so that if fits in screen when its fully rotated.
         // This is the screen-aligned box that contains our rotated page
         let boundingSize: CGSize
-        let itemSize: CGSize
+        var itemSize: CGSize
 
         if direction == .vertical {
             boundingSize = physicalSize.scaleWidth(to: kMaxDim, scaleUp: fitWidth)

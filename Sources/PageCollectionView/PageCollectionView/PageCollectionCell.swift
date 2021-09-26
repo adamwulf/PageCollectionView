@@ -20,13 +20,11 @@ class PageCollectionCell: UICollectionViewCell {
 
     public func setup() {
         guard textLabel.superview == nil else { return }
-        textLabel.translatesAutoresizingMaskIntoConstraints = false
+        textLabel.translatesAutoresizingMaskIntoConstraints = true
+        textLabel.autoresizingMask = [.flexibleRightMargin, .flexibleBottomMargin]
         textLabel.textAlignment = .center
         contentView.addSubview(textLabel)
-        textLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor).isActive = true
-        textLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
-        textLabel.topAnchor.constraint(equalTo: contentView.topAnchor).isActive = true
-        textLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
+        textLabel.frame = contentView.bounds
         textLabel.text = "??"
     }
 }
