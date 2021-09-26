@@ -435,7 +435,7 @@ open class PageCollectionViewController: UICollectionViewController, PageCollect
         let verticalSuccess = scrollView.contentOffset.y < -100
         let horizontalSuccess = scrollView.contentOffset.x < -100
 
-        if (verticalSuccess && isDisplayingGrid || isVerticalPage) || (horizontalSuccess && isHorizontalPage) {
+        if (verticalSuccess && (isDisplayingGrid || isVerticalPage)) || (horizontalSuccess && isHorizontalPage) {
             // turn off bounce during this animation, as the bounce from the scrollview
             // being overscrolled conflicts with the layout animation
             let nextLayout: ShelfLayout
