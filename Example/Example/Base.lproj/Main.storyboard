@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="19162" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="1St-Bm-yoG">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="19162" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="OxN-Uw-Uhc">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19144"/>
@@ -10,6 +10,7 @@
         <!--View Controller-->
         <scene sceneID="xYK-DB-3lz">
             <objects>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="zIY-xS-6ox" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
                 <collectionViewController id="1St-Bm-yoG" customClass="ViewController" customModule="Example" customModuleProvider="target" sceneMemberID="viewController">
                     <collectionView key="view" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" id="QpI-dC-hKZ" customClass="PageCollectionView" customModule="PageCollectionView">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
@@ -27,10 +28,89 @@
                             <outlet property="delegate" destination="1St-Bm-yoG" id="fYy-Ea-na0"/>
                         </connections>
                     </collectionView>
+                    <navigationItem key="navigationItem" id="kiA-Hd-n5E"/>
+                    <connections>
+                        <outlet property="bumpButton" destination="mHe-ET-tVE" id="ySk-LE-RkG"/>
+                        <outlet property="directionButton" destination="3tA-4I-YGD" id="Bzx-J8-VBQ"/>
+                        <outlet property="fitWidthButton" destination="1xh-nq-stS" id="8bN-U4-v3G"/>
+                        <outlet property="resetButton" destination="pF7-LL-gKU" id="DXg-KR-o6q"/>
+                        <outlet property="rotateButton" destination="fT8-A7-iy8" id="GGH-bx-iFA"/>
+                    </connections>
                 </collectionViewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="zIY-xS-6ox" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" id="fT8-A7-iy8">
+                    <rect key="frame" x="0.0" y="0.0" width="67" height="31"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <state key="normal" title="Button"/>
+                    <buttonConfiguration key="configuration" style="plain" title="Rotate">
+                        <fontDescription key="titleFontDescription" type="system" pointSize="22"/>
+                    </buttonConfiguration>
+                    <connections>
+                        <action selector="rotate:" destination="1St-Bm-yoG" eventType="touchUpInside" id="yR7-31-B4Y"/>
+                    </connections>
+                </button>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" id="mHe-ET-tVE">
+                    <rect key="frame" x="0.0" y="0.0" width="67" height="31"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <state key="normal" title="Button"/>
+                    <buttonConfiguration key="configuration" style="plain" title="Bump">
+                        <fontDescription key="titleFontDescription" type="system" pointSize="22"/>
+                    </buttonConfiguration>
+                    <connections>
+                        <action selector="bump:" destination="1St-Bm-yoG" eventType="touchUpInside" id="fxF-hZ-joR"/>
+                    </connections>
+                </button>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" id="pF7-LL-gKU">
+                    <rect key="frame" x="0.0" y="0.0" width="67" height="31"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <state key="normal" title="Button"/>
+                    <buttonConfiguration key="configuration" style="plain" title="Reset">
+                        <fontDescription key="titleFontDescription" type="system" pointSize="22"/>
+                    </buttonConfiguration>
+                    <connections>
+                        <action selector="reset:" destination="1St-Bm-yoG" eventType="touchUpInside" id="KQx-e8-fIq"/>
+                    </connections>
+                </button>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" id="1xh-nq-stS">
+                    <rect key="frame" x="0.0" y="0.0" width="83" height="31"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <state key="normal" title="Button"/>
+                    <buttonConfiguration key="configuration" style="plain" title="Fit Width">
+                        <fontDescription key="titleFontDescription" type="system" pointSize="22"/>
+                    </buttonConfiguration>
+                    <connections>
+                        <action selector="swapScale:" destination="1St-Bm-yoG" eventType="touchUpInside" id="aIU-KY-KTF"/>
+                    </connections>
+                </button>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" id="3tA-4I-YGD">
+                    <rect key="frame" x="0.0" y="0.0" width="86" height="31"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <state key="normal" title="Button"/>
+                    <buttonConfiguration key="configuration" style="plain" title="Direction">
+                        <fontDescription key="titleFontDescription" type="system" pointSize="22"/>
+                    </buttonConfiguration>
+                    <connections>
+                        <action selector="toggleDirection:" destination="1St-Bm-yoG" eventType="touchUpInside" id="QYE-ha-n0q"/>
+                    </connections>
+                </button>
             </objects>
             <point key="canvasLocation" x="-75" y="-1235"/>
+        </scene>
+        <!--Host View Controller-->
+        <scene sceneID="NdQ-OV-CUi">
+            <objects>
+                <navigationController navigationBarHidden="YES" id="OxN-Uw-Uhc" customClass="HostViewController" customModule="Example" customModuleProvider="target" sceneMemberID="viewController">
+                    <nil key="simulatedTopBarMetrics"/>
+                    <nil key="simulatedBottomBarMetrics"/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="tVp-Ac-adF">
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <connections>
+                        <segue destination="1St-Bm-yoG" kind="relationship" relationship="rootViewController" id="FsF-tu-gx7"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="wYR-iz-8zk" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-941" y="-1235"/>
         </scene>
     </scenes>
     <resources>

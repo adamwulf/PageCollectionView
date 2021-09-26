@@ -15,6 +15,7 @@
 		C533D368270024A300038E23 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C533D366270024A300038E23 /* LaunchScreen.storyboard */; };
 		C533D37127003D2900038E23 /* SampleObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = C533D37027003D2900038E23 /* SampleObject.swift */; };
 		C533D37427003EA300038E23 /* PageCollectionView in Frameworks */ = {isa = PBXBuildFile; productRef = C533D37327003EA300038E23 /* PageCollectionView */; };
+		C533D37827012DDA00038E23 /* HostViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C533D37727012DDA00038E23 /* HostViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +29,7 @@
 		C533D369270024A300038E23 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C533D36F270024DC00038E23 /* PageCollectionView */ = {isa = PBXFileReference; lastKnownFileType = folder; name = PageCollectionView; path = ..; sourceTree = "<group>"; };
 		C533D37027003D2900038E23 /* SampleObject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleObject.swift; sourceTree = "<group>"; };
+		C533D37727012DDA00038E23 /* HostViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HostViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -67,6 +69,7 @@
 				C533D35B270024A000038E23 /* AppDelegate.swift */,
 				C533D35D270024A000038E23 /* SceneDelegate.swift */,
 				C533D35F270024A000038E23 /* ViewController.swift */,
+				C533D37727012DDA00038E23 /* HostViewController.swift */,
 				C533D364270024A300038E23 /* Assets.xcassets */,
 				C533D361270024A000038E23 /* Main.storyboard */,
 				C533D366270024A300038E23 /* LaunchScreen.storyboard */,
@@ -158,6 +161,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C533D360270024A000038E23 /* ViewController.swift in Sources */,
+				C533D37827012DDA00038E23 /* HostViewController.swift in Sources */,
 				C533D35C270024A000038E23 /* AppDelegate.swift in Sources */,
 				C533D37127003D2900038E23 /* SampleObject.swift in Sources */,
 				C533D35E270024A000038E23 /* SceneDelegate.swift in Sources */,
