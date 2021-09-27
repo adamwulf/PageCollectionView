@@ -395,6 +395,9 @@ open class PageCollectionViewController: UICollectionViewController, PageCollect
                                                                          withReuseIdentifier: String(describing: PageCollectionHeader.self),
                                                                          for: indexPath) as! PageCollectionHeader
             header.indexPath = indexPath
+            header.backgroundColor = .white
+            header.layer.borderColor = UIColor.black.cgColor
+            header.layer.borderWidth = 1
 
             return header
         } else {
