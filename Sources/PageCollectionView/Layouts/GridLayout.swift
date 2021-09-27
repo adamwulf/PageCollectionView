@@ -19,10 +19,6 @@ public class GridLayout: ShelfLayout {
 
     // MARK: - Init
 
-    @objc public func setTransitionProgress(_ value: CGFloat) {
-        print("what")
-    }
-
     public init(section: Int) {
         self.section = section
         super.init()
