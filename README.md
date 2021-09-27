@@ -18,6 +18,5 @@ simpler and cleaner code!
 
 ![Loose Leaf Sample Gif](LooseLeafSample.gif)
 
-# Dependencies
-
-This uses [MMToolbox](https://github.com/adamwulf/MMToolbox) for binary search of NSArray.
+# Swift and Objective-C
+This framework was originally written in Objective-C, and then rewritten in Swift in late '21. The original source is available in the [old/obj-c branch](https://github.com/adamwulf/PageCollectionView/tree/old/obj-c). The new Swift version is now the main branch.
