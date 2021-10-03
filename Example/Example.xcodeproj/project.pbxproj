@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C505443A27092999009E4FA9 /* SimpleImageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C505443927092999009E4FA9 /* SimpleImageCell.swift */; };
 		C533D35C270024A000038E23 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C533D35B270024A000038E23 /* AppDelegate.swift */; };
 		C533D35E270024A000038E23 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C533D35D270024A000038E23 /* SceneDelegate.swift */; };
 		C533D360270024A000038E23 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C533D35F270024A000038E23 /* ViewController.swift */; };
@@ -19,6 +20,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		C505443927092999009E4FA9 /* SimpleImageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimpleImageCell.swift; sourceTree = "<group>"; };
 		C533D358270024A000038E23 /* Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Example.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C533D35B270024A000038E23 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		C533D35D270024A000038E23 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -69,6 +71,7 @@
 				C533D35B270024A000038E23 /* AppDelegate.swift */,
 				C533D35D270024A000038E23 /* SceneDelegate.swift */,
 				C533D35F270024A000038E23 /* ViewController.swift */,
+				C505443927092999009E4FA9 /* SimpleImageCell.swift */,
 				C533D37727012DDA00038E23 /* HostViewController.swift */,
 				C533D364270024A300038E23 /* Assets.xcassets */,
 				C533D361270024A000038E23 /* Main.storyboard */,
@@ -163,6 +166,7 @@
 				C533D360270024A000038E23 /* ViewController.swift in Sources */,
 				C533D37827012DDA00038E23 /* HostViewController.swift in Sources */,
 				C533D35C270024A000038E23 /* AppDelegate.swift in Sources */,
+				C505443A27092999009E4FA9 /* SimpleImageCell.swift in Sources */,
 				C533D37127003D2900038E23 /* SampleObject.swift in Sources */,
 				C533D35E270024A000038E23 /* SceneDelegate.swift in Sources */,
 			);

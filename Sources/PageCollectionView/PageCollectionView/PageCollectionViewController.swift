@@ -462,7 +462,7 @@ open class PageCollectionViewController: UICollectionViewController, PageCollect
         }
     }
 
-    // MARK: - CollectionView
+    // MARK: - CollectionViewDelegate
 
     open override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         var updatedLayout: GridLayout?

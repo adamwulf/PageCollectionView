@@ -20,6 +20,8 @@ class ViewController: PageCollectionViewController, UICollectionViewDataSourceSh
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        collectionView.register(SimpleImageCell.self, forCellWithReuseIdentifier: String(describing: SimpleImageCell.self))
+
         var arr: [SampleObject] = []
         let fullWidth = self.collectionView.bounds.width
 
@@ -182,6 +184,18 @@ class ViewController: PageCollectionViewController, UICollectionViewDataSourceSh
         _pageScale = 1.0
 
         collectionView.setCollectionViewLayout(layout, animated: true)
+    }
+
+    // MARK: CollectionView DataSource
+
+    open override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: String(describing: SimpleImageCell.self),
+                                                      for: indexPath) as! SimpleImageCell
+
+        cell.prepareForReuse()
+        cell.imageView.image = UIImage(named: "pdf-page")
+
+        return cell
     }
 
     // MARK: Shelf Layout
